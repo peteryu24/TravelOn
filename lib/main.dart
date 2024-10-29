@@ -24,7 +24,7 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => NavigationProvider()),
-        // 추가 provider들을 여기에 등록
+        // 추가 provider들을 여기에 등록..
       ],
       child: MaterialApp.router(
         title: 'Travel On',
