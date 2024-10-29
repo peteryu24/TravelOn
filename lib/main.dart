@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:travel_on_final/route.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:travel_on_final/features/search/data/repositories/travel_repositories_impl.dart';
 // firebase
 import 'package:firebase_core/firebase_core.dart';
 import 'package:travel_on_final/firebase_options.dart';

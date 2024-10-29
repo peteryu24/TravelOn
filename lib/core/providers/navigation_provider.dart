@@ -17,7 +17,7 @@ class NavigationProvider extends ChangeNotifier {
       case 1:
         return '/search';
       case 2:
-        return '/chat';
+        return '/chat_list';
       case 3:
         return '/profile';
       default:
