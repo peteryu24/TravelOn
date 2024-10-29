@@ -10,8 +10,14 @@ class ChatListScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final authProvider = Provider.of<AuthProvider>(context);
 
+    // currentUser가 null일 때 처리
+    if (authProvider.currentUser == null) {
+      return Scaffold(
+        body: Center(child: Text('로그인이 필요합니다')),
+      );
+    }
+
     return Scaffold(
-      appBar: AppBar(title: Text('Chat List')),
       body: StreamBuilder(
         stream: FirebaseFirestore.instance
             .collection('chats')
@@ -24,7 +30,7 @@ class ChatListScreen extends StatelessWidget {
 
           final chatDocs = chatSnapshot.data!.docs.where((doc) {
             final participants = List<String>.from(doc['participants']);
-            return participants.contains(authProvider.currentUser?.id);
+            return participants.contains(authProvider.currentUser!.id);
           }).toList();
 
           return ListView.builder(
@@ -35,30 +41,30 @@ class ChatListScreen extends StatelessWidget {
               return ListTile(
                 leading: CircleAvatar(
                   backgroundImage: chatData['userProfileImages'] != null &&
-                          chatData['userProfileImages'][authProvider.currentUser?.id == chatData['participants'][0]
+                          chatData['userProfileImages'][authProvider.currentUser!.id == chatData['participants'][0]
                               ? chatData['participants'][1]
                               : chatData['participants'][0]] != null &&
-                          chatData['userProfileImages'][authProvider.currentUser?.id == chatData['participants'][0]
+                          chatData['userProfileImages'][authProvider.currentUser!.id == chatData['participants'][0]
                               ? chatData['participants'][1]
                               : chatData['participants'][0]].isNotEmpty
-                      ? NetworkImage(chatData['userProfileImages'][authProvider.currentUser?.id == chatData['participants'][0]
+                      ? NetworkImage(chatData['userProfileImages'][authProvider.currentUser!.id == chatData['participants'][0]
                           ? chatData['participants'][1]
                           : chatData['participants'][0]])
                       : AssetImage('lib/assets/images/defaultUserProfile.png') as ImageProvider,
                 ),
                 title: Text(
-                  chatData['usernames'][authProvider.currentUser?.id == chatData['participants'][0]
+                  chatData['usernames'][authProvider.currentUser!.id == chatData['participants'][0]
                           ? chatData['participants'][1]
                           : chatData['participants'][0]]
                       ?.substring(
                           0,
-                          chatData['usernames'][authProvider.currentUser?.id == chatData['participants'][0]
+                          chatData['usernames'][authProvider.currentUser!.id == chatData['participants'][0]
                                       ? chatData['participants'][1]
                                       : chatData['participants'][0]]
                                   .length >
                               15
                           ? 15
-                          : chatData['usernames'][authProvider.currentUser?.id == chatData['participants'][0]
+                          : chatData['usernames'][authProvider.currentUser!.id == chatData['participants'][0]
                                   ? chatData['participants'][1]
                                   : chatData['participants'][0]]
                               .length) ??

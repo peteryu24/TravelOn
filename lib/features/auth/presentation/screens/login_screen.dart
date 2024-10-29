@@ -12,9 +12,32 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
-  void _login() {
+  Future<void> _login() async {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    authProvider.login(_emailController.text, _passwordController.text);
+
+    await authProvider.login(_emailController.text, _passwordController.text);
+
+    if (authProvider.isAuthenticated) {
+      // 로그인 성공 시 환영 메시지 출력
+      final userName = authProvider.currentUser?.name ?? '사용자';
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('$userName님 환영합니다.'),
+          duration: Duration(seconds: 4),
+        ),
+      );
+
+      // 홈 화면으로 이동
+      context.go('/');
+    } else {
+      // 로그인 실패 시 오류 메시지 출력
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('로그인에 실패했습니다. 다시 시도해주세요.'),
+          duration: Duration(seconds: 2),
+        ),
+      );
+    }
   }
 
   void _navigateToSignup() {

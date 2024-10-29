@@ -20,7 +20,7 @@ class _SignupScreenState extends State<SignupScreen> {
       _passwordController.text,
       _nameController.text,
     );
-    context.go('/');
+    context.go('/login');
   }
 
   @override

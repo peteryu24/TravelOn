@@ -76,12 +76,10 @@ class BottomSheetWidget {
                 final chatProvider = Provider.of<ChatProvider>(context, listen: false);
                 chatProvider.sendMessageToChat(
                   chatId: chatId,
-                  userId: userId,
                   text: '[Image]', // 이미지 메시지의 기본 텍스트
-                  username: username,
                   otherUserId: otherUserId,
-                  currentUserProfileImage: currentUserProfileImage,
                   imageFile: image,
+                  context: context,
                 );
               },
               child: Text('예'),

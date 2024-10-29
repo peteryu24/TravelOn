@@ -55,11 +55,9 @@ class _ChatScreenState extends State<ChatScreen> {
                   if (messageController.text.isNotEmpty) {
                     chatProvider.sendMessageToChat(
                       chatId: widget.chatId,
-                      userId: 'currentUserId', // 실제 사용자 ID 사용 필요
                       text: messageController.text,
-                      username: 'currentUsername', // 실제 사용자 이름 사용 필요
                       otherUserId: 'otherUserId', // 실제 상대방 사용자 ID 필요
-                      currentUserProfileImage: 'currentUserProfileImageUrl', // 실제 프로필 이미지 필요
+                      context: context,
                     );
                     messageController.clear();
                   }
