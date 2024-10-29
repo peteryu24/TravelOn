@@ -76,7 +76,7 @@ class _AddPackageScreenState extends State<AddPackageScreen> {
         description: _descriptionController.text,
         price: double.parse(_priceController.text),
         region: _selectedRegion,
-        mainImage: _mainImage?.path,  // 실제 구현시에는 서버에 업로드하고 URL을 저장
+        mainImage: _mainImage?.path,
         descriptionImages: _descriptionImages.map((file) => file.path).toList(),
       );
 
@@ -128,7 +128,6 @@ class _AddPackageScreenState extends State<AddPackageScreen> {
                 ),
                 const SizedBox(height: 16),
 
-                // 기존 입력 필드들...
                 TextFormField(
                   controller: _titleController,
                   decoration: const InputDecoration(

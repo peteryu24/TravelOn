@@ -14,7 +14,18 @@ class PackageList extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer<TravelProvider>(
       builder: (context, provider, child) {
+        if (provider.isLoading) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
+        if (provider.error != null) {
+          return Center(child: Text('Error: ${provider.error}'));
+        }
+
         final packages = provider.packages;
+        if (packages.isEmpty) {
+          return const Center(child: Text('등록된 패키지가 없습니다.'));
+        }
 
         return ListView.builder(
           padding: const EdgeInsets.all(16),
@@ -31,7 +42,6 @@ class PackageList extends StatelessWidget {
 
 class PackageCard extends StatelessWidget {
   final TravelPackage package;
-  // 숫자 포맷터 정의
   final NumberFormat _priceFormat = NumberFormat('#,###');
 
   PackageCard({
@@ -51,12 +61,45 @@ class PackageCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            if (package.mainImage != null)
-              Image.file(
-                File(package.mainImage!),
+            // 메인 이미지 - Image.file을 Image.network로 변경
+            if (package.mainImage != null && package.mainImage!.isNotEmpty)
+              Image.network(
+                package.mainImage!,
                 height: 200,
                 width: double.infinity,
                 fit: BoxFit.cover,
+                // 로딩 중 표시
+                loadingBuilder: (context, child, loadingProgress) {
+                  if (loadingProgress == null) return child;
+                  return Container(
+                    height: 200,
+                    width: double.infinity,
+                    color: Colors.grey[200],
+                    child: Center(
+                      child: CircularProgressIndicator(
+                        value: loadingProgress.expectedTotalBytes != null
+                            ? loadingProgress.cumulativeBytesLoaded /
+                            loadingProgress.expectedTotalBytes!
+                            : null,
+                      ),
+                    ),
+                  );
+                },
+                // 에러 발생 시 표시
+                errorBuilder: (context, error, stackTrace) {
+                  return Container(
+                    height: 200,
+                    width: double.infinity,
+                    color: Colors.grey[200],
+                    child: const Center(
+                      child: Icon(
+                        Icons.error_outline,
+                        size: 40,
+                        color: Colors.grey,
+                      ),
+                    ),
+                  );
+                },
               )
             else
               Container(
@@ -96,7 +139,7 @@ class PackageCard extends StatelessWidget {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    '₩${_priceFormat.format(package.price.toInt())}',  // 가격 포맷팅 적용
+                    '₩${_priceFormat.format(package.price.toInt())}',
                     style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
