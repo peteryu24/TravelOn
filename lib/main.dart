@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:travel_on_final/core/providers/navigation_provider.dart';
@@ -24,12 +25,15 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => NavigationProvider()),
-        // 추가 provider들을 여기에 등록..
+        // 추가 provider들을 여기에 등록...
       ],
-      child: MaterialApp.router(
-        title: 'Travel On',
-        debugShowCheckedModeBanner: false,
-        routerConfig: goRouter,
+      child: ScreenUtilInit(
+        designSize: const Size(375, 812),
+        child: MaterialApp.router(
+          title: 'Travel On',
+          debugShowCheckedModeBanner: false,
+          routerConfig: goRouter,
+        ),
       ),
     );
   }
