@@ -3,12 +3,12 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:travel_on_final/core/presentation/widgets/scaffold_with_bottom_nav.dart';
+import 'package:travel_on_final/features/chat/presentation/screens/chat_list_screen.dart';
 import 'package:travel_on_final/features/search/domain/entities/travel_package.dart';
 import 'package:travel_on_final/features/search/presentation/screens/add_package_screen.dart';
 import 'package:travel_on_final/features/search/presentation/screens/detail_screens.dart';
 import 'package:travel_on_final/features/search/presentation/screens/package_detail_screen.dart';
 import '../../features/home/presentation/screens/home_screen.dart';
-import '../../features/chat/presentation/screens/chat_screen.dart';
 import '../../features/profile/presentation/screens/profile_screen.dart';
 
 final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>();
