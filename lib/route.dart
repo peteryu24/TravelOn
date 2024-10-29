@@ -31,8 +31,8 @@ final goRouter = GoRouter(
           builder: (context, state) => const DetailScreen(),
         ),
         GoRoute(
-          path: '/chat',
-          builder: (context, state) => const ChatScreen(),
+          path: '/chat_list',
+          builder: (context, state) => ChatListScreen(),
         ),
         GoRoute(
           path: '/profile',
