@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../../domain/entities/travel_package.dart';
@@ -23,25 +22,56 @@ class PackageDetailScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // 메인 이미지
-            package.mainImage != null
-                ? Image.file(
-              File(package.mainImage!),
-              height: 200,
-              width: double.infinity,
-              fit: BoxFit.cover,
-            )
-                : Container(
-              height: 200,
-              width: double.infinity,
-              color: Colors.blue.shade100,
-              child: Center(
-                child: Icon(
-                  Icons.landscape,
-                  size: 64,
-                  color: Colors.blue.shade900,
+            if (package.mainImage != null && package.mainImage!.isNotEmpty)
+              Image.network(
+                package.mainImage!,
+                height: 200,
+                width: double.infinity,
+                fit: BoxFit.cover,
+                loadingBuilder: (context, child, loadingProgress) {
+                  if (loadingProgress == null) return child;
+                  return Container(
+                    height: 200,
+                    width: double.infinity,
+                    color: Colors.grey[200],
+                    child: Center(
+                      child: CircularProgressIndicator(
+                        value: loadingProgress.expectedTotalBytes != null
+                            ? loadingProgress.cumulativeBytesLoaded /
+                            loadingProgress.expectedTotalBytes!
+                            : null,
+                      ),
+                    ),
+                  );
+                },
+                errorBuilder: (context, error, stackTrace) {
+                  return Container(
+                    height: 200,
+                    width: double.infinity,
+                    color: Colors.grey[200],
+                    child: const Center(
+                      child: Icon(
+                        Icons.error_outline,
+                        size: 40,
+                        color: Colors.grey,
+                      ),
+                    ),
+                  );
+                },
+              )
+            else
+              Container(
+                height: 200,
+                width: double.infinity,
+                color: Colors.blue.shade100,
+                child: Center(
+                  child: Icon(
+                    Icons.landscape,
+                    size: 64,
+                    color: Colors.blue.shade900,
+                  ),
                 ),
               ),
-            ),
 
             Padding(
               padding: const EdgeInsets.all(16),
@@ -92,6 +122,8 @@ class PackageDetailScreen extends StatelessWidget {
                     ),
                     child: Row(
                       children: [
+                        const Icon(Icons.payment, color: Colors.blue),
+                        const SizedBox(width: 8),
                         Text(
                           '₩${_priceFormat.format(package.price.toInt())}',
                           style: const TextStyle(
@@ -126,24 +158,57 @@ class PackageDetailScreen extends StatelessWidget {
                   // 설명 이미지들
                   if (package.descriptionImages.isNotEmpty) ...[
                     const SizedBox(height: 24),
-
+                    const Text(
+                      '상세 이미지',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                     const SizedBox(height: 8),
-                    GridView.builder(
+                    ListView.builder(
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
-                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 1,
-                        crossAxisSpacing: 8,
-                        mainAxisSpacing: 8,
-                      ),
                       itemCount: package.descriptionImages.length,
                       itemBuilder: (context, index) {
-                        return Container(
-                          decoration: BoxDecoration(
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: 16),
+                          child: ClipRRect(
                             borderRadius: BorderRadius.circular(8),
-                            image: DecorationImage(
-                              image: FileImage(File(package.descriptionImages[index])),
+                            child: Image.network(
+                              package.descriptionImages[index],
+                              width: double.infinity,
                               fit: BoxFit.cover,
+                              loadingBuilder: (context, child, loadingProgress) {
+                                if (loadingProgress == null) return child;
+                                return Container(
+                                  height: 200,
+                                  width: double.infinity,
+                                  color: Colors.grey[200],
+                                  child: Center(
+                                    child: CircularProgressIndicator(
+                                      value: loadingProgress.expectedTotalBytes != null
+                                          ? loadingProgress.cumulativeBytesLoaded /
+                                          loadingProgress.expectedTotalBytes!
+                                          : null,
+                                    ),
+                                  ),
+                                );
+                              },
+                              errorBuilder: (context, error, stackTrace) {
+                                return Container(
+                                  height: 200,
+                                  width: double.infinity,
+                                  color: Colors.grey[200],
+                                  child: const Center(
+                                    child: Icon(
+                                      Icons.error_outline,
+                                      size: 40,
+                                      color: Colors.grey,
+                                    ),
+                                  ),
+                                );
+                              },
                             ),
                           ),
                         );
@@ -183,6 +248,7 @@ class PackageDetailScreen extends StatelessWidget {
       ),
     );
   }
+
   String _getRegionText(String region) {
     switch (region) {
       case 'seoul':
