@@ -1,0 +1,1 @@
+// lib/features/example_folder/presentation/widgets/example_widgets.dart
