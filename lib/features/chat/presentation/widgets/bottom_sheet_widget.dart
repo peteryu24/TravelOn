@@ -79,7 +79,7 @@ class BottomSheetWidget {
                   text: '[Image]', // 이미지 메시지의 기본 텍스트
                   otherUserId: otherUserId,
                   imageFile: image,
-                  context: context, // parentContext 대신 context 사용
+                  context: context,
                 );
               },
               child: Text('예'),
