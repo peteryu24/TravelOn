@@ -28,7 +28,21 @@ final goRouter = GoRouter(
   navigatorKey: _rootNavigatorKey,
   initialLocation: '/login',
   routes: [
-    // 로그인 관련 라우트는 ShellRoute 밖으로
+    ////////////////////////////////////////////////////////////////////////////////////
+    //               ↓↓↓ 바텀 내비게이션 바가 필요 없는 화면 라우팅 ↓↓↓                  //
+    ////////////////////////////////////////////////////////////////////////////////////
+    GoRoute(
+      path: '/add-package',
+      builder: (context, state) => const AddPackageScreen(),
+    ),
+    GoRoute(
+      path: '/package-detail/:id',
+      builder: (context, state) {
+        final package = state.extra as TravelPackage;
+        return PackageDetailScreen(package: package);
+      },
+    ),
+    // 로그인 관련 라우트
     GoRoute(
       path: '/login',
       builder: (context, state) => LoginScreen(),
@@ -37,7 +51,9 @@ final goRouter = GoRouter(
       path: '/signup',
       builder: (context, state) => SignupScreen(),
     ),
-
+    ////////////////////////////////////////////////////////////////////////////////////
+    //                ↓↓↓ 바텀 내비게이션 바가 필요한 화면 라우팅 ↓↓↓                    //
+    ////////////////////////////////////////////////////////////////////////////////////
     ShellRoute(
       builder: (context, state, child) {
         return ScaffoldWithBottomNavBar(child: child);
