@@ -4,8 +4,10 @@ class TravelPackage {
   final String region;
   final double price;
   final String description;
-  final String? mainImage;  // 메인 이미지 URL
-  final List<String> descriptionImages;  // 설명 이미지 URL 리스트
+  final String? mainImage;
+  final List<String> descriptionImages;
+  final String guideName;  // 추가
+  final String guideId;    // 추가
 
   TravelPackage({
     required this.id,
@@ -15,5 +17,7 @@ class TravelPackage {
     required this.description,
     this.mainImage,
     this.descriptionImages = const [],
+    required this.guideName,  // 추가
+    required this.guideId,    // 추가
   });
 }

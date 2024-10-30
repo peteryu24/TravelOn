@@ -9,6 +9,8 @@ import 'package:travel_on_final/features/auth/presentation/screens/signup_screen
 import 'package:travel_on_final/core/presentation/widgets/scaffold_with_bottom_nav.dart';
 // chat
 import 'package:travel_on_final/features/chat/presentation/screens/chat_list_screen.dart';
+import 'package:travel_on_final/features/profile/presentation/screens/guide_reservation_screen.dart';
+import 'package:travel_on_final/features/reservation/presentation/screens/reservation_calendar_screen.dart';
 // search
 import 'package:travel_on_final/features/search/domain/entities/travel_package.dart';
 import 'package:travel_on_final/features/search/presentation/screens/add_package_screen.dart';
@@ -26,6 +28,16 @@ final goRouter = GoRouter(
   navigatorKey: _rootNavigatorKey,
   initialLocation: '/login',
   routes: [
+    // 로그인 관련 라우트는 ShellRoute 밖으로
+    GoRoute(
+      path: '/login',
+      builder: (context, state) => LoginScreen(),
+    ),
+    GoRoute(
+      path: '/signup',
+      builder: (context, state) => SignupScreen(),
+    ),
+
     ShellRoute(
       builder: (context, state, child) {
         return ScaffoldWithBottomNavBar(child: child);
@@ -58,14 +70,16 @@ final goRouter = GoRouter(
             return PackageDetailScreen(package: package);
           },
         ),
-        // 로그인 관련 라우트
         GoRoute(
-          path: '/login',
-          builder: (context, state) => LoginScreen(),
+          path: '/reservation/:packageId',
+          builder: (context, state) {
+            final package = state.extra as TravelPackage;
+            return ReservationCalendarScreen(package: package);
+          },
         ),
         GoRoute(
-          path: '/signup',
-          builder: (context, state) => SignupScreen(),
+          path: '/reservations/guide',
+          builder: (context, state) => const GuideReservationsScreen(),
         ),
       ],
     ),

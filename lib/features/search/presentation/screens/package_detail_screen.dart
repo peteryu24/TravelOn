@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import '../../domain/entities/travel_package.dart';
 
@@ -235,7 +236,7 @@ class PackageDetailScreen extends StatelessWidget {
         ),
         child: ElevatedButton(
           onPressed: () {
-            // TODO: 예약 기능 구현
+            context.push('/reservation/${package.id}', extra: package);
           },
           style: ElevatedButton.styleFrom(
             padding: const EdgeInsets.symmetric(vertical: 16),

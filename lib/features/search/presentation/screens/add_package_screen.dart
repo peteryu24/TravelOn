@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:travel_on_final/features/auth/presentation/providers/auth_provider.dart';
 import 'dart:io';
 import '../providers/travel_provider.dart';
 import '../../domain/entities/travel_package.dart';
@@ -70,6 +71,9 @@ class _AddPackageScreenState extends State<AddPackageScreen> {
 
   void _submitForm() {
     if (_formKey.currentState!.validate()) {
+      final authProvider = context.read<AuthProvider>();
+      final user = authProvider.currentUser!;
+
       final newPackage = TravelPackage(
         id: DateTime.now().toString(),
         title: _titleController.text,
@@ -78,6 +82,8 @@ class _AddPackageScreenState extends State<AddPackageScreen> {
         region: _selectedRegion,
         mainImage: _mainImage?.path,
         descriptionImages: _descriptionImages.map((file) => file.path).toList(),
+        guideName: user.name,           // 추가
+        guideId: user.id,              // 추가
       );
 
       context.read<TravelProvider>().addPackage(newPackage);
