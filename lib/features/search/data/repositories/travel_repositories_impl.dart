@@ -25,6 +25,8 @@ class TravelRepositoryImpl implements TravelRepository {
           region: data['region'] ?? '',
           mainImage: data['mainImage'],
           descriptionImages: List<String>.from(data['descriptionImages'] ?? []),
+          guideName: data['guideName'] ?? '',  // 추가
+          guideId: data['guideId'] ?? '',      // 추가
         );
       }).toList();
     } catch (e) {
@@ -71,6 +73,8 @@ class TravelRepositoryImpl implements TravelRepository {
         'mainImage': mainImageUrl,
         'descriptionImages': descriptionImageUrls,
         'createdAt': FieldValue.serverTimestamp(),
+        'guideName': package.guideName,  // 추가
+        'guideId': package.guideId,      // 추가
       });
       print('Package saved with ID: ${docRef.id}');
 

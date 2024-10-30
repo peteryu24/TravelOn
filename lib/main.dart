@@ -1,4 +1,7 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:travel_on_final/features/reservation/presentation/providers/reservation_provider.dart';
+import 'package:travel_on_final/features/search/data/repositories/travel_repositories_impl.dart';
 import 'package:travel_on_final/route.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:travel_on_final/features/search/data/repositories/travel_repositories_impl.dart';
@@ -35,6 +38,9 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => ChatProvider()),
         ChangeNotifierProvider(
           create: (_) => TravelProvider(TravelRepositoryImpl()),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => ReservationProvider(FirebaseFirestore.instance),
         ),
         // 추가 provider들을 여기에 등록
       ],
