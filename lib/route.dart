@@ -72,6 +72,9 @@ final goRouter = GoRouter(
       path: '/signup',
       builder: (context, state) => SignupScreen(),
     ),
+    ////////////////////////////////////////////////////////////////////////////////////
+    //                ↓↓↓ 바텀 내비게이션 바가 필요한 화면 라우팅 ↓↓↓                    //
+    ////////////////////////////////////////////////////////////////////////////////////
     ShellRoute(
       builder: (context, state, child) {
         return ScaffoldWithBottomNavBar(child: child);

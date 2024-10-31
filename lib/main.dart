@@ -42,7 +42,6 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(
           create: (_) => ReservationProvider(FirebaseFirestore.instance),
         ),
-        // 추가 provider들을 여기에 등록
       ],
       child: ScreenUtilInit(
         designSize: const Size(375, 812),
@@ -50,6 +49,11 @@ class MyApp extends StatelessWidget {
           title: 'Travel On',
           debugShowCheckedModeBanner: false,
           routerConfig: goRouter,
+          theme: ThemeData(
+            primaryColor: Colors.blue,
+            colorScheme: ColorScheme.fromSwatch(primarySwatch: Colors.blue)
+                .copyWith(secondary: Colors.blueAccent),
+          ),
         ),
       ),
     );
