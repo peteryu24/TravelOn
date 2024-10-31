@@ -1,5 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:travel_on_final/features/home/data/repositories/home_repository_impl.dart';
+import 'package:travel_on_final/features/home/domain/usecases/get_next_trip.dart';
+import 'package:travel_on_final/features/home/presentation/providers/home_provider.dart';
 import 'package:travel_on_final/features/reservation/presentation/providers/reservation_provider.dart';
 import 'package:travel_on_final/features/search/data/repositories/travel_repositories_impl.dart';
 import 'package:travel_on_final/route.dart';
@@ -41,6 +44,13 @@ class MyApp extends StatelessWidget {
         ),
         ChangeNotifierProvider(
           create: (_) => ReservationProvider(FirebaseFirestore.instance),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => HomeProvider(
+            GetNextTrip(
+              HomeRepositoryImpl(FirebaseFirestore.instance),
+            ),
+          ),
         ),
       ],
       child: ScreenUtilInit(
