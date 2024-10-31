@@ -1,10 +1,7 @@
-// lib/features/profile/presentation/screens/profile_screen.dart
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
-import 'package:intl/intl.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -16,130 +13,152 @@ class ProfileScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(title: const Text('마이페이지')),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // 사용자 정보 섹션
-            Card(
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
+      body: SafeArea(
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // 사용자 정보 카드
+                Card(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Row(
                       children: [
-                        // 프로필 이미지 처리 수정
-                        Container(
-                          width: 60,
-                          height: 60,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: Colors.grey[200],
-                          ),
-                          child: user?.profileImageUrl != null && user!.profileImageUrl!.isNotEmpty
-                              ? ClipOval(
-                            child: Image.network(
-                              user.profileImageUrl!,
-                              width: 60,
-                              height: 60,
-                              fit: BoxFit.cover,
-                              errorBuilder: (context, error, stackTrace) {
-                                return const Icon(
-                                  Icons.person,
-                                  size: 30,
-                                  color: Colors.grey,
-                                );
-                              },
-                            ),
-                          )
-                              : const Icon(
+                        CircleAvatar(
+                          radius: 30,
+                          backgroundColor: Colors.grey[200],
+                          child: Icon(
                             Icons.person,
                             size: 30,
-                            color: Colors.grey,
+                            color: Colors.grey[600],
                           ),
                         ),
                         const SizedBox(width: 16),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              user?.name ?? '사용자',
-                              style: const TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                user?.name ?? '사용자',
+                                style: const TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
-                            ),
-                            Text(
-                              user?.email ?? '',
-                              style: TextStyle(
-                                color: Colors.grey[600],
+                              Text(
+                                user?.email ?? '',
+                                style: TextStyle(
+                                  color: Colors.grey[600],
+                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ],
                     ),
-                  ],
-                ),
-              ),
-            ),
-            const SizedBox(height: 24),
-
-            // 예약 관리 섹션
-            const Text(
-              '예약 관리',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 12),
-            Card(
-              child: Column(
-                children: [
-                  ListTile(
-                    leading: const Icon(Icons.calendar_today),
-                    title: const Text('내 패키지 예약 관리'),
-                    subtitle: const Text('내가 등록한 패키지의 예약 요청을 관리합니다'),
-                    trailing: const Icon(Icons.chevron_right),
-                    onTap: () {
-                      context.push('/reservations/guide');
-                    },
                   ),
-                  const Divider(),
-                  ListTile(
+                ),
+                const SizedBox(height: 24),
+
+                // 가이드 기능 섹션 (가이드인 경우에만 표시)
+                if (user?.isGuide == true) ...[
+                  const Text(
+                    '가이드 기능',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  Card(
+                    child: Column(
+                      children: [
+                        ListTile(
+                          leading: const Icon(Icons.add_box),
+                          title: const Text('나만의 패키지 만들기'),
+                          subtitle: const Text('새로운 여행 패키지를 등록합니다'),
+                          trailing: const Icon(Icons.chevron_right),
+                          onTap: () {
+                            context.push('/add-package');
+                          },
+                        ),
+                        const Divider(height: 1),
+                        ListTile(
+                          leading: const Icon(Icons.calendar_today),
+                          title: const Text('내 패키지 예약 관리'),
+                          subtitle: const Text('등록한 패키지의 예약을 관리합니다'),
+                          trailing: const Icon(Icons.chevron_right),
+                          onTap: () {
+                            context.push('/reservations/guide');
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+
+                // 가이드가 아닌 경우 가이드 인증 메뉴 표시
+                if (user?.isGuide != true) ...[
+                  const SizedBox(height: 24),
+                  Card(
+                    child: ListTile(
+                      leading: const Icon(Icons.verified_user),
+                      title: const Text('가이드 인증'),
+                      subtitle: const Text('가이드 인증을 진행하세요'),
+                      trailing: const Icon(Icons.chevron_right),
+                      onTap: () => context.push('/guide-certification'),
+                    ),
+                  ),
+                ],
+
+                // 일반 사용자 기능 섹션
+                const SizedBox(height: 24),
+                const Text(
+                  '예약 관리',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Card(
+                  child: ListTile(
                     leading: const Icon(Icons.bookmark),
                     title: const Text('내 예약 내역'),
-                    subtitle: const Text('내가 신청한 패키지 예약을 확인합니다'),
+                    subtitle: const Text('예약한 패키지를 확인합니다'),
                     trailing: const Icon(Icons.chevron_right),
                     onTap: () {
                       context.push('/reservations/customer');
                     },
                   ),
-                ],
-              ),
-            ),
-
-            // 로그아웃 버튼
-            const SizedBox(height: 24),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: () async {
-                  await authProvider.logout();
-                  if (context.mounted) {
-                    context.go('/login');
-                  }
-                },
-                style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 16),
                 ),
-                child: const Text('로그아웃'),
-              ),
+
+                const SizedBox(height: 24),
+
+                // 로그아웃 버튼
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  child: SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: () async {
+                        await authProvider.logout();
+                        if (context.mounted) {
+                          context.go('/login');
+                        }
+                      },
+                      style: ElevatedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                      ),
+                      child: const Text('로그아웃'),
+                    ),
+                  ),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );
