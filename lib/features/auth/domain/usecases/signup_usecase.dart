@@ -5,6 +5,7 @@ class SignupUseCase {
 
   SignupUseCase(this.authProvider);
 
+  // 실제로 회원가입을 수행
   Future<void> execute(String email, String password, String name) async {
     await authProvider.signup(email, password, name);
   }

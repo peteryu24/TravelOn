@@ -47,6 +47,7 @@ class _EmailFieldWidgetState extends State<EmailFieldWidget> {
               children: [
                 Expanded(
                   child: widget.selectedDomain == '직접 입력'
+                        // 직접 입력이면 TextField 활성화 아닐경우 Text 활성화 
                       ? TextField(
                           controller: widget.emailDomainController,
                           decoration: InputDecoration(

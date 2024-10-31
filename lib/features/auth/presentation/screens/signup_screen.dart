@@ -25,6 +25,7 @@ class _SignupScreenState extends State<SignupScreen> {
   bool _isPasswordLengthValid = true;
   String _selectedDomain = 'naver.com';
 
+  // 회원가입 메서드 // 최종 이메일 주소 선언, 이메일 인증 다이얼로그 표시
   Future<void> _signup() async {
     setState(() => _isLoading = true);
 
@@ -37,6 +38,7 @@ class _SignupScreenState extends State<SignupScreen> {
     DialogHelper.showEmailVerificationDialog(context);
   }
 
+  // 비밀번호 검증 메서드
   void _checkPasswordRequirements() {
     setState(() {
       _isPasswordMatched = validatePasswordMatch(_passwordController.text, _confirmPasswordController.text);
@@ -110,6 +112,7 @@ class _SignupScreenState extends State<SignupScreen> {
     );
   }
 
+  // 유효성 검사 // 비어있는 칸이 없어야 true 값 반환
   bool get _isFormValid {
     return _nameController.text.isNotEmpty &&
         _emailIdController.text.isNotEmpty &&
