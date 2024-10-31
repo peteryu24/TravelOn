@@ -1,0 +1,1 @@
+// lib/features/example_folder/domain/entities/example_entities.dart
