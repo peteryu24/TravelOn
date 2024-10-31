@@ -1,8 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:travel_on_final/features/home/data/repositories/home_repository_impl.dart';
 import 'package:travel_on_final/features/home/domain/usecases/get_next_trip.dart';
 import 'package:travel_on_final/features/home/presentation/providers/home_provider.dart';
+import 'package:travel_on_final/features/home/presentation/providers/weather_provider.dart';
 import 'package:travel_on_final/features/reservation/presentation/providers/reservation_provider.dart';
 import 'package:travel_on_final/features/search/data/repositories/travel_repositories_impl.dart';
 import 'package:travel_on_final/route.dart';
@@ -19,6 +21,8 @@ import 'package:travel_on_final/features/chat/presentation/providers/chat_provid
 import 'package:travel_on_final/features/search/presentation/providers/travel_provider.dart';
 
 Future<void> main() async {
+  await dotenv.load(fileName: ".env");
+
   WidgetsFlutterBinding.ensureInitialized();
 
   // Firebase 초기화
@@ -52,6 +56,7 @@ class MyApp extends StatelessWidget {
             ),
           ),
         ),
+        ChangeNotifierProvider(create: (_) => WeatherProvider()),
       ],
       child: ScreenUtilInit(
         designSize: const Size(375, 812),

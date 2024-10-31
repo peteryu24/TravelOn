@@ -7,6 +7,7 @@ import 'package:travel_on_final/features/auth/presentation/providers/auth_provid
 import 'package:travel_on_final/features/home/presentation/providers/home_provider.dart';
 import 'package:travel_on_final/features/home/presentation/widgets/next_trip_card.dart';
 import 'package:travel_on_final/features/home/presentation/widgets/travel_card.dart';
+import 'package:travel_on_final/features/home/presentation/widgets/weather_slider.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -70,26 +71,7 @@ class _HomeScreenState extends State<HomeScreen> {
               const SizedBox(height: 20),
 
               // 날씨 정보
-              Container(
-                padding: EdgeInsets.all(16.r),
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.grey.shade300),
-                  borderRadius: BorderRadius.circular(12.r),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Text('부산'),
-                    Row(
-                      children: [
-                        Icon(Icons.wb_sunny, color: Colors.orange.shade400),
-                        const Text(' 21.4°'),
-                      ],
-                    ),
-                    const Text('0.8m/s'),
-                  ],
-                ),
-              ),
+              const WeatherSlider(),
               SizedBox(height: 30.h),
 
               // 메뉴 그리드
