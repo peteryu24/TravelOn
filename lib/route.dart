@@ -9,7 +9,9 @@ import 'package:travel_on_final/features/auth/presentation/screens/signup_screen
 import 'package:travel_on_final/core/presentation/widgets/scaffold_with_bottom_nav.dart';
 // chat
 import 'package:travel_on_final/features/chat/presentation/screens/chat_list_screen.dart';
+import 'package:travel_on_final/features/profile/presentation/screens/guide_certification_screen.dart';
 import 'package:travel_on_final/features/profile/presentation/screens/guide_reservation_screen.dart';
+import 'package:travel_on_final/features/profile/presentation/screens/reservation_screen.dart';
 import 'package:travel_on_final/features/reservation/presentation/screens/reservation_calendar_screen.dart';
 // search
 import 'package:travel_on_final/features/search/domain/entities/travel_package.dart';
@@ -42,6 +44,25 @@ final goRouter = GoRouter(
         return PackageDetailScreen(package: package);
       },
     ),
+    GoRoute(
+      path: '/reservation/:packageId',
+      builder: (context, state) {
+        final package = state.extra as TravelPackage;
+        return ReservationCalendarScreen(package: package);
+      },
+    ),
+    GoRoute(
+      path: '/reservations/guide',
+      builder: (context, state) => const GuideReservationsScreen(),
+    ),
+    GoRoute(
+      path: '/guide-certification',
+      builder: (context, state) => const GuideCertificationScreen(),
+    ),
+    GoRoute(
+      path: '/reservations/customer',
+      builder: (context, state) => const CustomerReservationsScreen(),
+    ),
     // 로그인 관련 라우트
     GoRoute(
       path: '/login',
@@ -51,9 +72,6 @@ final goRouter = GoRouter(
       path: '/signup',
       builder: (context, state) => SignupScreen(),
     ),
-    ////////////////////////////////////////////////////////////////////////////////////
-    //                ↓↓↓ 바텀 내비게이션 바가 필요한 화면 라우팅 ↓↓↓                    //
-    ////////////////////////////////////////////////////////////////////////////////////
     ShellRoute(
       builder: (context, state, child) {
         return ScaffoldWithBottomNavBar(child: child);
@@ -74,28 +92,6 @@ final goRouter = GoRouter(
         GoRoute(
           path: '/profile',
           builder: (context, state) => const ProfileScreen(),
-        ),
-        GoRoute(
-          path: '/add-package',
-          builder: (context, state) => const AddPackageScreen(),
-        ),
-        GoRoute(
-          path: '/package-detail/:id',
-          builder: (context, state) {
-            final package = state.extra as TravelPackage;
-            return PackageDetailScreen(package: package);
-          },
-        ),
-        GoRoute(
-          path: '/reservation/:packageId',
-          builder: (context, state) {
-            final package = state.extra as TravelPackage;
-            return ReservationCalendarScreen(package: package);
-          },
-        ),
-        GoRoute(
-          path: '/reservations/guide',
-          builder: (context, state) => const GuideReservationsScreen(),
         ),
       ],
     ),
