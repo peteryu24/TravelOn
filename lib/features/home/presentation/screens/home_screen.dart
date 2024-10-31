@@ -5,6 +5,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 import 'package:travel_on_final/features/auth/presentation/providers/auth_provider.dart';
 import 'package:travel_on_final/features/home/presentation/providers/home_provider.dart';
+import 'package:travel_on_final/features/home/presentation/widgets/next_trip_card.dart';
 import 'package:travel_on_final/features/home/presentation/widgets/travel_card.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -64,47 +65,8 @@ class _HomeScreenState extends State<HomeScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              SizedBox(height: 20.h),
-
               // D-Day 카운터
-              Container(
-                width: double.infinity,
-                padding: EdgeInsets.all(16.r),
-                decoration: BoxDecoration(
-                  color: Colors.blue.shade50,
-                  borderRadius: BorderRadius.circular(12.r),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      // 로그인된 사용자가 있으면 닉네임 표시, 없으면 '게스트'로 표시
-                      '${user?.name ?? '게스트'}님,',
-                      style: TextStyle(fontSize: 18.sp),
-                    ),
-                    if (homeProvider.isLoading)
-                      const CircularProgressIndicator()
-                    else if (homeProvider.nextTrip != null)
-                      Text(
-                        homeProvider.nextTrip!.isTodayTrip
-                            ? '즐거운 ${homeProvider.nextTrip!.packageTitle} 되세요!'
-                            : '${homeProvider.nextTrip!.packageTitle}까지\nD-${homeProvider.nextTrip!.dDay} 남았습니다!',
-                        style: TextStyle(
-                          fontSize: 20.sp,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      )
-                    else
-                      Text(
-                        '예정된 여행이 없습니다.',
-                        style: TextStyle(
-                          fontSize: 20.sp,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                  ],
-                ),
-              ),
+              const NextTripCard(),
               const SizedBox(height: 20),
 
               // 날씨 정보
