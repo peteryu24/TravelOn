@@ -13,7 +13,9 @@ class DetailScreen extends StatefulWidget {
 }
 
 class _DetailScreenState extends State<DetailScreen> {
-  // ignore: unused_element
+  final TextEditingController _searchController = TextEditingController();
+  bool _isSearching = false;
+
   String _getRegionText(String region) {
     switch (region) {
       case 'seoul':
@@ -50,31 +52,160 @@ class _DetailScreenState extends State<DetailScreen> {
   }
 
   @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  // 검색 모드 시작
+  void _startSearch() {
+    setState(() {
+      _isSearching = true;
+    });
+  }
+
+  // 검색 모드 종료
+  void _stopSearch() {
+    setState(() {
+      _isSearching = false;
+      _searchController.clear();
+      context.read<TravelProvider>().clearSearch();
+    });
+  }
+
+  // 검색창 위젯
+  Widget _buildSearchField() {
+    return TextField(
+      controller: _searchController,
+      autofocus: true,
+      decoration: InputDecoration(
+        hintText: '패키지 제목이나 설명으로 검색...',
+        border: InputBorder.none,
+        hintStyle: TextStyle(color: Colors.grey[400]),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+        suffixIcon: IconButton(
+          icon: const Icon(Icons.clear),
+          onPressed: () {
+            _searchController.clear();
+            context.read<TravelProvider>().clearSearch();
+          },
+        ),
+      ),
+      style: const TextStyle(color: Colors.black, fontSize: 16.0),
+      onChanged: (query) {
+        context.read<TravelProvider>().search(query);
+      },
+      textInputAction: TextInputAction.search,
+    );
+  }
+
+  // AppBar 타이틀 위젯
+  Widget _buildTitle() {
+    return _isSearching
+        ? _buildSearchField()
+        : const Text('여행 패키지');
+  }
+
+  // AppBar 액션 버튼들
+  List<Widget> _buildActions() {
+    if (_isSearching) {
+      return [
+      ];
+    }
+
+    return [
+      IconButton(
+        icon: const Icon(Icons.search),
+        onPressed: _startSearch,
+      ),
+      Consumer<TravelProvider>(
+        builder: (context, provider, child) => RegionFilter(
+          onRegionChanged: (String region) {
+            provider.filterByRegion(region);
+          },
+        ),
+      ),
+      const SizedBox(width: 8),
+    ];
+  }
+
+  // 검색 결과 카운트 위젯
+  Widget _buildSearchInfo() {
+    return Consumer<TravelProvider>(
+      builder: (context, provider, child) {
+        if (provider.isLoading) {
+          return const SizedBox.shrink();
+        }
+
+        if (_isSearching && _searchController.text.isNotEmpty) {
+          final matchCount = provider.packages.length;
+          return Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            color: Colors.grey[100],
+            child: Row(
+              children: [
+                Text(
+                  '검색 결과: $matchCount개',
+                  style: const TextStyle(
+                    fontSize: 14,
+                    color: Colors.grey,
+                  ),
+                ),
+                const Spacer(),
+                if (provider.selectedRegion != 'all')
+                  Text(
+                    '지역: ${_getRegionText(provider.selectedRegion)}',
+                    style: const TextStyle(
+                      fontSize: 14,
+                      color: Colors.grey,
+                    ),
+                  ),
+              ],
+            ),
+          );
+        }
+
+        if (provider.selectedRegion != 'all') {
+          return Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            color: Colors.grey[100],
+            child: Text(
+              '선택된 지역: ${_getRegionText(provider.selectedRegion)}',
+              style: const TextStyle(
+                fontSize: 14,
+                color: Colors.grey,
+              ),
+            ),
+          );
+        }
+
+        return const SizedBox.shrink();
+      },
+    );
+  }
+
+  // 메인 위젯 빌드
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('여행 패키지'),
-        actions: [
-          Consumer<TravelProvider>(
-            builder: (context, provider, child) => Row(
-              children: [
-                RegionFilter(
-                  onRegionChanged: (String region) {
-                    provider.filterByRegion(region);
-                  },
-                ),
-                const SizedBox(width: 8),
-              ],
-            ),
+        leading: _isSearching
+            ? IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: _stopSearch,
+        )
+            : null,
+        title: _buildTitle(),
+        actions: _buildActions(),
+        elevation: 1,
+      ),
+      body: Column(
+        children: [
+          _buildSearchInfo(),
+          const Expanded(
+            child: PackageList(),
           ),
         ],
-      ),
-      body: const PackageList(),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          context.push('/add-package');
-        },
-        child: const Icon(Icons.add),
       ),
     );
   }

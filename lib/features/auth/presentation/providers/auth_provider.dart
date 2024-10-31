@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:travel_on_final/features/auth/data/models/user_model.dart';
@@ -5,6 +8,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 class AuthProvider with ChangeNotifier {
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;  // 추가
   UserModel? _currentUser;
 
   UserModel? get currentUser => _currentUser;
@@ -62,6 +66,40 @@ class AuthProvider with ChangeNotifier {
     await _auth.signOut();
     _currentUser = null;
     notifyListeners();
+  }
+  Future<void> certifyAsGuide(File certificateImage) async {
+    try {
+      if (_currentUser == null) throw '로그인이 필요합니다';
+
+      // 이미지 업로드
+      final storageRef = FirebaseStorage.instance
+          .ref()
+          .child('guide_certificates')
+          .child('${_currentUser!.id}_${DateTime.now().millisecondsSinceEpoch}.jpg');
+
+      await storageRef.putFile(certificateImage);
+      final imageUrl = await storageRef.getDownloadURL();
+
+      // Firestore 업데이트
+      await _firestore.collection('users').doc(_currentUser!.id).update({
+        'isGuide': true,
+        'certificateImageUrl': imageUrl,
+      });
+
+      // 현재 사용자 정보 업데이트
+      _currentUser = UserModel(
+        id: _currentUser!.id,
+        name: _currentUser!.name,
+        email: _currentUser!.email,
+        profileImageUrl: _currentUser!.profileImageUrl,
+        isGuide: true,
+      );
+
+      notifyListeners();
+    } catch (e) {
+      print('가이드 인증 실패: $e');
+      throw '가이드 인증에 실패했습니다';
+    }
   }
 
   void _onAuthStateChanged(User? firebaseUser) async {

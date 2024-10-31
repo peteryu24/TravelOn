@@ -104,7 +104,7 @@ class _GuideReservationsScreenState extends State<GuideReservationsScreen> with 
                   Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
-                      TextButton(
+                      ElevatedButton(
                         onPressed: () => _updateReservationStatus(
                           reservation.id,
                           'rejected',
