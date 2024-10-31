@@ -23,8 +23,8 @@ class CustomBottomNavigationBar extends StatelessWidget {
           label: '홈',
         ),
         BottomNavigationBarItem(
-          icon: Icon(Icons.search),
-          label: '검색',
+          icon: Icon(Icons.travel_explore),
+          label: '여행 상품',
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.chat),
