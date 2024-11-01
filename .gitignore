@@ -47,3 +47,6 @@ ios/Podfile.lock
 
 # apiKey 사용을 위한 .env 파일
 .env
+
+# firebase related
+firebase_options.dart
