@@ -6,8 +6,11 @@ class TravelPackage {
   final String description;
   final String? mainImage;
   final List<String> descriptionImages;
-  final String guideName;  // 추가
-  final String guideId;    // 추가
+  final String guideName;
+  final String guideId;
+  final int maxParticipants;
+  final int nights;           // 박 수
+  final List<int> departureDays;  // 출발 가능 요일 (1: 월요일 ~ 7: 일요일)
 
   TravelPackage({
     required this.id,
@@ -17,7 +20,10 @@ class TravelPackage {
     required this.description,
     this.mainImage,
     this.descriptionImages = const [],
-    required this.guideName,  // 추가
-    required this.guideId,    // 추가
+    required this.guideName,
+    required this.guideId,
+    required this.maxParticipants,
+    required this.nights,
+    required this.departureDays,
   });
 }

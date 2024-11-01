@@ -130,6 +130,9 @@ class _CustomerReservationsScreenState extends State<CustomerReservationsScreen>
                 region: '',
                 guideName: reservation.guideName,
                 guideId: reservation.guideId,
+                maxParticipants: 0,
+                nights: 1,                          // 기본값 1박
+                departureDays: [1, 2, 3, 4, 5, 6, 7],  // 모든 요일 허용
               ),
             );
 
