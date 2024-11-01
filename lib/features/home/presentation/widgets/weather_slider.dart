@@ -164,7 +164,12 @@ class _WeatherSliderState extends State<WeatherSlider> {
       case '비':
         return Icon(Icons.umbrella, color: Colors.blue.shade400);
       case '비/눈':
-        return Icon(Icons.ac_unit, color: Colors.blue.shade200);
+        return Stack(
+          children: [
+            Icon(Icons.umbrella, color: Colors.blue.shade400),
+            Icon(Icons.ac_unit, color: Colors.blue.shade100),
+          ],
+        );
       case '눈':
         return Icon(Icons.ac_unit, color: Colors.blue.shade100);
       case '소나기':

@@ -87,20 +87,25 @@ class WeatherApi {
       values[item['category']] = item['obsrValue'];
     }
 
+    // PTY(강수형태)와 SKY(하늘상태) 모두 확인
+    final condition = _getDetailedCondition(
+        values['PTY'] ?? '0', // 강수형태
+        values['SKY'] ?? '1' // 하늘상태
+        );
+
     return WeatherModel(
       city: cityName,
       temperature: double.parse(values['T1H'] ?? '0'),
-      condition: _getCondition(values['PTY'] ?? '0'),
+      condition: condition,
       windSpeed: double.parse(values['WSD'] ?? '0'),
       humidity: int.parse(values['REH'] ?? '0'),
       precipitation: double.parse(values['RN1'] ?? '0'),
     );
   }
 
-  String _getCondition(String pty) {
+  String _getDetailedCondition(String pty, String sky) {
+    // 먼저 강수형태 체크
     switch (pty) {
-      case '0':
-        return '맑음';
       case '1':
         return '비';
       case '2':
@@ -109,6 +114,16 @@ class WeatherApi {
         return '눈';
       case '4':
         return '소나기';
+    }
+
+    // 강수가 없을 경우 하늘상태 체크
+    switch (sky) {
+      case '1':
+        return '맑음';
+      case '3':
+        return '구름많음';
+      case '4':
+        return '흐림';
       default:
         return '맑음';
     }
