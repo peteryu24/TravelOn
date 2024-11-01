@@ -42,7 +42,7 @@ class WeatherApi {
         final uri = Uri.parse('$baseUrl/getUltraSrtNcst')
             .replace(queryParameters: queryParams);
 
-        print('Request URL for ${city.key}: $uri');
+        // print('Request URL for ${city.key}: $uri');
 
         final response = await http.get(uri);
 

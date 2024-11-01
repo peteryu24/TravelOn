@@ -27,10 +27,8 @@ import 'package:travel_on_final/features/auth/data/repositories/auth_repository_
 import 'package:travel_on_final/features/auth/domain/repositories/auth_repository.dart';
 
 Future<void> main() async {
-  WidgetsFlutterBinding.ensureInitialized();
   KakaoSdk.init(nativeAppKey: 'ac1aeb4d578457a2abd73ebfab67b3b6');
 
-Future<void> main() async {
   await dotenv.load(fileName: ".env");
 
   WidgetsFlutterBinding.ensureInitialized();
