@@ -1,11 +1,15 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:travel_on_final/features/home/data/repositories/home_repository_impl.dart';
+import 'package:travel_on_final/features/home/domain/usecases/get_next_trip.dart';
+import 'package:travel_on_final/features/home/presentation/providers/home_provider.dart';
+import 'package:travel_on_final/features/home/presentation/providers/weather_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:travel_on_final/features/reservation/presentation/providers/reservation_provider.dart';
 import 'package:travel_on_final/features/search/data/repositories/travel_repositories_impl.dart';
 import 'package:travel_on_final/route.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:travel_on_final/features/search/data/repositories/travel_repositories_impl.dart';
 // firebase
 import 'package:firebase_core/firebase_core.dart';
 import 'package:travel_on_final/firebase_options.dart';
@@ -25,6 +29,11 @@ import 'package:travel_on_final/features/auth/domain/repositories/auth_repositor
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   KakaoSdk.init(nativeAppKey: 'ac1aeb4d578457a2abd73ebfab67b3b6');
+
+Future<void> main() async {
+  await dotenv.load(fileName: ".env");
+
+  WidgetsFlutterBinding.ensureInitialized();
 
   // Firebase 초기화
   await Firebase.initializeApp(
@@ -60,6 +69,14 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(
           create: (_) => ReservationProvider(FirebaseFirestore.instance),
         ),
+        ChangeNotifierProvider(
+          create: (_) => HomeProvider(
+            GetNextTrip(
+              HomeRepositoryImpl(FirebaseFirestore.instance),
+            ),
+          ),
+        ),
+        ChangeNotifierProvider(create: (_) => WeatherProvider()),
       ],
       child: ScreenUtilInit(
         designSize: const Size(375, 812),

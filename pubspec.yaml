@@ -21,6 +21,7 @@ dependencies:
 
   flutter_screenutil: ^5.9.3
   cached_network_image: ^3.4.1
+  flutter_dotenv: ^5.2.1
 
   # 권한
   permission_handler: ^11.3.1
@@ -38,6 +39,8 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  mockito: ^5.4.4
+  build_runner: ^2.4.6
 
   flutter_lints: ^4.0.0
 
@@ -50,3 +53,4 @@ flutter:
     - assets/images/logo/naver.png
     - assets/images/logo/facebook.png
     - assets/images/logo/kakaotalk.png
+    - .env
