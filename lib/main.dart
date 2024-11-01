@@ -15,9 +15,16 @@ import 'package:travel_on_final/core/providers/navigation_provider.dart';
 import 'package:travel_on_final/features/auth/presentation/providers/auth_provider.dart';
 import 'package:travel_on_final/features/chat/presentation/providers/chat_provider.dart';
 import 'package:travel_on_final/features/search/presentation/providers/travel_provider.dart';
+// social_login
+import 'package:kakao_flutter_sdk/kakao_flutter_sdk.dart';
+// DI
+import 'package:travel_on_final/features/auth/domain/usecases/kakao_login_usecase.dart';
+import 'package:travel_on_final/features/auth/data/repositories/auth_repository_impl.dart';
+import 'package:travel_on_final/features/auth/domain/repositories/auth_repository.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  KakaoSdk.init(nativeAppKey: 'ac1aeb4d578457a2abd73ebfab67b3b6');
 
   // Firebase 초기화
   await Firebase.initializeApp(
@@ -37,7 +44,15 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => NavigationProvider()),
-        ChangeNotifierProvider(create: (_) => AuthProvider()),
+        Provider<AuthRepository>(create: (_) => AuthRepositoryImpl()),
+        ProxyProvider<AuthRepository, KakaoLoginUseCase>(
+          update: (_, authRepository, __) => KakaoLoginUseCase(authRepository),
+        ),
+        ChangeNotifierProvider(
+          create: (context) => AuthProvider(
+            context.read<KakaoLoginUseCase>(),
+          ),
+        ),
         ChangeNotifierProvider(create: (_) => ChatProvider()),
         ChangeNotifierProvider(
           create: (_) => TravelProvider(TravelRepositoryImpl()),

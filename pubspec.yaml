@@ -31,6 +31,9 @@ dependencies:
   cloud_firestore: ^5.4.4
   firebase_storage: ^12.3.2
 
+  #소셜 로그인
+  kakao_flutter_sdk: ^1.9.6
+
 
 dev_dependencies:
   flutter_test:
@@ -43,3 +46,7 @@ flutter:
   assets:
     - assets/images/travel-on-login.png
     - assets/images/default_profile.png
+    - assets/images/logo/google.png
+    - assets/images/logo/naver.png
+    - assets/images/logo/facebook.png
+    - assets/images/logo/kakaotalk.png

@@ -5,6 +5,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:travel_on_final/features/auth/presentation/providers/auth_provider.dart';
 import 'package:travel_on_final/features/auth/presentation/widgets/text_field_widget.dart';
 import 'package:travel_on_final/features/auth/presentation/widgets/password_field_widget.dart';
+import 'package:travel_on_final/features/auth/presentation/widgets/social_login_button_widget.dart';
 import 'package:go_router/go_router.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -146,7 +147,51 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
               ),
             ),
-            SizedBox(height: 20.h),
+            SizedBox(height: 25.h),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                SocialLoginButton(
+                  assetPath: "assets/images/logo/kakaotalk.png",
+                  onPressed: () async {
+                    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+                    await authProvider.loginWithKakao();
+
+                    if (authProvider.isAuthenticated) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('${authProvider.currentUser!.name}님 환영합니다.')),
+                      );
+                      context.go('/');
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('카카오톡 로그인 실패')),
+                      );
+                    }
+                  },
+                ),
+                SizedBox(width: 10.w),
+                SocialLoginButton(
+                  assetPath: "assets/images/logo/google.png",
+                  onPressed: () {
+                    // 구글
+                  },
+                ),
+                SizedBox(width: 10.w),
+                SocialLoginButton(
+                  assetPath: "assets/images/logo/naver.png",
+                  onPressed: () {
+                    // 네이버
+                  },
+                ),
+                SizedBox(width: 10.w),
+                SocialLoginButton(
+                  assetPath: "assets/images/logo/facebook.png",
+                  onPressed: () {
+                    // 페이스북
+                  },
+                ),
+              ],
+            ),
           ],
         ),
       ),
