@@ -46,3 +46,4 @@ flutter:
   assets:
     - .env
     - assets/images/travel-on-login.png
+    - assets/images/default_profile.png

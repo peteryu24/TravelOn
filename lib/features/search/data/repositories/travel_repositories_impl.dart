@@ -25,8 +25,11 @@ class TravelRepositoryImpl implements TravelRepository {
           region: data['region'] ?? '',
           mainImage: data['mainImage'],
           descriptionImages: List<String>.from(data['descriptionImages'] ?? []),
-          guideName: data['guideName'] ?? '',  // 추가
-          guideId: data['guideId'] ?? '',      // 추가
+          guideName: data['guideName'] ?? '',
+          guideId: data['guideId'] ?? '',
+          maxParticipants: (data['maxParticipants'] ?? 0).toInt(),
+          nights: (data['nights'] ?? 1).toInt(),                   // 추가: 기본값 1박
+          departureDays: List<int>.from(data['departureDays'] ?? [1,2,3,4,5,6,7]),  // 추가: 기본값 모든 요일
         );
       }).toList();
     } catch (e) {
@@ -73,11 +76,13 @@ class TravelRepositoryImpl implements TravelRepository {
         'mainImage': mainImageUrl,
         'descriptionImages': descriptionImageUrls,
         'createdAt': FieldValue.serverTimestamp(),
-        'guideName': package.guideName,  // 추가
-        'guideId': package.guideId,      // 추가
+        'guideName': package.guideName,
+        'guideId': package.guideId,
+        'maxParticipants': package.maxParticipants,
+        'nights': package.nights,              // 2박
+        'departureDays': package.departureDays, // [1, 4] (월, 목)
       });
       print('Package saved with ID: ${docRef.id}');
-
     } catch (e) {
       print('Error adding package: $e');
       rethrow;

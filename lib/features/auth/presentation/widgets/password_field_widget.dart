@@ -18,6 +18,7 @@ class PasswordFieldWidget extends StatefulWidget {
 class _PasswordFieldWidgetState extends State<PasswordFieldWidget> {
   bool _isPasswordVisible = false;
 
+  // 비밀번호 가시성 변환 메서드
   void _togglePasswordVisibility() {
     setState(() {
       _isPasswordVisible = !_isPasswordVisible;

@@ -5,6 +5,7 @@ import 'package:travel_on_final/features/home/data/repositories/home_repository_
 import 'package:travel_on_final/features/home/domain/usecases/get_next_trip.dart';
 import 'package:travel_on_final/features/home/presentation/providers/home_provider.dart';
 import 'package:travel_on_final/features/home/presentation/providers/weather_provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:travel_on_final/features/reservation/presentation/providers/reservation_provider.dart';
 import 'package:travel_on_final/features/search/data/repositories/travel_repositories_impl.dart';
 import 'package:travel_on_final/route.dart';
@@ -29,6 +30,8 @@ Future<void> main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+
+  await SharedPreferences.getInstance();
 
   runApp(const MyApp());
 }

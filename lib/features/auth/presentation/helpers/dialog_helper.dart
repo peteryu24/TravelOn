@@ -4,6 +4,8 @@ import 'package:go_router/go_router.dart';
 import 'package:travel_on_final/features/auth/presentation/providers/auth_provider.dart';
 
 class DialogHelper {
+
+  // 이메일 인증 확인 다이얼로그를 보여주는 메소드
   static void showEmailVerificationDialog(BuildContext context) {
     showDialog(
       context: context,
@@ -33,6 +35,7 @@ class DialogHelper {
     );
   }
 
+  // showEmailVerificationDialog 메서드에서 인증 실패할 경우 나오는 다이얼로그를 보여주는 메서드
   static void _showNotVerifiedDialog(BuildContext context) {
     showDialog(
       context: context,
