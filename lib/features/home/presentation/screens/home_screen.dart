@@ -38,10 +38,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // AuthProvider의 상태를 구독
-    final user = context.watch<AuthProvider>().currentUser;
-    final homeProvider = context.watch<HomeProvider>();
-
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
@@ -68,7 +64,7 @@ class _HomeScreenState extends State<HomeScreen> {
             children: [
               // D-Day 카운터
               const NextTripCard(),
-              const SizedBox(height: 20),
+              SizedBox(height: 20.h),
 
               // 날씨 정보
               const WeatherSlider(),
