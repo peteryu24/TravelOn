@@ -30,8 +30,12 @@ Future<void> main() async {
   await dotenv.load(fileName: ".env");
 
   WidgetsFlutterBinding.ensureInitialized();
-  KakaoSdk.init(nativeAppKey: 'ac1aeb4d578457a2abd73ebfab67b3b6');
-  
+  // Load the Kakao Native App Key from the .env file
+  String kakaoNativeAppKey = dotenv.env['KAKAO_NATIVE_APP_KEY'] ?? '';
+
+  // Initialize Kakao SDK with the loaded key
+  KakaoSdk.init(nativeAppKey: kakaoNativeAppKey);
+
   // Firebase 초기화
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,

@@ -131,18 +131,18 @@ class _WeatherSliderState extends State<WeatherSlider> {
                 ),
                 Row(
                   children: [
-                    Text(
-                      '${currentWeather.windSpeed.toStringAsFixed(1)}m/s',
-                      style: TextStyle(fontSize: 16.sp),
-                    ),
                     if (currentWeather.precipitation > 0)
                       Text(
-                        ' ${currentWeather.precipitation}mm',
+                        ' ${currentWeather.precipitation}mm ',
                         style: TextStyle(
                           fontSize: 16.sp,
                           color: Colors.blue,
                         ),
                       ),
+                    Text(
+                      '${currentWeather.windSpeed.toStringAsFixed(1)}m/s',
+                      style: TextStyle(fontSize: 16.sp),
+                    ),
                   ],
                 ),
               ],
