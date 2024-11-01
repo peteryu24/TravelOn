@@ -9,8 +9,10 @@ import 'package:travel_on_final/features/auth/presentation/screens/signup_screen
 import 'package:travel_on_final/core/presentation/widgets/scaffold_with_bottom_nav.dart';
 // chat
 import 'package:travel_on_final/features/chat/presentation/screens/chat_list_screen.dart';
+import 'package:travel_on_final/features/profile/presentation/screens/edit_packages_screen.dart';
 import 'package:travel_on_final/features/profile/presentation/screens/guide_certification_screen.dart';
 import 'package:travel_on_final/features/profile/presentation/screens/guide_reservation_screen.dart';
+import 'package:travel_on_final/features/profile/presentation/screens/my_packages_screen.dart';
 import 'package:travel_on_final/features/profile/presentation/screens/reservation_screen.dart';
 import 'package:travel_on_final/features/reservation/presentation/screens/reservation_calendar_screen.dart';
 // search
@@ -41,6 +43,18 @@ final goRouter = GoRouter(
       builder: (context, state) {
         final package = state.extra as TravelPackage;
         return PackageDetailScreen(package: package);
+      },
+    ),
+    GoRoute(
+      path: '/my-packages',
+      builder: (context, state) => const MyPackagesScreen(),
+    ),
+    // TODO: 수정 화면용 라우트도 추가 필요
+    GoRoute(
+      path: '/edit-package/:id',
+      builder: (context, state) {
+        final package = state.extra as TravelPackage;
+        return EditPackageScreen(package: package);
       },
     ),
     GoRoute(

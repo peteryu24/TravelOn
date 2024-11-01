@@ -72,13 +72,13 @@ class _PackageDetailScreenState extends State<PackageDetailScreen> {
             if (widget.package.mainImage != null && widget.package.mainImage!.isNotEmpty)
               Image.network(
                 widget.package.mainImage!,
-                height: 200,
+                height: 200.h,
                 width: double.infinity,
                 fit: BoxFit.cover,
                 loadingBuilder: (context, child, loadingProgress) {
                   if (loadingProgress == null) return child;
                   return Container(
-                    height: 200,
+                    height: 200.h,
                     width: double.infinity,
                     color: Colors.grey[200],
                     child: Center(
@@ -93,7 +93,7 @@ class _PackageDetailScreenState extends State<PackageDetailScreen> {
                 },
                 errorBuilder: (context, error, stackTrace) {
                   return Container(
-                    height: 200,
+                    height: 200.h,
                     width: double.infinity,
                     color: Colors.grey[200],
                     child: const Center(
@@ -108,7 +108,7 @@ class _PackageDetailScreenState extends State<PackageDetailScreen> {
               )
             else
               Container(
-                height: 200,
+                height: 200.h,
                 width: double.infinity,
                 color: Colors.blue.shade100,
                 child: Center(
@@ -121,7 +121,7 @@ class _PackageDetailScreenState extends State<PackageDetailScreen> {
               ),
 
             Padding(
-              padding: const EdgeInsets.all(16),
+              padding: EdgeInsets.all(16.w),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -159,7 +159,7 @@ class _PackageDetailScreenState extends State<PackageDetailScreen> {
                   ),
                   SizedBox(height: 16.h),
                   Container(
-                    padding: const EdgeInsets.all(3),
+                    padding: EdgeInsets.all(3.w),
                     decoration: BoxDecoration(
                       color: Colors.grey.shade100,
                       borderRadius: BorderRadius.circular(8),
@@ -236,10 +236,10 @@ class _PackageDetailScreenState extends State<PackageDetailScreen> {
                         color: Colors.red.shade100,
                         borderRadius: BorderRadius.circular(4),
                       ),
-                      child: const Row(
+                      child: Row(
                         children: [
                           Icon(Icons.info_outline, color: Colors.red),
-                          SizedBox(width: 8),
+                          SizedBox(width: 8.w),
                           Text(
                             '오늘은 예약이 마감되었습니다',
                             style: TextStyle(
@@ -251,43 +251,43 @@ class _PackageDetailScreenState extends State<PackageDetailScreen> {
                       ),
                     ),
 
-                  const SizedBox(height: 24),
+                  SizedBox(height: 24.h),
 
                   // 설명
-                  const Text(
+                  Text(
                     '상세 설명',
                     style: TextStyle(
-                      fontSize: 18,
+                      fontSize: 18.sp,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  const SizedBox(height: 8),
+                  SizedBox(height: 8.h),
                   Text(
                     widget.package.description,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      height: 1.5,
+                    style: TextStyle(
+                      fontSize: 16.sp,
+                      height: 1.5.h,
                     ),
                   ),
 
                   // 설명 이미지들
                   if (widget.package.descriptionImages.isNotEmpty) ...[
-                    const SizedBox(height: 24),
-                    const Text(
+                    SizedBox(height: 24.h),
+                    Text(
                       '상세 이미지',
                       style: TextStyle(
-                        fontSize: 18,
+                        fontSize: 18.sp,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    const SizedBox(height: 8),
+                    SizedBox(height: 8.h),
                     ListView.builder(
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
                       itemCount: widget.package.descriptionImages.length,
                       itemBuilder: (context, index) {
                         return Padding(
-                          padding: const EdgeInsets.only(bottom: 16),
+                          padding: EdgeInsets.only(bottom: 16.h),
                           child: ClipRRect(
                             borderRadius: BorderRadius.circular(8),
                             child: Image.network(
@@ -297,7 +297,7 @@ class _PackageDetailScreenState extends State<PackageDetailScreen> {
                               loadingBuilder: (context, child, loadingProgress) {
                                 if (loadingProgress == null) return child;
                                 return Container(
-                                  height: 200,
+                                  height: 200.h,
                                   width: double.infinity,
                                   color: Colors.grey[200],
                                   child: Center(
@@ -312,7 +312,7 @@ class _PackageDetailScreenState extends State<PackageDetailScreen> {
                               },
                               errorBuilder: (context, error, stackTrace) {
                                 return Container(
-                                  height: 200,
+                                  height: 200.h,
                                   width: double.infinity,
                                   color: Colors.grey[200],
                                   child: const Center(

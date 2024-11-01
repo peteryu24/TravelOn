@@ -83,7 +83,7 @@ class _DetailScreenState extends State<DetailScreen> {
         hintText: '패키지 제목이나 설명으로 검색...',
         border: InputBorder.none,
         hintStyle: TextStyle(color: Colors.grey[400]),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+        contentPadding: EdgeInsets.symmetric(horizontal: 16.w),
         suffixIcon: IconButton(
           icon: const Icon(Icons.clear),
           onPressed: () {
@@ -92,7 +92,7 @@ class _DetailScreenState extends State<DetailScreen> {
           },
         ),
       ),
-      style: const TextStyle(color: Colors.black, fontSize: 16.0),
+      style: TextStyle(color: Colors.black, fontSize: 16.0.sp),
       onChanged: (query) {
         context.read<TravelProvider>().search(query);
       },
@@ -141,7 +141,7 @@ class _DetailScreenState extends State<DetailScreen> {
         if (_isSearching && _searchController.text.isNotEmpty) {
           final matchCount = provider.packages.length;
           return Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
             color: Colors.grey[100],
             child: Row(
               children: [
@@ -168,18 +168,17 @@ class _DetailScreenState extends State<DetailScreen> {
 
         if (provider.selectedRegion != 'all') {
           return Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
             color: Colors.grey[100],
             child: Text(
               '선택된 지역: ${_getRegionText(provider.selectedRegion)}',
-              style: const TextStyle(
-                fontSize: 14,
+              style: TextStyle(
+                fontSize: 14.sp,
                 color: Colors.grey,
               ),
             ),
           );
         }
-
         return const SizedBox.shrink();
       },
     );
