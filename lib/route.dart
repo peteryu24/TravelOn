@@ -23,7 +23,6 @@ import 'package:travel_on_final/features/home/presentation/screens/home_screen.d
 // profile
 import 'package:travel_on_final/features/profile/presentation/screens/profile_screen.dart';
 
-
 final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>();
 
 final goRouter = GoRouter(
@@ -77,7 +76,7 @@ final goRouter = GoRouter(
     ////////////////////////////////////////////////////////////////////////////////////
     ShellRoute(
       builder: (context, state, child) {
-        return ScaffoldWithBottomNavBar(child: child);
+        return const ScaffoldWithBottomNavBar(); // child 파라미터 제거
       },
       routes: [
         GoRoute(

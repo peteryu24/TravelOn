@@ -2,13 +2,46 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:provider/provider.dart';
+import 'package:travel_on_final/features/auth/presentation/providers/auth_provider.dart';
+import 'package:travel_on_final/features/home/presentation/providers/home_provider.dart';
+import 'package:travel_on_final/features/home/presentation/widgets/next_trip_card.dart';
 import 'package:travel_on_final/features/home/presentation/widgets/travel_card.dart';
+import 'package:travel_on_final/features/home/presentation/widgets/weather_slider.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
   @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  @override
+  void initState() {
+    super.initState();
+    // build가 완료된 후 데이터 로드
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _loadNextTrip();
+    });
+  }
+
+  Future<void> _loadNextTrip() async {
+    final authProvider = context.read<AuthProvider>();
+
+    if (authProvider.currentUser != null) {
+      await context
+          .read<HomeProvider>()
+          .loadNextTrip(authProvider.currentUser!.id);
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
+    // AuthProvider의 상태를 구독
+    final user = context.watch<AuthProvider>().currentUser;
+    final homeProvider = context.watch<HomeProvider>();
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
@@ -33,56 +66,12 @@ class HomeScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              SizedBox(height: 20.h),
-
               // D-Day 카운터
-              Container(
-                width: double.infinity,
-                padding: EdgeInsets.all(16.r),
-                decoration: BoxDecoration(
-                  color: Colors.blue.shade50,
-                  borderRadius: BorderRadius.circular(12.r),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      '트래블온님,',
-                      style: TextStyle(fontSize: 18.sp),
-                    ),
-                    Text(
-                      '부산 여행까지 D-10 남았습니다!',
-                      style: TextStyle(
-                        fontSize: 20.sp,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+              const NextTripCard(),
               const SizedBox(height: 20),
 
               // 날씨 정보
-              Container(
-                padding: EdgeInsets.all(16.r),
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.grey.shade300),
-                  borderRadius: BorderRadius.circular(12.r),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Text('부산'),
-                    Row(
-                      children: [
-                        Icon(Icons.wb_sunny, color: Colors.orange.shade400),
-                        const Text(' 21.4°'),
-                      ],
-                    ),
-                    const Text('0.8m/s'),
-                  ],
-                ),
-              ),
+              const WeatherSlider(),
               SizedBox(height: 30.h),
 
               // 메뉴 그리드
