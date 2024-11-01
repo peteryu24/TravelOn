@@ -29,7 +29,7 @@ class SocialLoginButton extends StatelessWidget {
           child: Image.asset(
             assetPath,
             height: 45.h,
-            width: 35.w,
+            width: 45.w,
             fit: BoxFit.cover,
           ),
         ),

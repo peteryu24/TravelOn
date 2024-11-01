@@ -15,4 +15,16 @@ class AuthRepositoryImpl implements AuthRepository {
       rethrow;
     }
   }
+
+  @override
+  Future<void> loginWithNaver() async {
+  }
+
+  @override
+  Future<void> loginWithGoogle() async {
+  }
+
+  @override
+  Future<void> loginWithFacebook() async {
+  }
 }

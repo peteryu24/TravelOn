@@ -6,12 +6,18 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:travel_on_final/features/auth/data/models/user_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:travel_on_final/features/auth/domain/usecases/kakao_login_usecase.dart';
+import 'package:travel_on_final/features/auth/domain/usecases/google_login_usecase.dart';
+import 'package:travel_on_final/features/auth/domain/usecases/naver_login_usecase.dart';
+import 'package:travel_on_final/features/auth/domain/usecases/facebook_login_usecase.dart';
 
 class AuthProvider with ChangeNotifier {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseStorage _storage = FirebaseStorage.instance;
   final KakaoLoginUseCase _kakaoLoginUseCase;
+  // final GoogleLoginUseCase _googleLoginUseCase;
+  // final NaverLoginUseCase _naverLoginUseCase;
+  // final FacebookLoginUseCase _facebookLoginUseCase;
 
   UserModel? _currentUser;
   bool isEmailVerified = false;
@@ -166,7 +172,14 @@ class AuthProvider with ChangeNotifier {
     try {
       final userModel = await _kakaoLoginUseCase.execute();
       if (userModel != null) {
-        // 로그인 성공 시 사용자 정보 저장
+        await _firestore.collection('users').doc(userModel.id).set({
+          'id': userModel.id,
+          'name': userModel.name,
+          'email': userModel.email,
+          'profileImageUrl': userModel.profileImageUrl,
+          'isGuide': userModel.isGuide,
+        }, SetOptions(merge: true));
+
         _currentUser = userModel;
         notifyListeners();
       } else {
@@ -175,5 +188,17 @@ class AuthProvider with ChangeNotifier {
     } catch (e) {
       print('카카오톡 로그인 에러: $e');
     }
+  }
+
+  Future<void> loginWithGoogle() async {
+    // final userModel = await _GoogleLoginUseCase.execute(); 
+  }
+
+  Future<void> loginWithNaver() async {
+    // final userModel = await _NaverLoginUseCase.execute(); 
+  }
+
+  Future<void> loginWithFacebook() async {
+    // final userModel = await _FacebookUseCase.execute();
   }
 }
