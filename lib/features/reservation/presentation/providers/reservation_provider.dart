@@ -20,33 +20,30 @@ class ReservationProvider extends ChangeNotifier {
     required String guideId,
     required DateTime reservationDate,
     required double price,
+    required int participants,  // 여기 추가
   }) async {
     try {
       await _firestore.runTransaction((transaction) async {
-        final packageRef = _firestore.collection('packages').doc(packageId);
-        final packageDoc = await transaction.get(packageRef);
+        // 이미 예약이 있는지 확인
+        final start = DateTime(reservationDate.year, reservationDate.month, reservationDate.day);
+        final end = start.add(const Duration(days: 1));
 
-        if (!packageDoc.exists) {
-          throw '패키지를 찾을 수 없습니다';
-        }
-
-        final maxParticipants = packageDoc.data()?['maxParticipants'] ?? 0;
-
-        // 해당 날짜의 예약 수 확인
-        final reservationsQuery = await _firestore
+        // 예약 가능 여부 다시 확인
+        final existingReservations = await _firestore
             .collection('reservations')
             .where('packageId', isEqualTo: packageId)
             .where('status', isEqualTo: 'approved')
-            .where('reservationDate', isEqualTo: Timestamp.fromDate(DateTime(reservationDate.year, reservationDate.month, reservationDate.day)))
+            .where('reservationDate', isGreaterThanOrEqualTo: Timestamp.fromDate(start))
+            .where('reservationDate', isLessThan: Timestamp.fromDate(end))
             .get();
 
-        if (reservationsQuery.docs.length >= maxParticipants) {
-          throw '선택한 날짜는 예약이 마감되었습니다';
+        if (existingReservations.docs.isNotEmpty) {
+          throw '이미 예약이 마감된 날짜입니다';
         }
 
         // 예약 생성
         final reservationRef = _firestore.collection('reservations').doc();
-        transaction.set(reservationRef, {
+        await reservationRef.set({
           'packageId': packageId,
           'packageTitle': packageTitle,
           'customerId': customerId,
@@ -54,22 +51,24 @@ class ReservationProvider extends ChangeNotifier {
           'guideName': guideName,
           'guideId': guideId,
           'reservationDate': Timestamp.fromDate(reservationDate),
-          'requestedAt': FieldValue.serverTimestamp(),
+          'requestedAt': Timestamp.fromDate(DateTime.now()),
           'status': 'pending',
           'price': price,
+          'participants': participants,  // 여기에서 인원 수 저장
         });
 
         // 알림 생성
-        final notificationRef = _firestore.collection('notifications').doc();
-        transaction.set(notificationRef, {
+        await _firestore.collection('notifications').add({
           'userId': guideId,
           'title': '새로운 예약 요청',
-          'message': '$customerName님이 $packageTitle 패키지를 예약 신청했습니다.',
+          'message': '$customerName님이 $packageTitle 패키지를 예약 신청했습니다. (${participants}명)',
           'type': 'reservation_request',
           'reservationId': reservationRef.id,
           'createdAt': FieldValue.serverTimestamp(),
           'isRead': false,
         });
+
+        print('Reservation created with participants: $participants'); // 디버깅용
       });
 
       notifyListeners();
@@ -90,30 +89,36 @@ class ReservationProvider extends ChangeNotifier {
         }
 
         final data = reservationDoc.data()!;
-        final String packageId = data['packageId'];
-        final DateTime reservationDate = (data['reservationDate'] as Timestamp).toDate();
-
-        if (status == 'approved') {
-          // 해당 날짜의 예약 수 다시 확인
-          final reservationsQuery = await _firestore
-              .collection('reservations')
-              .where('packageId', isEqualTo: packageId)
-              .where('status', isEqualTo: 'approved')
-              .where('reservationDate', isEqualTo: Timestamp.fromDate(DateTime(reservationDate.year, reservationDate.month, reservationDate.day)))
-              .get();
-
-          final packageDoc = await transaction.get(_firestore.collection('packages').doc(packageId));
-          final maxParticipants = packageDoc.data()?['maxParticipants'] ?? 0;
-
-          if (reservationsQuery.docs.length >= maxParticipants) {
-            throw '선택한 날짜는 예약이 마감되었습니다';
-          }
-        }
 
         // 상태 업데이트
         transaction.update(reservationRef, {
           'status': status,
         });
+
+        // 승인된 경우, 같은 날짜의 다른 예약들은 자동으로 거절
+        if (status == 'approved') {
+          final sameDate = (data['reservationDate'] as Timestamp).toDate();
+          final start = DateTime(sameDate.year, sameDate.month, sameDate.day);
+          final end = start.add(const Duration(days: 1));
+
+          // 같은 날짜의 다른 예약들 가져오기
+          final otherReservations = await _firestore
+              .collection('reservations')
+              .where('packageId', isEqualTo: data['packageId'])
+              .where('reservationDate', isGreaterThanOrEqualTo: Timestamp.fromDate(start))
+              .where('reservationDate', isLessThan: Timestamp.fromDate(end))
+              .where('status', isEqualTo: 'pending')  // 대기 중인 예약만
+              .get();
+
+          // 다른 예약들 모두 거절로 변경
+          for (var doc in otherReservations.docs) {
+            if (doc.id != reservationId) {
+              transaction.update(doc.reference, {
+                'status': 'rejected',
+              });
+            }
+          }
+        }
 
         // 알림 생성
         final notificationRef = _firestore.collection('notifications').doc();
@@ -187,22 +192,17 @@ class ReservationProvider extends ChangeNotifier {
       final start = DateTime(date.year, date.month, date.day);
       final end = start.add(const Duration(days: 1));
 
-      // 패키지 정보 가져오기
-      final packageDoc = await _firestore.collection('packages').doc(packageId).get();
-      if (!packageDoc.exists) return false;
-
-      final maxParticipants = packageDoc.data()?['maxParticipants'] ?? 0;
-
-      // 해당 날짜의 승인된 예약 수 확인
+      // 해당 날짜의 승인된 예약이 있는지 확인
       final snapshot = await _firestore
           .collection('reservations')
           .where('packageId', isEqualTo: packageId)
-          .where('status', isEqualTo: 'approved')
+          .where('status', isEqualTo: 'approved')  // 승인된 예약만 확인
           .where('reservationDate', isGreaterThanOrEqualTo: Timestamp.fromDate(start))
           .where('reservationDate', isLessThan: Timestamp.fromDate(end))
           .get();
 
-      return snapshot.docs.length < maxParticipants;
+      // 승인된 예약이 하나라도 있으면 false 반환
+      return snapshot.docs.isEmpty;
     } catch (e) {
       print('Error checking date availability: $e');
       return false;

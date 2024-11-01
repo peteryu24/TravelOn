@@ -32,12 +32,9 @@ class _ReservationCalendarScreenState extends State<ReservationCalendarScreen> {
   bool _isValidDepartureDay(DateTime date) {
     return widget.package.departureDays.contains(date.weekday);
   }
+  late int _selectedParticipants;  // 선택된 인원 수
 
-  @override
-  void initState() {
-    super.initState();
-    _preloadAvailability();
-  }
+
 
   String _getDateKey(DateTime date) {
     return DateFormat('yyyy-MM-dd').format(date);
@@ -51,18 +48,20 @@ class _ReservationCalendarScreenState extends State<ReservationCalendarScreen> {
     });
 
     try {
-      final provider = context.read<ReservationProvider>();
       final now = DateTime.now();
-      // 현재 보이는 달의 시작과 끝
       final start = DateTime(_focusedDay.year, _focusedDay.month, 1);
       final end = DateTime(_focusedDay.year, _focusedDay.month + 1, 0);
 
-      // 한 달치 예약 정보를 한 번에 가져오기
-      final reservations = await provider.getMonthReservations(
-        widget.package.id,
-        start,
-        end,
-      );
+      // 해당 월의 승인된 예약 모두 가져오기
+      final snapshot = await FirebaseFirestore.instance
+          .collection('reservations')
+          .where('packageId', isEqualTo: widget.package.id)
+          .where('status', isEqualTo: 'approved')
+          .get();
+
+      final approvedDates = snapshot.docs.map((doc) =>
+          (doc.data()['reservationDate'] as Timestamp).toDate()
+      ).toList();
 
       if (mounted) {
         setState(() {
@@ -71,11 +70,13 @@ class _ReservationCalendarScreenState extends State<ReservationCalendarScreen> {
           date = date.add(const Duration(days: 1))) {
             if (!date.isBefore(now)) {
               final dateKey = _getDateKey(date);
-              // 해당 날짜의 승인된 예약 수 계산
-              final approvedCount = reservations
-                  .where((r) => isSameDay(r.reservationDate, date))
-                  .length;
-              _availabilityCache[dateKey] = approvedCount < widget.package.maxParticipants;
+              // 해당 날짜에 승인된 예약이 있는지 확인
+              final hasApprovedReservation = approvedDates.any((approvedDate) =>
+              approvedDate.year == date.year &&
+                  approvedDate.month == date.month &&
+                  approvedDate.day == date.day
+              );
+              _availabilityCache[dateKey] = !hasApprovedReservation;
             }
           }
           _isLoading = false;
@@ -97,6 +98,21 @@ class _ReservationCalendarScreenState extends State<ReservationCalendarScreen> {
     // 출발 가능 요일인지 먼저 확인
     if (!_isValidDepartureDay(date)) return false;
 
+    // 예약 여부 확인 (승인된 예약이 있는지)
+    final snapshot = await FirebaseFirestore.instance
+        .collection('reservations')
+        .where('packageId', isEqualTo: widget.package.id)
+        .where('status', isEqualTo: 'approved')
+        .where('reservationDate', isEqualTo: Timestamp.fromDate(
+      DateTime(date.year, date.month, date.day),
+    ))
+        .get();
+
+    // 승인된 예약이 있으면 false 반환
+    if (snapshot.docs.isNotEmpty) {
+      return false;
+    }
+
     final dateKey = _getDateKey(date);
     if (_availabilityCache.containsKey(dateKey)) {
       return _availabilityCache[dateKey]!;
@@ -113,6 +129,7 @@ class _ReservationCalendarScreenState extends State<ReservationCalendarScreen> {
 
     return isAvailable;
   }
+
 
   Future<int> _getDateParticipants(DateTime date) async {
     final start = DateTime(date.year, date.month, date.day);
@@ -369,7 +386,6 @@ class _ReservationCalendarScreenState extends State<ReservationCalendarScreen> {
                     '${widget.package.nights}박${widget.package.nights + 1}일',
                     style: const TextStyle(fontSize: 16),
                   ),
-                  // 여기서 기존 Text 위젯을 새로운 Row 위젯으로 교체
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -406,24 +422,10 @@ class _ReservationCalendarScreenState extends State<ReservationCalendarScreen> {
                     '가격: ₩${NumberFormat('#,###').format(widget.package.price.toInt())}',
                     style: const TextStyle(fontSize: 16),
                   ),
-                  FutureBuilder<int>(
-                    future: _getDateParticipants(_selectedDay!),
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return const CircularProgressIndicator();
-                      }
-                      final currentParticipants = snapshot.data ?? 0;
-                      return Text(
-                        '예약 현황: $currentParticipants/${widget.package.maxParticipants}명',
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: currentParticipants >= widget.package.maxParticipants
-                              ? Colors.red
-                              : Colors.black,
-                        ),
-                      );
-                    },
-                  ),
+                  const SizedBox(height: 16),
+                  // 여기에 인원 선택 위젯 추가
+                  _buildParticipantSelector(),
+
                 ],
               ),
             ),
@@ -460,14 +462,12 @@ class _ReservationCalendarScreenState extends State<ReservationCalendarScreen> {
       return;
     }
 
-    // 예약 전 다시 한번 가용성 체크
-    final isAvailable = await _checkDateAvailability(_selectedDay!);
-    if (!isAvailable) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('선택한 날짜는 예약이 마감되었습니다')),
-        );
-      }
+    // 인원 수 유효성 검사
+    if (_selectedParticipants < widget.package.minParticipants ||
+        _selectedParticipants > widget.package.maxParticipants) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('올바른 인원을 선택해주세요')),
+      );
       return;
     }
 
@@ -481,6 +481,7 @@ class _ReservationCalendarScreenState extends State<ReservationCalendarScreen> {
         guideId: widget.package.guideId,
         reservationDate: _selectedDay!,
         price: widget.package.price,
+        participants: _selectedParticipants,
       );
 
       if (mounted) {
@@ -496,5 +497,81 @@ class _ReservationCalendarScreenState extends State<ReservationCalendarScreen> {
         );
       }
     }
+  }
+  Widget _buildParticipantSelector() {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.grey.shade100,
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            '인원 선택',
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              // 여기를 수정
+              Text('${widget.package.minParticipants}명 ~ ${widget.package.maxParticipants}명'),
+              Row(
+                children: [
+                  IconButton(
+                    onPressed: _selectedParticipants > widget.package.minParticipants  // 최소 인원으로 수정
+                        ? () {
+                      setState(() {
+                        _selectedParticipants--;
+                      });
+                    }
+                        : null,
+                    icon: Icon(
+                      Icons.remove_circle_outline,
+                      color: _selectedParticipants > widget.package.minParticipants
+                          ? Colors.blue
+                          : Colors.grey,
+                    ),
+                  ),
+                  Text(
+                    '$_selectedParticipants명',
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  IconButton(
+                    onPressed: _selectedParticipants < widget.package.maxParticipants
+                        ? () {
+                      setState(() {
+                        _selectedParticipants++;
+                      });
+                    }
+                        : null,
+                    icon: Icon(
+                      Icons.add_circle_outline,
+                      color: _selectedParticipants < widget.package.maxParticipants
+                          ? Colors.blue
+                          : Colors.grey,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+  @override
+  void initState() {
+    super.initState();
+    _selectedParticipants = widget.package.minParticipants;
+    _preloadAvailability();
   }
 }

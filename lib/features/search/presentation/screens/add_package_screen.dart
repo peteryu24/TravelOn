@@ -26,6 +26,7 @@ class _AddPackageScreenState extends State<AddPackageScreen> {
   final _maxParticipantsController = TextEditingController();
   int _nights = 1;  // 기본값 1박
   final Set<int> _selectedDepartureDays = {};  // 선택된 출발 요일들
+  final _minParticipantsController = TextEditingController();
 
   final List<Map<String, dynamic>> _weekDays = [
     {'value': 1, 'label': '월'},
@@ -175,6 +176,9 @@ class _AddPackageScreenState extends State<AddPackageScreen> {
       final authProvider = context.read<AuthProvider>();
       final user = authProvider.currentUser!;
 
+      // 디버깅을 위한 로그 추가
+      print('Creating package with min participants: ${int.parse(_minParticipantsController.text)}');
+
       final newPackage = TravelPackage(
         id: DateTime.now().toString(),
         title: _titleController.text,
@@ -185,6 +189,7 @@ class _AddPackageScreenState extends State<AddPackageScreen> {
         descriptionImages: _descriptionImages.map((file) => file.path).toList(),
         guideName: user.name,
         guideId: user.id,
+        minParticipants: int.parse(_minParticipantsController.text),  // 여기 확인
         maxParticipants: int.parse(_maxParticipantsController.text),
         nights: _nights,
         departureDays: _selectedDepartureDays.toList()..sort(),
@@ -326,6 +331,36 @@ class _AddPackageScreenState extends State<AddPackageScreen> {
                 const SizedBox(height: 16),
 
                 _buildDepartureDaysSelection(),
+                const SizedBox(height: 16),
+                TextFormField(
+                  controller: _minParticipantsController,
+                  keyboardType: TextInputType.number,
+                  decoration: const InputDecoration(
+                    labelText: '최소 인원',
+                    hintText: '예: 2',
+                    border: OutlineInputBorder(),
+                    enabledBorder: OutlineInputBorder(
+                      borderSide: BorderSide(
+                        color: Color(0XFF2196F3),
+                      ),
+                    ),
+                    suffixText: '명',
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return '최소 인원을 입력해주세요';
+                    }
+                    final minNumber = int.tryParse(value);
+                    if (minNumber == null || minNumber <= 0) {
+                      return '유효한 인원 수를 입력해주세요';
+                    }
+                    final maxNumber = int.tryParse(_maxParticipantsController.text) ?? 0;
+                    if (minNumber > maxNumber) {
+                      return '최소 인원이 최대 인원보다 클 수 없습니다';
+                    }
+                    return null;
+                  },
+                ),
                 const SizedBox(height: 16),
 
                 TextFormField(

@@ -180,6 +180,7 @@ class _PackageDetailScreenState extends State<PackageDetailScreen> {
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
+                                  // IconButton(onPressed: onPressed, icon: icon)
                                 ],
                               ),
                             ),
@@ -190,7 +191,7 @@ class _PackageDetailScreenState extends State<PackageDetailScreen> {
                           children: [
                             const SizedBox(width: 8),
                             Text(
-                              '₩${_priceFormat.format(widget.package.price.toInt())}',
+                              '1인 ${_priceFormat.format(widget.package.price.toInt())}원',
                               style: const TextStyle(
                                 fontSize: 24,
                                 fontWeight: FontWeight.bold,

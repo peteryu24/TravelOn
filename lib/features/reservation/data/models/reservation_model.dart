@@ -2,6 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:travel_on_final/features/reservation/domain/entities/reservation_entity.dart';
 
 class ReservationModel extends ReservationEntity {
+  final int participants;
+
   ReservationModel({
     required String id,
     required String packageId,
@@ -14,6 +16,7 @@ class ReservationModel extends ReservationEntity {
     required DateTime requestedAt,
     required String status,
     required double price,
+    required this.participants,
   }) : super(
     id: id,
     packageId: packageId,
@@ -40,23 +43,25 @@ class ReservationModel extends ReservationEntity {
       reservationDate: (json['reservationDate'] as Timestamp).toDate(),
       requestedAt: (json['requestedAt'] as Timestamp).toDate(),
       status: json['status'] as String,
-      price: json['price'] as double,
+      price: (json['price'] as num).toDouble(),
+      participants: json['participants'] as int? ?? 1,  // 기본값 1
     );
   }
 
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'packageId': packageId,
-      'packageTitle': packageTitle,
-      'customerId': customerId,
-      'customerName': customerName,
-      'guideName': guideName,
-      'guideId': guideId,
-      'reservationDate': Timestamp.fromDate(reservationDate),
-      'requestedAt': Timestamp.fromDate(requestedAt),
-      'status': status,
-      'price': price,
-    };
-  }
+
+  @override
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'packageId': packageId,
+    'packageTitle': packageTitle,
+    'customerId': customerId,
+    'customerName': customerName,
+    'guideName': guideName,
+    'guideId': guideId,
+    'reservationDate': Timestamp.fromDate(reservationDate),
+    'requestedAt': Timestamp.fromDate(requestedAt),
+    'status': status,
+    'price': price,
+    'participants': participants,
+  };
 }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import '../widgets/package_list.dart';
@@ -125,7 +126,7 @@ class _DetailScreenState extends State<DetailScreen> {
           },
         ),
       ),
-      const SizedBox(width: 8),
+      SizedBox(width: 8.w),
     ];
   }
 
@@ -146,8 +147,8 @@ class _DetailScreenState extends State<DetailScreen> {
               children: [
                 Text(
                   '검색 결과: $matchCount개',
-                  style: const TextStyle(
-                    fontSize: 14,
+                  style: TextStyle(
+                    fontSize: 14.sp,
                     color: Colors.grey,
                   ),
                 ),
@@ -155,8 +156,8 @@ class _DetailScreenState extends State<DetailScreen> {
                 if (provider.selectedRegion != 'all')
                   Text(
                     '지역: ${_getRegionText(provider.selectedRegion)}',
-                    style: const TextStyle(
-                      fontSize: 14,
+                    style: TextStyle(
+                      fontSize: 14.sp,
                       color: Colors.grey,
                     ),
                   ),
