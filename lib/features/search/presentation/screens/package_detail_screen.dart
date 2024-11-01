@@ -151,28 +151,36 @@ class _PackageDetailScreenState extends State<PackageDetailScreen> {
                       ),
                     ],
                   ),
-
                   const SizedBox(height: 16),
-
-                  // 가격
                   Container(
-                    padding: const EdgeInsets.all(16),
+                    padding: const EdgeInsets.all(3),
                     decoration: BoxDecoration(
                       color: Colors.grey.shade100,
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Column(
                       children: [
+                        const SizedBox(height: 8),
                         Row(
                           children: [
-                            const Icon(Icons.payment, color: Colors.blue),
                             const SizedBox(width: 8),
-                            Text(
-                              '₩${_priceFormat.format(widget.package.price.toInt())}',
-                              style: const TextStyle(
-                                fontSize: 24,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.blue,
+                            Container(
+                              decoration: BoxDecoration(
+                                color: Colors.grey.shade100,
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Row(
+                                children: [
+                                  const Icon(Icons.person, color: Colors.black),
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    '가이드 : ${widget.package.guideName}',
+                                    style: const TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
                           ],
@@ -180,8 +188,23 @@ class _PackageDetailScreenState extends State<PackageDetailScreen> {
                         const SizedBox(height: 8),
                         Row(
                           children: [
-                            const Icon(Icons.group, color: Colors.blue),
                             const SizedBox(width: 8),
+                            Text(
+                              '₩${_priceFormat.format(widget.package.price.toInt())}',
+                              style: const TextStyle(
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black,
+                              ),
+                            ),
+                          ],
+                        ),
+
+                        const SizedBox(height: 8),
+                        Row(
+                          children: [
+                            const SizedBox(width: 8),
+                            const Icon(Icons.group, color: Colors.black),
                             FutureBuilder<int>(
                               future: _todayParticipants,
                               builder: (context, snapshot) {
@@ -198,7 +221,7 @@ class _PackageDetailScreenState extends State<PackageDetailScreen> {
                                   '오늘 예약 현황: $participants/${widget.package.maxParticipants}명',
                                   style: TextStyle(
                                     fontSize: 16,
-                                    color: _isAvailable ? Colors.blue : Colors.red,
+                                    color: _isAvailable ? Colors.black : Colors.red,
                                     fontWeight: FontWeight.bold,
                                   ),
                                 );

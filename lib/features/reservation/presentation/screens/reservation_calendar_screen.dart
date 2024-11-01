@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
@@ -111,6 +112,21 @@ class _ReservationCalendarScreenState extends State<ReservationCalendarScreen> {
     }
 
     return isAvailable;
+  }
+
+  Future<int> _getDateParticipants(DateTime date) async {
+    final start = DateTime(date.year, date.month, date.day);
+    final end = start.add(const Duration(days: 1));
+
+    final snapshot = await FirebaseFirestore.instance
+        .collection('reservations')
+        .where('packageId', isEqualTo: widget.package.id)
+        .where('status', isEqualTo: 'approved')
+        .where('reservationDate', isGreaterThanOrEqualTo: Timestamp.fromDate(start))
+        .where('reservationDate', isLessThan: Timestamp.fromDate(end))
+        .get();
+
+    return snapshot.docs.length;
   }
 
   Widget _buildCalendarDay(DateTime date) {
@@ -390,9 +406,23 @@ class _ReservationCalendarScreenState extends State<ReservationCalendarScreen> {
                     '가격: ₩${NumberFormat('#,###').format(widget.package.price.toInt())}',
                     style: const TextStyle(fontSize: 16),
                   ),
-                  Text(
-                    '최대 인원: ${widget.package.maxParticipants}명',
-                    style: const TextStyle(fontSize: 16),
+                  FutureBuilder<int>(
+                    future: _getDateParticipants(_selectedDay!),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const CircularProgressIndicator();
+                      }
+                      final currentParticipants = snapshot.data ?? 0;
+                      return Text(
+                        '예약 현황: $currentParticipants/${widget.package.maxParticipants}명',
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: currentParticipants >= widget.package.maxParticipants
+                              ? Colors.red
+                              : Colors.black,
+                        ),
+                      );
+                    },
                   ),
                 ],
               ),
