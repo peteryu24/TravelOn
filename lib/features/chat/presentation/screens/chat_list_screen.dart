@@ -10,7 +10,6 @@ class ChatListScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final authProvider = Provider.of<AuthProvider>(context);
 
-    // currentUser가 null일 때 처리
     if (authProvider.currentUser == null) {
       return Scaffold(
         body: Center(child: Text('로그인이 필요합니다')),
@@ -50,7 +49,7 @@ class ChatListScreen extends StatelessWidget {
                       ? NetworkImage(chatData['userProfileImages'][authProvider.currentUser!.id == chatData['participants'][0]
                           ? chatData['participants'][1]
                           : chatData['participants'][0]])
-                      : AssetImage('lib/assets/images/defaultUserProfile.png') as ImageProvider,
+                      : AssetImage('assets/images/default_profile.png') as ImageProvider,
                 ),
                 title: Text(
                   chatData['usernames'][authProvider.currentUser!.id == chatData['participants'][0]

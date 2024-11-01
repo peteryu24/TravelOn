@@ -34,7 +34,7 @@ class _LoginScreenState extends State<LoginScreen> {
     });
   }
 
-  // 로그인 시 ID와 비밀번호 저장
+  // 로그인 시 ID와 비밀번호를 SharedPreferences에 저장
   Future<void> _saveCredentialsToPrefs() async {
     if (_saveCredentials) {
       await _prefs?.setString('savedEmail', _emailController.text);
@@ -47,6 +47,7 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
+  // 로그인 메서드
   Future<void> _login() async {
     setState(() => _isLoading = true);
 
