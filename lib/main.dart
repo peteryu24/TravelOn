@@ -27,11 +27,14 @@ import 'package:travel_on_final/features/auth/data/repositories/auth_repository_
 import 'package:travel_on_final/features/auth/domain/repositories/auth_repository.dart';
 
 Future<void> main() async {
-  KakaoSdk.init(nativeAppKey: 'ac1aeb4d578457a2abd73ebfab67b3b6');
-
   await dotenv.load(fileName: ".env");
 
   WidgetsFlutterBinding.ensureInitialized();
+  // Load the Kakao Native App Key from the .env file
+  String kakaoNativeAppKey = dotenv.env['KAKAO_NATIVE_APP_KEY'] ?? '';
+
+  // Initialize Kakao SDK with the loaded key
+  KakaoSdk.init(nativeAppKey: kakaoNativeAppKey);
 
   // Firebase 초기화
   await Firebase.initializeApp(
