@@ -99,6 +99,10 @@ class _GuideReservationsScreenState extends State<GuideReservationsScreen> with 
                 Text(
                   '가격: ₩${NumberFormat('#,###').format(reservation.price.toInt())}',
                 ),
+                // 여기에 인원 수 정보 추가
+                Text(
+                  '예약 인원: ${reservation.participants}명',
+                ),
                 const SizedBox(height: 12),
                 if (status == 'pending')
                   Row(

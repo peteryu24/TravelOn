@@ -11,13 +11,18 @@ class TravelRepositoryImpl implements TravelRepository {
   @override
   Future<List<TravelPackage>> getPackages() async {
     try {
-      print('Fetching packages from Firestore...');
+      print('Fetching packages from Firestore...'); // 디버그 로그 추가
       final snapshot = await _firestore.collection('packages').get();
-      print('Fetched ${snapshot.docs.length} packages');
 
       return snapshot.docs.map((doc) {
         final data = doc.data();
-        return TravelPackage(
+        // print('Raw package data: $data'); // 파이어베이스에서 받아온 원본 데이터 확인
+
+        // 명시적으로 minParticipants 확인
+        // final minPart = data['minParticipants'];
+        // print('minParticipants from Firestore: $minPart (type: ${minPart.runtimeType})');
+
+        final package = TravelPackage(
           id: doc.id,
           title: data['title'] ?? '',
           description: data['description'] ?? '',
@@ -27,14 +32,19 @@ class TravelRepositoryImpl implements TravelRepository {
           descriptionImages: List<String>.from(data['descriptionImages'] ?? []),
           guideName: data['guideName'] ?? '',
           guideId: data['guideId'] ?? '',
-          maxParticipants: (data['maxParticipants'] ?? 0).toInt(),
-          nights: (data['nights'] ?? 1).toInt(),                   // 추가: 기본값 1박
-          departureDays: List<int>.from(data['departureDays'] ?? [1,2,3,4,5,6,7]), minParticipants: 1,  // 추가: 기본값 모든 요일
+          // 여기서 minParticipants 처리를 명확하게
+          minParticipants: (data['minParticipants'] as num?)?.toInt() ?? 4, // 기본값을 4로 설정
+          maxParticipants: (data['maxParticipants'] as num?)?.toInt() ?? 8,
+          nights: (data['nights'] ?? 1).toInt(),
+          departureDays: List<int>.from(data['departureDays'] ?? [1,2,3,4,5,6,7]),
         );
+
+        // print('Converted package minParticipants: ${package.minParticipants}'); // 변환된 데이터 확인
+        return package;
       }).toList();
     } catch (e) {
       print('Error fetching packages: $e');
-      return [];
+      rethrow;  // 에러를 던져서 디버깅을 용이하게
     }
   }
 
@@ -44,9 +54,9 @@ class TravelRepositoryImpl implements TravelRepository {
       print('Starting to add package...');
 
       // 저장하기 전 데이터 확인을 위한 로그
-      print('Package data being saved:');
-      print('minParticipants: ${package.minParticipants}');
-      print('maxParticipants: ${package.maxParticipants}');
+      // print('Package data being saved:');
+      // print('minParticipants: ${package.minParticipants}');
+      // print('maxParticipants: ${package.maxParticipants}');
 
       String? mainImageUrl;
       List<String> descriptionImageUrls = [];

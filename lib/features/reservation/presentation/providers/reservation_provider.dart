@@ -20,10 +20,21 @@ class ReservationProvider extends ChangeNotifier {
     required String guideId,
     required DateTime reservationDate,
     required double price,
-    required int participants,  // 여기 추가
+    required int participants,
   }) async {
     try {
       await _firestore.runTransaction((transaction) async {
+        // 패키지 정보 가져오기
+        final packageDoc = await _firestore.collection('packages').doc(packageId).get();
+        final packageData = packageDoc.data()!;
+
+        // 인원 수 검증
+        final minParticipants = packageData['minParticipants'] as int;
+        final maxParticipants = packageData['maxParticipants'] as int;
+
+        if (participants < minParticipants || participants > maxParticipants) {
+          throw '올바르지 않은 인원 수입니다';
+        }
         // 이미 예약이 있는지 확인
         final start = DateTime(reservationDate.year, reservationDate.month, reservationDate.day);
         final end = start.add(const Duration(days: 1));

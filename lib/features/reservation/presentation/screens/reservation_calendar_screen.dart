@@ -21,25 +21,35 @@ class ReservationCalendarScreen extends StatefulWidget {
 }
 
 class _ReservationCalendarScreenState extends State<ReservationCalendarScreen> {
+  // 상태 변수들
   DateTime? _selectedDay;
   DateTime _focusedDay = DateTime.now();
-  Map<String, bool> _availabilityCache = {};  // 날짜 문자열을 키로 사용
+  Map<String, bool> _availabilityCache = {};
   bool _isLoading = false;
-  bool _isDepartureDay(DateTime date) {
-    // 1: 월요일 ~ 7: 일요일로 변환 (DateTime.weekday는 1: 월요일 ~ 7: 일요일)
-    return widget.package.departureDays.contains(date.weekday);
+  late int _selectedParticipants;
+  late final int _minParticipants;
+  late final int _maxParticipants;
+
+  @override
+  void initState() {
+    super.initState();
+    _minParticipants = widget.package.minParticipants;
+    _maxParticipants = widget.package.maxParticipants;
+    assert(widget.package.minParticipants > 0, 'Invalid minimum participants');
+    _selectedParticipants = widget.package.minParticipants;
+    _preloadAvailability();
   }
-  bool _isValidDepartureDay(DateTime date) {
-    return widget.package.departureDays.contains(date.weekday);
-  }
-  late int _selectedParticipants;  // 선택된 인원 수
 
-
-
+  // 헬퍼 메서드
   String _getDateKey(DateTime date) {
     return DateFormat('yyyy-MM-dd').format(date);
   }
 
+  bool _isValidDepartureDay(DateTime date) {
+    return widget.package.departureDays.contains(date.weekday);
+  }
+
+  // 가용성 로딩
   Future<void> _preloadAvailability() async {
     if (_isLoading) return;
 
@@ -52,7 +62,6 @@ class _ReservationCalendarScreenState extends State<ReservationCalendarScreen> {
       final start = DateTime(_focusedDay.year, _focusedDay.month, 1);
       final end = DateTime(_focusedDay.year, _focusedDay.month + 1, 0);
 
-      // 해당 월의 승인된 예약 모두 가져오기
       final snapshot = await FirebaseFirestore.instance
           .collection('reservations')
           .where('packageId', isEqualTo: widget.package.id)
@@ -70,7 +79,6 @@ class _ReservationCalendarScreenState extends State<ReservationCalendarScreen> {
           date = date.add(const Duration(days: 1))) {
             if (!date.isBefore(now)) {
               final dateKey = _getDateKey(date);
-              // 해당 날짜에 승인된 예약이 있는지 확인
               final hasApprovedReservation = approvedDates.any((approvedDate) =>
               approvedDate.year == date.year &&
                   approvedDate.month == date.month &&
@@ -83,7 +91,6 @@ class _ReservationCalendarScreenState extends State<ReservationCalendarScreen> {
         });
       }
     } catch (e) {
-      print('Error preloading availability: $e');
       if (mounted) {
         setState(() {
           _isLoading = false;
@@ -92,127 +99,163 @@ class _ReservationCalendarScreenState extends State<ReservationCalendarScreen> {
     }
   }
 
-  Future<bool> _checkDateAvailability(DateTime date) async {
-    if (date.isBefore(DateTime.now())) return false;
-
-    // 출발 가능 요일인지 먼저 확인
-    if (!_isValidDepartureDay(date)) return false;
-
-    // 예약 여부 확인 (승인된 예약이 있는지)
-    final snapshot = await FirebaseFirestore.instance
-        .collection('reservations')
-        .where('packageId', isEqualTo: widget.package.id)
-        .where('status', isEqualTo: 'approved')
-        .where('reservationDate', isEqualTo: Timestamp.fromDate(
-      DateTime(date.year, date.month, date.day),
-    ))
-        .get();
-
-    // 승인된 예약이 있으면 false 반환
-    if (snapshot.docs.isNotEmpty) {
-      return false;
+  // UI 빌더 메서드
+  Widget _buildParticipantSelector() {
+    // widget.package.minParticipants 대신 _minParticipants 사용
+    if (_selectedParticipants < _minParticipants) {
+      _selectedParticipants = _minParticipants;
     }
-
-    final dateKey = _getDateKey(date);
-    if (_availabilityCache.containsKey(dateKey)) {
-      return _availabilityCache[dateKey]!;
-    }
-
-    final provider = context.read<ReservationProvider>();
-    final isAvailable = await provider.isDateAvailable(widget.package.id, date);
-
-    if (mounted) {
-      setState(() {
-        _availabilityCache[dateKey] = isAvailable;
-      });
-    }
-
-    return isAvailable;
-  }
-
-
-  Future<int> _getDateParticipants(DateTime date) async {
-    final start = DateTime(date.year, date.month, date.day);
-    final end = start.add(const Duration(days: 1));
-
-    final snapshot = await FirebaseFirestore.instance
-        .collection('reservations')
-        .where('packageId', isEqualTo: widget.package.id)
-        .where('status', isEqualTo: 'approved')
-        .where('reservationDate', isGreaterThanOrEqualTo: Timestamp.fromDate(start))
-        .where('reservationDate', isLessThan: Timestamp.fromDate(end))
-        .get();
-
-    return snapshot.docs.length;
-  }
-
-  Widget _buildCalendarDay(DateTime date) {
-    if (date.isBefore(DateTime.now())) {
-      return _buildDayContainer(date, isDisabled: true);
-    }
-
-    final dateKey = _getDateKey(date);
-    final isAvailable = _availabilityCache[dateKey] ?? true;
-    final isSelected = _selectedDay != null && isSameDay(_selectedDay!, date);
-    final isToday = isSameDay(date, DateTime.now());
-    final isDepartureDay = _isValidDepartureDay(date);
-
-    return _buildDayContainer(
-      date,
-      isSelected: isSelected,
-      isAvailable: isAvailable && isDepartureDay,
-      isToday: isToday,
-      isDepartureDay: isDepartureDay,
-    );
-  }
-
-  Widget _buildDayContainer(
-      DateTime date, {
-        bool isSelected = false,
-        bool isAvailable = true,
-        bool isToday = false,
-        bool isDisabled = false,
-        bool isDepartureDay = false,
-      }) {
-    final isEnabled = isAvailable && isDepartureDay && !isDisabled;
 
     return Container(
-      margin: const EdgeInsets.all(4),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: isSelected
-            ? Colors.blue
-            : !isEnabled
-            ? Colors.grey.shade200
-            : isDepartureDay
-            ? Colors.blue.shade50  // 출발 가능 요일 강조
-            : null,
-        shape: BoxShape.circle,
-        border: isToday ? Border.all(color: Colors.blue, width: 1) : null,
+        color: Colors.grey.shade100,
+        borderRadius: BorderRadius.circular(8),
       ),
-      child: Center(
-        child: Text(
-          '${date.day}',
-          style: TextStyle(
-            color: isSelected
-                ? Colors.white
-                : !isEnabled
-                ? Colors.grey
-                : isToday
-                ? Colors.blue
-                : isDepartureDay
-                ? Colors.blue.shade900  // 출발 가능 요일 텍스트 색상
-                : Colors.black,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            '인원 선택',
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+            ),
           ),
-        ),
+          const SizedBox(height: 8),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              // 여기도 저장된 변수 사용
+              Text('$_minParticipants명 ~ $_maxParticipants명'),
+              Row(
+                children: [
+                  IconButton(
+                    // 여기도 수정
+                    onPressed: _selectedParticipants > _minParticipants
+                        ? () {
+                      setState(() {
+                        final newValue = _selectedParticipants - 1;
+                        if (newValue >= _minParticipants) {
+                          _selectedParticipants = newValue;
+                        }
+                      });
+                    }
+                        : null,
+                    icon: Icon(
+                      Icons.remove_circle_outline,
+                      color: _selectedParticipants > _minParticipants
+                          ? Colors.blue
+                          : Colors.grey,
+                    ),
+                  ),
+                  Text(
+                    '$_selectedParticipants명',
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  IconButton(
+                    // 여기도 수정
+                    onPressed: _selectedParticipants < _maxParticipants
+                        ? () {
+                      setState(() {
+                        _selectedParticipants++;
+                      });
+                    }
+                        : null,
+                    icon: Icon(
+                      Icons.add_circle_outline,
+                      color: _selectedParticipants < _maxParticipants
+                          ? Colors.blue
+                          : Colors.grey,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ],
       ),
     );
+  }
+
+  // 예약 처리
+  void _requestReservation(BuildContext context) async {
+    final authProvider = context.read<AuthProvider>();
+    final reservationProvider = context.read<ReservationProvider>();
+
+    if (!authProvider.isAuthenticated) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('로그인이 필요합니다')),
+      );
+      context.push('/login');
+      return;
+    }
+
+    if (_selectedParticipants < _minParticipants) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('최소 $_minParticipants명 이상 선택해주세요')),
+      );
+      return;
+    }
+
+    if (_selectedParticipants > _maxParticipants) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('최대 $_maxParticipants명까지 선택 가능합니다')),
+      );
+      return;
+    }
+
+    if (_selectedDay == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('날짜를 선택해주세요')),
+      );
+      return;
+    }
+
+    if (_selectedParticipants < widget.package.minParticipants ||
+        _selectedParticipants > widget.package.maxParticipants) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('올바른 인원을 선택해주세요')),
+      );
+      return;
+    }
+
+    try {
+      await reservationProvider.createReservation(
+        packageId: widget.package.id,
+        packageTitle: widget.package.title,
+        customerId: authProvider.currentUser!.id,
+        customerName: authProvider.currentUser!.name,
+        guideName: widget.package.guideName,
+        guideId: widget.package.guideId,
+        reservationDate: _selectedDay!,
+        price: widget.package.price,
+        participants: _selectedParticipants,
+      );
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('예약이 신청되었습니다')),
+        );
+        context.pop();
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('예약 신청 중 오류가 발생했습니다: $e')),
+        );
+      }
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('예약 날짜 선택'),
+        title: const Text('예약 날짜 선택'),
       ),
       body: Column(
         children: [
@@ -224,30 +267,21 @@ class _ReservationCalendarScreenState extends State<ReservationCalendarScreen> {
             focusedDay: _focusedDay,
             selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
             enabledDayPredicate: (day) {
-              // 과거 날짜 제외
               if (day.isBefore(DateTime.now())) return false;
-
-              // 출발 가능 요일이 아닌 경우 제외
-              if (!_isValidDepartureDay(day)) {
-                return false;
-              }
-
-              // 예약 가능 여부 확인
+              if (!_isValidDepartureDay(day)) return false;
               final dateKey = _getDateKey(day);
               return _availabilityCache[dateKey] ?? true;
             },
             onDaySelected: (selectedDay, focusedDay) {
               if (selectedDay.isBefore(DateTime.now())) return;
 
-              // 출발 가능 요일인지 확인
-              if (!widget.package.departureDays.contains(selectedDay.weekday)) {
+              if (!_isValidDepartureDay(selectedDay)) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(content: Text('선택할 수 없는 출발일입니다')),
                 );
                 return;
               }
 
-              // 예약 가능 여부 확인
               final dateKey = _getDateKey(selectedDay);
               final isAvailable = _availabilityCache[dateKey] ?? true;
 
@@ -267,13 +301,13 @@ class _ReservationCalendarScreenState extends State<ReservationCalendarScreen> {
             onPageChanged: (focusedDay) {
               setState(() {
                 _focusedDay = focusedDay;
-                _availabilityCache.clear(); // 페이지 변경 시 캐시 초기화
+                _availabilityCache.clear();
               });
               _preloadAvailability();
             },
             calendarBuilders: CalendarBuilders(
               defaultBuilder: (context, date, _) {
-                bool isDepartureDay = widget.package.departureDays.contains(date.weekday);
+                bool isDepartureDay = _isValidDepartureDay(date);
                 return Container(
                   margin: const EdgeInsets.all(4),
                   decoration: BoxDecoration(
@@ -322,41 +356,19 @@ class _ReservationCalendarScreenState extends State<ReservationCalendarScreen> {
                   ),
                 );
               },
-              outsideBuilder: (context, date, _) {
-                return Container(
-                  margin: const EdgeInsets.all(4),
-                  decoration: BoxDecoration(
-                    color: Colors.grey.shade200,
-                    shape: BoxShape.circle,
-                  ),
-                  child: Center(
-                    child: Text(
-                      '${date.day}',
-                      style: const TextStyle(color: Colors.grey),
-                    ),
-                  ),
-                );
-              },
             ),
             calendarStyle: CalendarStyle(
-              // 선택된 날짜 스타일
               selectedDecoration: const BoxDecoration(
                 color: Colors.blue,
                 shape: BoxShape.circle,
               ),
               selectedTextStyle: const TextStyle(color: Colors.white),
-
-              // 오늘 날짜 스타일
               todayDecoration: BoxDecoration(
                 border: Border.all(color: Colors.blue),
                 shape: BoxShape.circle,
               ),
               todayTextStyle: const TextStyle(color: Colors.blue),
-
-              // 비활성화된 날짜 스타일
               disabledTextStyle: const TextStyle(color: Colors.grey),
-
-              // 기본 스타일
               defaultDecoration: const BoxDecoration(shape: BoxShape.circle),
               weekendDecoration: const BoxDecoration(shape: BoxShape.circle),
               outsideDecoration: const BoxDecoration(shape: BoxShape.circle),
@@ -423,9 +435,7 @@ class _ReservationCalendarScreenState extends State<ReservationCalendarScreen> {
                     style: const TextStyle(fontSize: 16),
                   ),
                   const SizedBox(height: 16),
-                  // 여기에 인원 선택 위젯 추가
                   _buildParticipantSelector(),
-
                 ],
               ),
             ),
@@ -448,130 +458,5 @@ class _ReservationCalendarScreenState extends State<ReservationCalendarScreen> {
         ],
       ),
     );
-  }
-
-  void _requestReservation(BuildContext context) async {
-    final authProvider = context.read<AuthProvider>();
-    final reservationProvider = context.read<ReservationProvider>();
-
-    if (!authProvider.isAuthenticated) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('로그인이 필요합니다')),
-      );
-      context.push('/login');
-      return;
-    }
-
-    // 인원 수 유효성 검사
-    if (_selectedParticipants < widget.package.minParticipants ||
-        _selectedParticipants > widget.package.maxParticipants) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('올바른 인원을 선택해주세요')),
-      );
-      return;
-    }
-
-    try {
-      await reservationProvider.createReservation(
-        packageId: widget.package.id,
-        packageTitle: widget.package.title,
-        customerId: authProvider.currentUser!.id,
-        customerName: authProvider.currentUser!.name,
-        guideName: widget.package.guideName,
-        guideId: widget.package.guideId,
-        reservationDate: _selectedDay!,
-        price: widget.package.price,
-        participants: _selectedParticipants,
-      );
-
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('예약이 신청되었습니다')),
-        );
-        context.pop();
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('예약 신청 중 오류가 발생했습니다: $e')),
-        );
-      }
-    }
-  }
-  Widget _buildParticipantSelector() {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.grey.shade100,
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            '인원 선택',
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              // 여기를 수정
-              Text('${widget.package.minParticipants}명 ~ ${widget.package.maxParticipants}명'),
-              Row(
-                children: [
-                  IconButton(
-                    onPressed: _selectedParticipants > widget.package.minParticipants  // 최소 인원으로 수정
-                        ? () {
-                      setState(() {
-                        _selectedParticipants--;
-                      });
-                    }
-                        : null,
-                    icon: Icon(
-                      Icons.remove_circle_outline,
-                      color: _selectedParticipants > widget.package.minParticipants
-                          ? Colors.blue
-                          : Colors.grey,
-                    ),
-                  ),
-                  Text(
-                    '$_selectedParticipants명',
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  IconButton(
-                    onPressed: _selectedParticipants < widget.package.maxParticipants
-                        ? () {
-                      setState(() {
-                        _selectedParticipants++;
-                      });
-                    }
-                        : null,
-                    icon: Icon(
-                      Icons.add_circle_outline,
-                      color: _selectedParticipants < widget.package.maxParticipants
-                          ? Colors.blue
-                          : Colors.grey,
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-  @override
-  void initState() {
-    super.initState();
-    _selectedParticipants = widget.package.minParticipants;
-    _preloadAvailability();
   }
 }

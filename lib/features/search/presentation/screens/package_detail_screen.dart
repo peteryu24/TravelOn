@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import '../../domain/entities/travel_package.dart';
@@ -20,10 +21,15 @@ class _PackageDetailScreenState extends State<PackageDetailScreen> {
   final NumberFormat _priceFormat = NumberFormat('#,###');
   Future<int>? _todayParticipants;
   bool _isAvailable = true;
+  late final int _minParticipants;
+  late final int _maxParticipants;
+
 
   @override
   void initState() {
     super.initState();
+    _minParticipants = widget.package.minParticipants;
+    _maxParticipants = widget.package.maxParticipants;
     _loadTodayParticipants();
   }
 
@@ -126,16 +132,16 @@ class _PackageDetailScreenState extends State<PackageDetailScreen> {
                       Expanded(
                         child: Text(
                           widget.package.title,
-                          style: const TextStyle(
-                            fontSize: 24,
+                          style: TextStyle(
+                            fontSize: 24.sp,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
                       ),
                       Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 6,
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 12.w,
+                          vertical: 6.h,
                         ),
                         decoration: BoxDecoration(
                           color: Colors.blue.shade100,
@@ -151,7 +157,7 @@ class _PackageDetailScreenState extends State<PackageDetailScreen> {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 16),
+                  SizedBox(height: 16.h),
                   Container(
                     padding: const EdgeInsets.all(3),
                     decoration: BoxDecoration(
@@ -160,10 +166,9 @@ class _PackageDetailScreenState extends State<PackageDetailScreen> {
                     ),
                     child: Column(
                       children: [
-                        const SizedBox(height: 8),
                         Row(
                           children: [
-                            const SizedBox(width: 8),
+                            SizedBox(width: 8.w),
                             Container(
                               decoration: BoxDecoration(
                                 color: Colors.grey.shade100,
@@ -172,7 +177,7 @@ class _PackageDetailScreenState extends State<PackageDetailScreen> {
                               child: Row(
                                 children: [
                                   const Icon(Icons.person, color: Colors.black),
-                                  const SizedBox(width: 8),
+                                  SizedBox(width: 8.w),
                                   Text(
                                     '가이드 : ${widget.package.guideName}',
                                     style: const TextStyle(
@@ -180,53 +185,42 @@ class _PackageDetailScreenState extends State<PackageDetailScreen> {
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
-                                  // IconButton(onPressed: onPressed, icon: icon)
+                                  IconButton(
+                                    onPressed: () {},
+                                    icon: Icon(Icons.chat),
+                                  )
                                 ],
                               ),
                             ),
                           ],
                         ),
-                        const SizedBox(height: 8),
+
                         Row(
                           children: [
-                            const SizedBox(width: 8),
+                            SizedBox(width: 8.w),
+                            const Icon(Icons.group, color: Colors.black),
                             Text(
-                              '1인 ${_priceFormat.format(widget.package.price.toInt())}원',
-                              style: const TextStyle(
-                                fontSize: 24,
+                              '예약 가능 인원: $_minParticipants명 ~ $_maxParticipants명',
+                              style: TextStyle(
+                                fontSize: 16.sp,
+                                color: _isAvailable ? Colors.black : Colors.red,
                                 fontWeight: FontWeight.bold,
-                                color: Colors.black,
                               ),
                             ),
                           ],
                         ),
 
-                        const SizedBox(height: 8),
+                        SizedBox(height: 8.h),
                         Row(
                           children: [
-                            const SizedBox(width: 8),
-                            const Icon(Icons.group, color: Colors.black),
-                            FutureBuilder<int>(
-                              future: _todayParticipants,
-                              builder: (context, snapshot) {
-                                if (snapshot.connectionState == ConnectionState.waiting) {
-                                  return const SizedBox(
-                                    width: 20,
-                                    height: 20,
-                                    child: CircularProgressIndicator(strokeWidth: 2),
-                                  );
-                                }
-
-                                final participants = snapshot.data ?? 0;
-                                return Text(
-                                  '오늘 예약 현황: $participants/${widget.package.maxParticipants}명',
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    color: _isAvailable ? Colors.black : Colors.red,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                );
-                              },
+                            SizedBox(width: 8.h),
+                            Text(
+                              '1인 ${_priceFormat.format(widget.package.price.toInt())}원',
+                              style: TextStyle(
+                                fontSize: 16.sp,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black,
+                              ),
                             ),
                           ],
                         ),
@@ -236,8 +230,8 @@ class _PackageDetailScreenState extends State<PackageDetailScreen> {
 
                   if (!_isAvailable)
                     Container(
-                      margin: const EdgeInsets.only(top: 8),
-                      padding: const EdgeInsets.all(8),
+                      margin: EdgeInsets.only(top: 8.w),
+                      padding: EdgeInsets.all(8.w),
                       decoration: BoxDecoration(
                         color: Colors.red.shade100,
                         borderRadius: BorderRadius.circular(4),
