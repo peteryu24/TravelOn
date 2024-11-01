@@ -5,11 +5,14 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:travel_on_final/features/auth/data/models/user_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:travel_on_final/features/auth/domain/usecases/kakao_login_usecase.dart';
 
 class AuthProvider with ChangeNotifier {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseStorage _storage = FirebaseStorage.instance;
+  final KakaoLoginUseCase _kakaoLoginUseCase;
+
   UserModel? _currentUser;
   bool isEmailVerified = false;
 
@@ -17,7 +20,7 @@ class AuthProvider with ChangeNotifier {
   bool get isAuthenticated => _currentUser != null;
 
   // Firebase 인증 상태가 변경되면 onAuthStateChanged 메서드 호출
-  AuthProvider() {
+  AuthProvider(this._kakaoLoginUseCase) {
     _auth.authStateChanges().listen(_onAuthStateChanged);
   }
 
@@ -155,5 +158,22 @@ class AuthProvider with ChangeNotifier {
       _currentUser = null;
     }
     notifyListeners();
+  }
+
+  /////////////////////////////////////////////////////////////////////
+  /// 소셜 로그인
+  Future<void> loginWithKakao() async {
+    try {
+      final userModel = await _kakaoLoginUseCase.execute();
+      if (userModel != null) {
+        // 로그인 성공 시 사용자 정보 저장
+        _currentUser = userModel;
+        notifyListeners();
+      } else {
+        print('카카오톡 로그인 실패');
+      }
+    } catch (e) {
+      print('카카오톡 로그인 에러: $e');
+    }
   }
 }

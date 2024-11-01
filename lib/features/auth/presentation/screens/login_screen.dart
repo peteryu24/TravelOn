@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:travel_on_final/features/auth/presentation/providers/auth_provider.dart';
 import 'package:travel_on_final/features/auth/presentation/widgets/text_field_widget.dart';
 import 'package:travel_on_final/features/auth/presentation/widgets/password_field_widget.dart';
+import 'package:travel_on_final/features/auth/presentation/widgets/social_login_button_widget.dart';
 import 'package:go_router/go_router.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -79,31 +81,31 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('로그인')),
+      appBar: AppBar(title: Text('로그인', style: TextStyle(fontSize: 20.sp))),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
+        padding: EdgeInsets.all(16.0.w),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Image.asset(
               'assets/images/travel-on-login.png',
-              height: 230,
-              width: 230,
+              height: 230.h,
+              width: 230.w,
             ),
             TextFieldWidget(controller: _emailController, labelText: '이메일'),
-            SizedBox(height: 20),
+            SizedBox(height: 20.h),
             PasswordFieldWidget(
               controller: _passwordController,
               labelText: '비밀번호',
             ),
-            SizedBox(height: 5),
+            SizedBox(height: 5.h),
             Row(
               children: [
                 Padding(
-                  padding: const EdgeInsets.only(left: 8.0),
+                  padding: EdgeInsets.only(left: 8.0.w),
                   child: Row(
                     children: [
-                      Text('로그인 정보 저장'),
+                      Text('로그인 정보 저장', style: TextStyle(fontSize: 14.sp)),
                       Checkbox(
                         value: _saveCredentials,
                         onChanged: (value) {
@@ -117,34 +119,79 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 Spacer(),
                 Padding(
-                  padding: const EdgeInsets.only(right: 8.0),
+                  padding: EdgeInsets.only(right: 8.0.w),
                   child: TextButton(
                     onPressed: _navigateToSignup,
                     child: Text(
                       '회원가입',
                       style: TextStyle(
                         color: Colors.blue,
+                        fontSize: 14.sp,
                       ),
                     ),
                   ),
                 ),
               ],
             ),
-            SizedBox(height: 20),
+            SizedBox(height: 20.h),
             Center(
               child: ElevatedButton(
                 onPressed: _login,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.blue[500],
-                  padding: EdgeInsets.symmetric(horizontal: 50, vertical: 16),
+                  padding: EdgeInsets.symmetric(horizontal: 50.w, vertical: 16.h),
                 ),
                 child: Text(
                   '로그인',
-                  style: TextStyle(color: Colors.white),
+                  style: TextStyle(color: Colors.white, fontSize: 14.sp,),
                 ),
               ),
             ),
-            SizedBox(height: 20),
+            SizedBox(height: 25.h),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                SocialLoginButton(
+                  assetPath: "assets/images/logo/kakaotalk.png",
+                  onPressed: () async {
+                    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+                    await authProvider.loginWithKakao();
+
+                    if (authProvider.isAuthenticated) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('${authProvider.currentUser!.name}님 환영합니다.')),
+                      );
+                      context.go('/');
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('카카오톡 로그인 실패')),
+                      );
+                    }
+                  },
+                ),
+                SizedBox(width: 10.w),
+                SocialLoginButton(
+                  assetPath: "assets/images/logo/google.png",
+                  onPressed: () {
+                    // 구글
+                  },
+                ),
+                SizedBox(width: 10.w),
+                SocialLoginButton(
+                  assetPath: "assets/images/logo/naver.png",
+                  onPressed: () {
+                    // 네이버
+                  },
+                ),
+                SizedBox(width: 10.w),
+                SocialLoginButton(
+                  assetPath: "assets/images/logo/facebook.png",
+                  onPressed: () {
+                    // 페이스북
+                  },
+                ),
+              ],
+            ),
           ],
         ),
       ),

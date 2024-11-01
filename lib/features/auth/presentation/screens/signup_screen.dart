@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:travel_on_final/features/auth/domain/usecases/signup_usecase.dart';
 import 'package:travel_on_final/features/auth/presentation/providers/auth_provider.dart';
 import 'package:travel_on_final/features/auth/presentation/widgets/email_field_widget.dart';
@@ -49,23 +50,23 @@ class _SignupScreenState extends State<SignupScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('회원가입')),
+      appBar: AppBar(title: Text('회원가입', style: TextStyle(fontSize: 20.sp,))),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
+        padding: EdgeInsets.all(16.0.w),
         child: _isLoading
             ? Center(child: CircularProgressIndicator())
             : Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   TextFieldWidget(controller: _nameController, labelText: '닉네임'),
-                  SizedBox(height: 16),
+                  SizedBox(height: 16.h),
                   EmailFieldWidget(
                     emailIdController: _emailIdController,
                     emailDomainController: _emailDomainController,
                     onDomainSelected: (value) => setState(() => _selectedDomain = value),
                     selectedDomain: _selectedDomain,
                   ),
-                  SizedBox(height: 16),
+                  SizedBox(height: 16.h),
                   PasswordFieldWidget(
                     controller: _passwordController,
                     labelText: '비밀번호',
@@ -73,14 +74,14 @@ class _SignupScreenState extends State<SignupScreen> {
                   ),
                   if (!_isPasswordLengthValid)
                     Padding(
-                      padding: const EdgeInsets.only(top: 8.0, left: 12.0),
+                      padding: EdgeInsets.only(top: 8.0.h, left: 12.0.w),
                       child: Text(
                         '비밀번호는 6자리 이상이어야 합니다.',
-                        style: TextStyle(color: Colors.red),
+                        style: TextStyle(color: Colors.red, fontSize: 14.sp,),
                         textAlign: TextAlign.left,
                       ),
                     ),
-                  SizedBox(height: 16),
+                  SizedBox(height: 16.h),
                   PasswordFieldWidget(
                     controller: _confirmPasswordController,
                     labelText: '비밀번호 확인',
@@ -91,7 +92,7 @@ class _SignupScreenState extends State<SignupScreen> {
                       padding: const EdgeInsets.only(top: 8.0, left: 12.0),
                       child: Text(
                         '비밀번호가 다릅니다.',
-                        style: TextStyle(color: Colors.red),
+                        style: TextStyle(color: Colors.red, fontSize: 14.sp,),
                         textAlign: TextAlign.left,
                       ),
                     ),
@@ -103,7 +104,7 @@ class _SignupScreenState extends State<SignupScreen> {
                         backgroundColor: Colors.blue[300],
                         padding: EdgeInsets.symmetric(horizontal: 50, vertical: 16),
                       ),
-                      child: Text('회원가입', style: TextStyle(color: Colors.white)),
+                      child: Text('회원가입', style: TextStyle(color: Colors.white, fontSize: 14.sp,)),
                     ),
                   ),
                 ],

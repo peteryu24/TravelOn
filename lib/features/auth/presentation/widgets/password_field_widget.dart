@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class PasswordFieldWidget extends StatefulWidget {
   final TextEditingController controller;
@@ -28,10 +29,10 @@ class _PasswordFieldWidgetState extends State<PasswordFieldWidget> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
       decoration: BoxDecoration(
         border: Border.all(color: Colors.blue),
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(8.r),
       ),
       child: TextField(
         controller: widget.controller,
@@ -39,7 +40,7 @@ class _PasswordFieldWidgetState extends State<PasswordFieldWidget> {
         onChanged: widget.onChanged,
         decoration: InputDecoration(
           labelText: widget.labelText,
-          labelStyle: TextStyle(color: Colors.blue),
+          labelStyle: TextStyle(color: Colors.blue, fontSize: 14.sp,),
           border: InputBorder.none,
           suffixIcon: IconButton(
             icon: Icon(

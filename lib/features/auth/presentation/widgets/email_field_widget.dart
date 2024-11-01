@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'text_field_widget.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class EmailFieldWidget extends StatefulWidget {
   final TextEditingController emailIdController;
@@ -32,15 +33,15 @@ class _EmailFieldWidgetState extends State<EmailFieldWidget> {
           ),
         ),
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+          padding: EdgeInsets.symmetric(horizontal: 8.0.w),
           child: Text('@'),
         ),
         Expanded(
           child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
             decoration: BoxDecoration(
               border: Border.all(color: Colors.blue),
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.circular(8.r),
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -58,7 +59,7 @@ class _EmailFieldWidgetState extends State<EmailFieldWidget> {
                         )
                       : Text(
                           widget.selectedDomain,
-                          style: TextStyle(color: Colors.blue),
+                          style: TextStyle(color: Colors.blue, fontSize: 14.sp,),
                         ),
                 ),
                 PopupMenuButton<String>(
@@ -69,7 +70,7 @@ class _EmailFieldWidgetState extends State<EmailFieldWidget> {
                   itemBuilder: (context) => _emailDomains
                       .map((domain) => PopupMenuItem(
                             value: domain,
-                            child: Text(domain, style: TextStyle(color: Colors.blue)),
+                            child: Text(domain, style: TextStyle(color: Colors.blue, fontSize: 14.sp,)),
                           ))
                       .toList(),
                 ),
