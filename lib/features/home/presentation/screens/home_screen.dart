@@ -8,6 +8,8 @@ import 'package:travel_on_final/features/home/presentation/providers/home_provid
 import 'package:travel_on_final/features/home/presentation/widgets/next_trip_card.dart';
 import 'package:travel_on_final/features/home/presentation/widgets/travel_card.dart';
 import 'package:travel_on_final/features/home/presentation/widgets/weather_slider.dart';
+import 'package:travel_on_final/features/search/presentation/providers/travel_provider.dart';
+import 'package:go_router/go_router.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -22,18 +24,22 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
     // build가 완료된 후 데이터 로드
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _loadNextTrip();
+      _loadData();
     });
   }
 
-  Future<void> _loadNextTrip() async {
+  Future<void> _loadData() async {
     final authProvider = context.read<AuthProvider>();
+    final travelProvider = context.read<TravelProvider>();
 
     if (authProvider.currentUser != null) {
       await context
           .read<HomeProvider>()
           .loadNextTrip(authProvider.currentUser!.id);
     }
+
+    // 패키지 데이터 로드
+    await travelProvider.loadPackages();
   }
 
   @override
@@ -41,6 +47,8 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
+        scrolledUnderElevation: 0,
+        elevation: 0,
         title: Text(
           'TravelOn',
           style: TextStyle(
@@ -118,31 +126,40 @@ class _HomeScreenState extends State<HomeScreen> {
               SizedBox(height: 10.h),
 
               // 가로 스크롤 되는 추천 이미지 카드
-              SizedBox(
-                height: 200.h, // TravelCard의 높이와 동일하게 설정
-                child: ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  itemCount: travelItems.length, // 데이터 리스트 길이만큼
-                  itemBuilder: (context, index) {
-                    final item = travelItems[index];
-                    return Padding(
-                      padding: EdgeInsets.only(
-                        right: 16.w, // 카드 사이 간격
-                        left: index == 0 ? 0 : 0, // 첫 번째 카드는 패딩 없음
-                      ),
-                      child: SizedBox(
-                        width: 300.w, // 카드의 너비 설정
-                        child: TravelCard(
-                          location: item.location,
-                          title: item.title,
-                          imageUrl: item.imageUrl,
-                          tagBackgroundColor: item.tagBackgroundColor,
-                          tagTextColor: item.tagTextColor,
-                        ),
-                      ),
-                    );
-                  },
-                ),
+              Consumer<TravelProvider>(
+                builder: (context, provider, child) {
+                  final recentPackages = provider.recentPackages;
+
+                  return SizedBox(
+                    height: 200.h,
+                    child: ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: recentPackages.length,
+                      itemBuilder: (context, index) {
+                        final package = recentPackages[index];
+                        return Padding(
+                          padding: EdgeInsets.only(
+                            right: 16.w,
+                            left: index == 0 ? 0 : 0,
+                          ),
+                          child: SizedBox(
+                            width: 300.w,
+                            child: TravelCard(
+                              location: _getRegionText(package.region),
+                              title: package.title,
+                              imageUrl: package.mainImage ??
+                                  'https://picsum.photos/300/200',
+                              onTap: () {
+                                context.go('/package-detail/${package.id}',
+                                    extra: package);
+                              },
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  );
+                },
               ),
               SizedBox(height: 10.h),
             ],
@@ -176,51 +193,31 @@ class _HomeScreenState extends State<HomeScreen> {
       ],
     );
   }
+
+  String _getRegionText(String region) {
+    switch (region) {
+      case 'seoul':
+        return '서울';
+      case 'incheon_gyeonggi':
+        return '인천/경기';
+      case 'gangwon':
+        return '강원';
+      case 'daejeon_chungnam':
+        return '대전/충남';
+      case 'chungbuk':
+        return '충북';
+      case 'gwangju_jeonnam':
+        return '광주/전남';
+      case 'jeonbuk':
+        return '전북';
+      case 'busan_gyeongnam':
+        return '부산/경남';
+      case 'daegu_gyeongbuk':
+        return '대구/경북';
+      case 'jeju':
+        return '제주도';
+      default:
+        return '전체';
+    }
+  }
 }
-
-// 클래스 상단에 추가
-class TravelItem {
-  final String location;
-  final String title;
-  final String imageUrl;
-  final Color? tagBackgroundColor;
-  final Color? tagTextColor;
-
-  TravelItem({
-    required this.location,
-    required this.title,
-    required this.imageUrl,
-    this.tagBackgroundColor,
-    this.tagTextColor,
-  });
-}
-
-// 샘플 데이터 (클래스 내부에 추가)
-final List<TravelItem> travelItems = [
-  TravelItem(
-    location: '부산',
-    title: '무봤나? 붓싼 풀코스',
-    imageUrl: 'https://picsum.photos/400/200',
-  ),
-  TravelItem(
-    location: '서울',
-    title: '서울 야경 투어',
-    imageUrl: 'https://picsum.photos/300/200',
-    tagBackgroundColor: Colors.green,
-    tagTextColor: Colors.green,
-  ),
-  TravelItem(
-    location: '제주',
-    title: '제주도 맛집 투어',
-    imageUrl: 'https://picsum.photos/200/200',
-    tagBackgroundColor: Colors.orange,
-    tagTextColor: Colors.orange,
-  ),
-  TravelItem(
-    location: '강원도',
-    title: '강원도 힐링 여행',
-    imageUrl: 'https://picsum.photos/400/300',
-    tagBackgroundColor: Colors.purple,
-    tagTextColor: Colors.purple,
-  ),
-];

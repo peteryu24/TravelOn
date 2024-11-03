@@ -35,9 +35,9 @@ class TravelProvider extends ChangeNotifier {
 
     // 지역 필터링
     if (_selectedRegion != 'all') {
-      filteredPackages = filteredPackages.where(
-              (package) => package.region == _selectedRegion
-      ).toList();
+      filteredPackages = filteredPackages
+          .where((package) => package.region == _selectedRegion)
+          .toList();
     }
 
     return filteredPackages;
@@ -110,7 +110,7 @@ class TravelProvider extends ChangeNotifier {
   Future<void> deletePackage(String packageId) async {
     try {
       await _repository.deletePackage(packageId);
-      await loadPackages();  // 목록 새로고침
+      await loadPackages(); // 목록 새로고침
     } catch (e) {
       print('Error deleting package: $e');
       rethrow;
@@ -120,7 +120,7 @@ class TravelProvider extends ChangeNotifier {
   Future<void> updatePackage(TravelPackage package) async {
     try {
       await _repository.updatePackage(package);
-      await loadPackages();  // 목록 새로고침
+      await loadPackages(); // 목록 새로고침
       notifyListeners();
     } catch (e) {
       print('Error updating package: $e');
@@ -141,5 +141,12 @@ class TravelProvider extends ChangeNotifier {
   void clearError() {
     _error = null;
     notifyListeners();
+  }
+
+  // 최신 패키지 5개 getter
+  List<TravelPackage> get recentPackages {
+    return _packages
+        .take(5) // 최대 5개만 가져옴
+        .toList();
   }
 }
