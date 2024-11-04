@@ -1,10 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:travel_on_final/features/auth/presentation/providers/auth_provider.dart';
+import 'package:travel_on_final/features/auth/presentation/screens/login_screen.dart';
 import 'package:travel_on_final/features/reservation/presentation/providers/reservation_provider.dart';
 import 'package:travel_on_final/features/search/domain/entities/travel_package.dart';
 
@@ -107,7 +109,7 @@ class _ReservationCalendarScreenState extends State<ReservationCalendarScreen> {
     }
 
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
         color: Colors.grey.shade100,
         borderRadius: BorderRadius.circular(8),
@@ -115,14 +117,14 @@ class _ReservationCalendarScreenState extends State<ReservationCalendarScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             '인원 선택',
             style: TextStyle(
-              fontSize: 16,
+              fontSize: 16.sp,
               fontWeight: FontWeight.bold,
             ),
           ),
-          const SizedBox(height: 8),
+          SizedBox(height: 8.h),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -151,8 +153,8 @@ class _ReservationCalendarScreenState extends State<ReservationCalendarScreen> {
                   ),
                   Text(
                     '$_selectedParticipants명',
-                    style: const TextStyle(
-                      fontSize: 16,
+                    style: TextStyle(
+                      fontSize: 16.sp,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -309,7 +311,7 @@ class _ReservationCalendarScreenState extends State<ReservationCalendarScreen> {
               defaultBuilder: (context, date, _) {
                 bool isDepartureDay = _isValidDepartureDay(date);
                 return Container(
-                  margin: const EdgeInsets.all(4),
+                  margin: EdgeInsets.all(4.w),
                   decoration: BoxDecoration(
                     color: isDepartureDay ? Colors.blue.shade50 : Colors.grey.shade200,
                     shape: BoxShape.circle,
@@ -328,7 +330,7 @@ class _ReservationCalendarScreenState extends State<ReservationCalendarScreen> {
               },
               selectedBuilder: (context, date, _) {
                 return Container(
-                  margin: const EdgeInsets.all(4),
+                  margin: EdgeInsets.all(4.w),
                   decoration: const BoxDecoration(
                     color: Colors.blue,
                     shape: BoxShape.circle,
@@ -343,7 +345,7 @@ class _ReservationCalendarScreenState extends State<ReservationCalendarScreen> {
               },
               disabledBuilder: (context, date, _) {
                 return Container(
-                  margin: const EdgeInsets.all(4),
+                  margin: EdgeInsets.all(4.w),
                   decoration: BoxDecoration(
                     color: Colors.grey.shade200,
                     shape: BoxShape.circle,
@@ -380,28 +382,28 @@ class _ReservationCalendarScreenState extends State<ReservationCalendarScreen> {
           ),
           if (_selectedDay != null) ...[
             Padding(
-              padding: const EdgeInsets.all(16.0),
+              padding: EdgeInsets.all(16.0.w),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     '선택한 날짜: ${DateFormat('yyyy년 MM월 dd일').format(_selectedDay!)}',
-                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold),
                   ),
-                  const SizedBox(height: 8),
+                  SizedBox(height: 8.h),
                   Text(
                     '패키지: ${widget.package.title}',
-                    style: const TextStyle(fontSize: 16),
+                    style: TextStyle(fontSize: 16.sp),
                   ),
-                  const SizedBox(height: 4),
+                  SizedBox(height: 4.h),
                   Text(
                     '${widget.package.nights}박${widget.package.nights + 1}일',
-                    style: const TextStyle(fontSize: 16),
+                    style: TextStyle(fontSize: 16.sp),
                   ),
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text('출발 요일: ', style: TextStyle(fontSize: 16)),
+                      Text('출발 요일: ', style: TextStyle(fontSize: 16.sp)),
                       Expanded(
                         child: Wrap(
                           spacing: 4,
@@ -418,7 +420,7 @@ class _ReservationCalendarScreenState extends State<ReservationCalendarScreen> {
                               child: Text(
                                 weekday,
                                 style: TextStyle(
-                                  fontSize: 14,
+                                  fontSize: 14.sp,
                                   color: Colors.blue.shade900,
                                   fontWeight: FontWeight.bold,
                                 ),
@@ -429,28 +431,28 @@ class _ReservationCalendarScreenState extends State<ReservationCalendarScreen> {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 4),
+                  SizedBox(height: 4.h),
                   Text(
                     '가격: ₩${NumberFormat('#,###').format(widget.package.price.toInt())}',
-                    style: const TextStyle(fontSize: 16),
+                    style: TextStyle(fontSize: 16.sp),
                   ),
-                  const SizedBox(height: 16),
+                  SizedBox(height: 16.h),
                   _buildParticipantSelector(),
                 ],
               ),
             ),
             const Spacer(),
             Padding(
-              padding: const EdgeInsets.all(16.0),
+              padding: EdgeInsets.all(16.0.w),
               child: ElevatedButton(
                 onPressed: () => _requestReservation(context),
                 style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  minimumSize: const Size(double.infinity, 50),
+                  padding: EdgeInsets.symmetric(vertical: 16.h),
+                  minimumSize: Size(double.infinity, 50),
                 ),
-                child: const Text(
+                child: Text(
                   '예약 신청하기',
-                  style: TextStyle(fontSize: 16),
+                  style: TextStyle(fontSize: 16.sp),
                 ),
               ),
             ),

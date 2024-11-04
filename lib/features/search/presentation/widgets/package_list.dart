@@ -1,9 +1,11 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
+import 'package:travel_on_final/features/auth/presentation/screens/login_screen.dart';
 import '../providers/travel_provider.dart';
 import '../../domain/entities/travel_package.dart';
 
@@ -28,7 +30,7 @@ class PackageList extends StatelessWidget {
         }
 
         return ListView.builder(
-          padding: const EdgeInsets.all(16),
+          padding: EdgeInsets.all(16.w),
           itemCount: packages.length,
           itemBuilder: (context, index) {
             final package = packages[index];
@@ -52,7 +54,7 @@ class PackageCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      margin: const EdgeInsets.only(bottom: 16),
+      margin: EdgeInsets.only(bottom: 16.h),
       clipBehavior: Clip.antiAlias,
       child: InkWell(
         onTap: () {
@@ -65,14 +67,14 @@ class PackageCard extends StatelessWidget {
             if (package.mainImage != null && package.mainImage!.isNotEmpty)
               Image.network(
                 package.mainImage!,
-                height: 200,
+                height: 200.h,
                 width: double.infinity,
                 fit: BoxFit.cover,
                 // 로딩 중 표시
                 loadingBuilder: (context, child, loadingProgress) {
                   if (loadingProgress == null) return child;
                   return Container(
-                    height: 200,
+                    height: 200.h,
                     width: double.infinity,
                     color: Colors.grey[200],
                     child: Center(
@@ -88,7 +90,7 @@ class PackageCard extends StatelessWidget {
                 // 에러 발생 시 표시
                 errorBuilder: (context, error, stackTrace) {
                   return Container(
-                    height: 200,
+                    height: 200.h,
                     width: double.infinity,
                     color: Colors.grey[200],
                     child: const Center(
@@ -103,7 +105,7 @@ class PackageCard extends StatelessWidget {
               )
             else
               Container(
-                height: 200,
+                height: 200.h,
                 width: double.infinity,
                 color: Colors.grey[200],
                 child: Center(
@@ -116,32 +118,32 @@ class PackageCard extends StatelessWidget {
               ),
 
             Padding(
-              padding: const EdgeInsets.all(16),
+              padding: EdgeInsets.all(16.w),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     package.title,
-                    style: const TextStyle(
-                      fontSize: 18,
+                    style: TextStyle(
+                      fontSize: 18.sp,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  const SizedBox(height: 8),
+                  SizedBox(height: 8.h),
                   Text(
                     package.description,
-                    style: const TextStyle(
+                    style: TextStyle(
                       color: Colors.grey,
-                      fontSize: 14,
+                      fontSize: 14.sp,
                     ),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
-                  const SizedBox(height: 8),
+                  SizedBox(height: 8.h),
                   Text(
                     '₩${_priceFormat.format(package.price.toInt())}',
-                    style: const TextStyle(
-                      fontSize: 16,
+                    style: TextStyle(
+                      fontSize: 16.sp,
                       fontWeight: FontWeight.bold,
                       color: Colors.blue,
                     ),

@@ -107,6 +107,27 @@ class TravelProvider extends ChangeNotifier {
     }
   }
 
+  Future<void> deletePackage(String packageId) async {
+    try {
+      await _repository.deletePackage(packageId);
+      await loadPackages();  // 목록 새로고침
+    } catch (e) {
+      print('Error deleting package: $e');
+      rethrow;
+    }
+  }
+
+  Future<void> updatePackage(TravelPackage package) async {
+    try {
+      await _repository.updatePackage(package);
+      await loadPackages();  // 목록 새로고침
+      notifyListeners();
+    } catch (e) {
+      print('Error updating package: $e');
+      rethrow;
+    }
+  }
+
   // 특정 패키지 검색
   TravelPackage? getPackageById(String id) {
     try {
