@@ -5,7 +5,8 @@ class SocialLoginButton extends StatelessWidget {
   final String assetPath;
   final VoidCallback onPressed;
 
-  SocialLoginButton({
+  const SocialLoginButton({
+    super.key,
     required this.assetPath,
     required this.onPressed,
   });

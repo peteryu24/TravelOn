@@ -2,6 +2,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 import 'package:travel_on_final/features/home/presentation/providers/weather_provider.dart';
@@ -108,43 +109,46 @@ class _WeatherSliderState extends State<WeatherSlider> {
                 ),
               );
             },
-            child: Row(
+            child: Stack(
               key: ValueKey<int>(_currentIndex),
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  currentWeather.city,
-                  style: TextStyle(
-                    fontSize: 16.sp,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
                 Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    _getWeatherIcon(currentWeather.condition),
-                    SizedBox(width: 8.w),
                     Text(
-                      '${currentWeather.temperature.toStringAsFixed(1)}°',
-                      style: TextStyle(fontSize: 16.sp),
-                    ),
-                  ],
-                ),
-                Row(
-                  children: [
-                    if (currentWeather.precipitation > 0)
-                      Text(
-                        ' ${currentWeather.precipitation}mm ',
-                        style: TextStyle(
-                          fontSize: 16.sp,
-                          color: Colors.blue,
-                        ),
+                      currentWeather.city,
+                      style: TextStyle(
+                        fontSize: 16.sp,
+                        fontWeight: FontWeight.bold,
                       ),
+                    ),
+                    Row(
+                      children: [
+                        _getWeatherIcon(currentWeather.condition),
+                        SizedBox(width: 8.w),
+                        Text(
+                          '${currentWeather.temperature.toStringAsFixed(1)}°',
+                          style: TextStyle(fontSize: 16.sp),
+                        ),
+                      ],
+                    ),
                     Text(
                       '${currentWeather.windSpeed.toStringAsFixed(1)}m/s',
                       style: TextStyle(fontSize: 16.sp),
                     ),
                   ],
                 ),
+                if (currentWeather.precipitation > 0)
+                  Positioned(
+                    right: 65.w,
+                    child: Text(
+                      ' ${currentWeather.precipitation}mm',
+                      style: TextStyle(
+                        fontSize: 16.sp,
+                        color: Colors.blue,
+                      ),
+                    ),
+                  ),
               ],
             ),
           ),
@@ -156,26 +160,28 @@ class _WeatherSliderState extends State<WeatherSlider> {
   Widget _getWeatherIcon(String condition) {
     switch (condition) {
       case '맑음':
-        return Icon(Icons.wb_sunny, color: Colors.orange.shade400);
+        return Icon(CupertinoIcons.sun_max_fill, color: Colors.orange.shade400);
       case '구름많음':
-        return Icon(Icons.cloud, color: Colors.grey.shade400);
+        return Icon(CupertinoIcons.cloud_sun_fill, color: Colors.grey.shade400);
       case '흐림':
-        return Icon(Icons.cloud, color: Colors.grey.shade600);
+        return Icon(CupertinoIcons.cloud_fill, color: Colors.grey.shade600);
       case '비':
-        return Icon(Icons.umbrella, color: Colors.blue.shade400);
+        return Icon(CupertinoIcons.cloud_rain_fill,
+            color: Colors.blue.shade400);
       case '비/눈':
         return Stack(
           children: [
-            Icon(Icons.umbrella, color: Colors.blue.shade400),
-            Icon(Icons.ac_unit, color: Colors.blue.shade100),
+            Icon(CupertinoIcons.cloud_rain_fill, color: Colors.blue.shade400),
+            Icon(CupertinoIcons.snow, color: Colors.blue.shade100),
           ],
         );
       case '눈':
-        return Icon(Icons.ac_unit, color: Colors.blue.shade100);
+        return Icon(CupertinoIcons.snow, color: Colors.blue.shade100);
       case '소나기':
-        return Icon(Icons.umbrella, color: Colors.blue.shade300);
+        return Icon(CupertinoIcons.cloud_heavyrain_fill,
+            color: Colors.blue.shade300);
       default:
-        return Icon(Icons.wb_sunny, color: Colors.orange.shade400);
+        return Icon(CupertinoIcons.sun_max_fill, color: Colors.orange.shade400);
     }
   }
 }
