@@ -90,7 +90,7 @@ final goRouter = GoRouter(
     ////////////////////////////////////////////////////////////////////////////////////
     ShellRoute(
       builder: (context, state, child) {
-        return const ScaffoldWithBottomNavBar(); // child 파라미터 제거
+        return const ScaffoldWithBottomNavBar();
       },
       routes: [
         GoRoute(
