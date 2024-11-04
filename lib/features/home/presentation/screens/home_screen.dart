@@ -150,7 +150,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               imageUrl: package.mainImage ??
                                   'https://picsum.photos/300/200',
                               onTap: () {
-                                context.go('/package-detail/${package.id}',
+                                context.push('/package-detail/${package.id}',
                                     extra: package);
                               },
                             ),
