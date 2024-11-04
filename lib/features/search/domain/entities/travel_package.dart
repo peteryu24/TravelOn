@@ -30,11 +30,8 @@ class TravelPackage {
   });
 
   factory TravelPackage.fromJson(Map<String, dynamic> json) {
-
-
     final minPart = json['minParticipants'];
     print('minParticipants from JSON: $minPart (type: ${minPart.runtimeType})');
-
 
     return TravelPackage(
       id: json['id'] as String,
@@ -54,18 +51,18 @@ class TravelPackage {
   }
 
   Map<String, dynamic> toJson() => {
-    'id': id,
-    'title': title,
-    'region': region,
-    'price': price,
-    'description': description,
-    'mainImage': mainImage,
-    'descriptionImages': descriptionImages,
-    'guideName': guideName,
-    'guideId': guideId,
-    'minParticipants': minParticipants,
-    'maxParticipants': maxParticipants,
-    'nights': nights,
-    'departureDays': departureDays,
-  };
+        'id': id,
+        'title': title,
+        'region': region,
+        'price': price,
+        'description': description,
+        'mainImage': mainImage,
+        'descriptionImages': descriptionImages,
+        'guideName': guideName,
+        'guideId': guideId,
+        'minParticipants': minParticipants,
+        'maxParticipants': maxParticipants,
+        'nights': nights,
+        'departureDays': departureDays,
+      };
 }

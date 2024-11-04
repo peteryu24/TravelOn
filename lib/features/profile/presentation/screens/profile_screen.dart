@@ -94,6 +94,16 @@ class ProfileScreen extends StatelessWidget {
                             context.push('/reservations/guide');
                           },
                         ),
+                        const Divider(height: 1),
+                        ListTile(
+                          leading: const Icon(Icons.list_alt),
+                          title: const Text('내 패키지 관리'),
+                          subtitle: const Text('등록한 패키지를 수정하거나 삭제합니다'),
+                          trailing: const Icon(Icons.chevron_right),
+                          onTap: () {
+                            context.push('/my-packages');
+                          },
+                        ),
                       ],
                     ),
                   ),

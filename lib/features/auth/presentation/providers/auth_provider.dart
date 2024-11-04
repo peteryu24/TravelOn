@@ -15,9 +15,9 @@ class AuthProvider with ChangeNotifier {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseStorage _storage = FirebaseStorage.instance;
   final KakaoLoginUseCase _kakaoLoginUseCase;
-  // final GoogleLoginUseCase _googleLoginUseCase;
-  // final NaverLoginUseCase _naverLoginUseCase;
-  // final FacebookLoginUseCase _facebookLoginUseCase;
+  final GoogleLoginUseCase _googleLoginUseCase = GoogleLoginUseCase();
+  final FacebookLoginUseCase _facebookLoginUseCase = FacebookLoginUseCase();
+  final NaverLoginUseCase _naverLoginUseCase = NaverLoginUseCase();
 
   UserModel? _currentUser;
   bool isEmailVerified = false;
@@ -191,14 +191,35 @@ class AuthProvider with ChangeNotifier {
   }
 
   Future<void> loginWithGoogle() async {
-    // final userModel = await _GoogleLoginUseCase.execute(); 
-  }
-
-  Future<void> loginWithNaver() async {
-    // final userModel = await _NaverLoginUseCase.execute(); 
+    final userModel = await _googleLoginUseCase.execute();
+    if (userModel != null) {
+      // Firestore에 유저 정보를 저장하는 로직 추가
+      _currentUser = userModel;
+      notifyListeners();
+    } else {
+      print('Google 로그인 실패');
+    }
   }
 
   Future<void> loginWithFacebook() async {
-    // final userModel = await _FacebookUseCase.execute();
+    final userModel = await _facebookLoginUseCase.execute();
+    if (userModel != null) {
+      // Firestore에 유저 정보를 저장하는 로직 추가
+      _currentUser = userModel;
+      notifyListeners();
+    } else {
+      print('Facebook 로그인 실패');
+    }
+  }
+
+  Future<void> loginWithNaver() async {
+    // Naver 로그인 UseCase 호출
+    final userModel = await _naverLoginUseCase.execute();
+    if (userModel != null) {
+      _currentUser = userModel;
+      notifyListeners();
+    } else {
+      print('Naver 로그인 실패');
+    }
   }
 }

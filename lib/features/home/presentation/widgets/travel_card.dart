@@ -7,6 +7,7 @@ class TravelCard extends StatelessWidget {
   final String imageUrl; // 이미지 URL
   final Color? tagBackgroundColor; // 태그 배경색
   final Color? tagTextColor; // 태그 텍스트 색상
+  final VoidCallback? onTap;
 
   const TravelCard({
     super.key,
@@ -15,40 +16,44 @@ class TravelCard extends StatelessWidget {
     required this.imageUrl,
     this.tagBackgroundColor = Colors.blue,
     this.tagTextColor = Colors.white,
+    this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: 200.h,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12.r),
-        image: DecorationImage(
-          image: NetworkImage(imageUrl),
-          fit: BoxFit.cover,
-        ),
-      ),
+    return GestureDetector(
+      onTap: onTap,
       child: Container(
+        height: 200.h,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(12.r),
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              Colors.transparent,
-              Colors.black.withOpacity(0.7),
-            ],
+          image: DecorationImage(
+            image: NetworkImage(imageUrl),
+            fit: BoxFit.cover,
           ),
         ),
-        padding: EdgeInsets.all(16.r),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.end,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildLocationTag(),
-            SizedBox(height: 8.h),
-            _buildTitle(),
-          ],
+        child: Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(12.r),
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [
+                Colors.transparent,
+                Colors.black.withOpacity(0.7),
+              ],
+            ),
+          ),
+          padding: EdgeInsets.all(16.r),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.end,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildLocationTag(),
+              SizedBox(height: 8.h),
+              _buildTitle(),
+            ],
+          ),
         ),
       ),
     );
@@ -57,18 +62,19 @@ class TravelCard extends StatelessWidget {
   Widget _buildLocationTag() {
     return Container(
       padding: EdgeInsets.symmetric(
-        horizontal: 8.w,
+        horizontal: 12.w,
         vertical: 4.h,
       ),
       decoration: BoxDecoration(
-        color: tagBackgroundColor?.withOpacity(0.2) ?? Colors.blue.shade100,
-        borderRadius: BorderRadius.circular(4.r),
+        color: const Color(0xFFE3F2FD), // 하늘색 배경
+        borderRadius: BorderRadius.circular(20.r), // 더 둥근 모서리
       ),
       child: Text(
         location,
         style: TextStyle(
-          color: tagTextColor ?? Colors.blue,
+          color: Colors.blue, // 파란색 텍스트
           fontSize: 12.sp,
+          fontWeight: FontWeight.w500,
         ),
       ),
     );

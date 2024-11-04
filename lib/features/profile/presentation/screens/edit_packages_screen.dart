@@ -1,34 +1,39 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:travel_on_final/features/auth/presentation/providers/auth_provider.dart';
-import 'package:travel_on_final/features/home/presentation/screens/home_screen.dart';
 import 'dart:io';
-import '../providers/travel_provider.dart';
-import '../../domain/entities/travel_package.dart';
 
-class AddPackageScreen extends StatefulWidget {
-  const AddPackageScreen({Key? key}) : super(key: key);
+import 'package:travel_on_final/features/search/domain/entities/travel_package.dart';
+import 'package:travel_on_final/features/search/presentation/providers/travel_provider.dart';
+
+
+class EditPackageScreen extends StatefulWidget {
+  final TravelPackage package;
+
+  const EditPackageScreen({
+    Key? key,
+    required this.package,
+  }) : super(key: key);
 
   @override
-  State<AddPackageScreen> createState() => _AddPackageScreenState();
+  State<EditPackageScreen> createState() => _EditPackageScreenState();
 }
 
-class _AddPackageScreenState extends State<AddPackageScreen> {
+class _EditPackageScreenState extends State<EditPackageScreen> {
   final _formKey = GlobalKey<FormState>();
-  final _titleController = TextEditingController();
-  final _descriptionController = TextEditingController();
-  final _priceController = TextEditingController();
-  String _selectedRegion = 'seoul';
+  late final TextEditingController _titleController;
+  late final TextEditingController _descriptionController;
+  late final TextEditingController _priceController;
+  late final TextEditingController _maxParticipantsController;
+  late final TextEditingController _minParticipantsController;
+  late String _selectedRegion;
   File? _mainImage;
-  final List<File> _descriptionImages = [];
+  final List<File> _newDescriptionImages = [];
+  final List<String> _existingDescriptionImages = [];
   final _picker = ImagePicker();
-  final _maxParticipantsController = TextEditingController();
-  int _nights = 1;  // 기본값 1박
-  final Set<int> _selectedDepartureDays = {};  // 선택된 출발 요일들
-  final _minParticipantsController = TextEditingController();
+  late int _nights;
+  final Set<int> _selectedDepartureDays = {};
 
   final List<Map<String, dynamic>> _weekDays = [
     {'value': 1, 'label': '월'},
@@ -40,9 +45,64 @@ class _AddPackageScreenState extends State<AddPackageScreen> {
     {'value': 7, 'label': '일'},
   ];
 
+  @override
+  void initState() {
+    super.initState();
+    // 기존 패키지 데이터로 초기화
+    _titleController = TextEditingController(text: widget.package.title);
+    _descriptionController = TextEditingController(text: widget.package.description);
+    _priceController = TextEditingController(text: widget.package.price.toString());
+    _selectedRegion = widget.package.region;
+    _maxParticipantsController = TextEditingController(text: widget.package.maxParticipants.toString());
+    _minParticipantsController = TextEditingController(text: widget.package.minParticipants.toString());
+    _nights = widget.package.nights;
+    _selectedDepartureDays.addAll(widget.package.departureDays);
+    _existingDescriptionImages.addAll(widget.package.descriptionImages);
+  }
+
+  @override
+  void dispose() {
+    _titleController.dispose();
+    _descriptionController.dispose();
+    _priceController.dispose();
+    _maxParticipantsController.dispose();
+    _minParticipantsController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _pickMainImage() async {
+    final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
+    if (image != null) {
+      setState(() {
+        _mainImage = File(image.path);
+      });
+    }
+  }
+
+  Future<void> _pickDescriptionImage() async {
+    final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
+    if (image != null) {
+      setState(() {
+        _newDescriptionImages.add(File(image.path));
+      });
+    }
+  }
+
+  void _removeNewDescriptionImage(int index) {
+    setState(() {
+      _newDescriptionImages.removeAt(index);
+    });
+  }
+
+  void _removeExistingDescriptionImage(int index) {
+    setState(() {
+      _existingDescriptionImages.removeAt(index);
+    });
+  }
+
   Widget _buildNightsSelection() {
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
         border: Border.all(color: const Color(0XFF2196F3)),
         borderRadius: BorderRadius.circular(4),
@@ -50,11 +110,11 @@ class _AddPackageScreenState extends State<AddPackageScreen> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text('박 수:', style: TextStyle(fontSize: 16.sp)),
+          const Text('박 수:', style: TextStyle(fontSize: 16)),
           DropdownButton<int>(
             value: _nights,
             isDense: true,
-            underline: Container(), // 드롭다운 버튼의 기본 밑줄 제거
+            underline: Container(),
             items: List.generate(7, (index) => index + 1).map((nights) {
               return DropdownMenuItem(
                 value: nights,
@@ -74,7 +134,7 @@ class _AddPackageScreenState extends State<AddPackageScreen> {
 
   Widget _buildDepartureDaysSelection() {
     return Container(
-      padding: EdgeInsets.all(12.w),
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         border: Border.all(color: const Color(0XFF2196F3)),
         borderRadius: BorderRadius.circular(4),
@@ -82,7 +142,7 @@ class _AddPackageScreenState extends State<AddPackageScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('출발 요일', style: TextStyle(fontSize: 16.sp)),
+          const Text('출발 요일', style: TextStyle(fontSize: 16)),
           const SizedBox(height: 8),
           Wrap(
             spacing: 6,
@@ -98,7 +158,7 @@ class _AddPackageScreenState extends State<AddPackageScreen> {
                   ),
                 ),
                 selected: isSelected,
-                showCheckmark: false,  // 체크마크 비활성화
+                showCheckmark: false,
                 selectedColor: Colors.blue,
                 backgroundColor: Colors.white,
                 side: BorderSide(color: isSelected ? Colors.blue : Colors.grey),
@@ -119,54 +179,7 @@ class _AddPackageScreenState extends State<AddPackageScreen> {
     );
   }
 
-
-  final List<String> _regions = [
-    'seoul',
-    'incheon_gyeonggi',
-    'gangwon',
-    'daejeon_chungnam',
-    'chungbuk',
-    'gwangju_jeonnam',
-    'jeonbuk',
-    'busan_gyeongnam',
-    'daegu_gyeongbuk',
-    'jeju',
-  ];
-
-  Future<void> _pickMainImage() async {
-    final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
-    if (image != null) {
-      setState(() {
-        _mainImage = File(image.path);
-      });
-    }
-  }
-
-  Future<void> _pickDescriptionImage() async {
-    final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
-    if (image != null) {
-      setState(() {
-        _descriptionImages.add(File(image.path));
-      });
-    }
-  }
-
-  void _removeDescriptionImage(int index) {
-    setState(() {
-      _descriptionImages.removeAt(index);
-    });
-  }
-
-  @override
-  void dispose() {
-    _titleController.dispose();
-    _descriptionController.dispose();
-    _priceController.dispose();
-    _maxParticipantsController.dispose();
-    super.dispose();
-  }
-
-  void _submitForm() {
+  void _submitForm() async {
     if (_formKey.currentState!.validate()) {
       if (_selectedDepartureDays.isEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -175,30 +188,39 @@ class _AddPackageScreenState extends State<AddPackageScreen> {
         return;
       }
 
-      final authProvider = context.read<AuthProvider>();
-      final user = authProvider.currentUser!;
+      try {
+        final updatedPackage = TravelPackage(
+          id: widget.package.id,
+          title: _titleController.text,
+          description: _descriptionController.text,
+          price: double.parse(_priceController.text),
+          region: _selectedRegion,
+          mainImage: _mainImage?.path ?? widget.package.mainImage,
+          descriptionImages: [
+            ..._existingDescriptionImages,
+            ..._newDescriptionImages.map((file) => file.path),
+          ],
+          guideName: widget.package.guideName,
+          guideId: widget.package.guideId,
+          minParticipants: int.parse(_minParticipantsController.text),
+          maxParticipants: int.parse(_maxParticipantsController.text),
+          nights: _nights,
+          departureDays: _selectedDepartureDays.toList()..sort(),
+        );
 
-      // 디버깅을 위한 로그 추가
-      print('Creating package with min participants: ${int.parse(_minParticipantsController.text)}');
+        await context.read<TravelProvider>().updatePackage(updatedPackage);
 
-      final newPackage = TravelPackage(
-        id: DateTime.now().toString(),
-        title: _titleController.text,
-        description: _descriptionController.text,
-        price: double.parse(_priceController.text),
-        region: _selectedRegion,
-        mainImage: _mainImage?.path,
-        descriptionImages: _descriptionImages.map((file) => file.path).toList(),
-        guideName: user.name,
-        guideId: user.id,
-        minParticipants: int.parse(_minParticipantsController.text),  // 여기 확인
-        maxParticipants: int.parse(_maxParticipantsController.text),
-        nights: _nights,
-        departureDays: _selectedDepartureDays.toList()..sort(),
-      );
-
-      context.read<TravelProvider>().addPackage(newPackage);
-      context.pop();
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('패키지가 수정되었습니다')),
+          );
+          context.pop();
+        }
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('오류가 발생했습니다: $e')),
+        );
+      }
     }
   }
 
@@ -206,25 +228,24 @@ class _AddPackageScreenState extends State<AddPackageScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('새 패키지 등록'),
+        title: const Text('패키지 수정'),
       ),
       body: SingleChildScrollView(
         child: Padding(
-          padding: EdgeInsets.all(16.0.w),
+          padding: const EdgeInsets.all(16.0),
           child: Form(
             key: _formKey,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                // 메인 이미지 선택
+                // 메인 이미지
                 GestureDetector(
                   onTap: _pickMainImage,
                   child: Container(
-                    height: 200.h,
+                    height: 200,
                     decoration: BoxDecoration(
                       border: Border.all(color: const Color(0XFF2196F3)),
                       borderRadius: BorderRadius.circular(8),
-
                     ),
                     child: _mainImage != null
                         ? ClipRRect(
@@ -235,27 +256,34 @@ class _AddPackageScreenState extends State<AddPackageScreen> {
                         width: double.infinity,
                       ),
                     )
+                        : widget.package.mainImage != null
+                        ? ClipRRect(
+                      borderRadius: BorderRadius.circular(8),
+                      child: Image.network(
+                        widget.package.mainImage!,
+                        fit: BoxFit.cover,
+                        width: double.infinity,
+                      ),
+                    )
                         : Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: const [
                         Icon(Icons.add_photo_alternate, size: 50),
-                        Text('메인 이미지 추가'),
+                        Text('메인 이미지 수정'),
                       ],
                     ),
                   ),
                 ),
-                SizedBox(height: 16.h),
+                const SizedBox(height: 16),
 
+                // 제목
                 TextFormField(
                   controller: _titleController,
                   decoration: const InputDecoration(
                     labelText: '패키지 제목',
-                    hintText: '예: 서울 시티 투어',
                     border: OutlineInputBorder(),
                     enabledBorder: OutlineInputBorder(
-                      borderSide: BorderSide(
-                        color: Color(0XFF2196F3),
-                      ),
+                      borderSide: BorderSide(color: Color(0XFF2196F3)),
                     ),
                   ),
                   validator: (value) {
@@ -265,55 +293,47 @@ class _AddPackageScreenState extends State<AddPackageScreen> {
                     return null;
                   },
                 ),
-                SizedBox(height: 16.h),
+                const SizedBox(height: 16),
 
+                // 지역 선택
                 DropdownButtonFormField<String>(
                   value: _selectedRegion,
                   decoration: const InputDecoration(
                     labelText: '지역',
                     border: OutlineInputBorder(),
                     enabledBorder: OutlineInputBorder(
-                      borderSide: BorderSide(
-                        color: Color(0XFF2196F3),
-                      ),
+                      borderSide: BorderSide(color: Color(0XFF2196F3)),
                     ),
                   ),
-                  items: _regions.map((region) {
-                    return DropdownMenuItem(
-                      value: region,
-                      child: Text(
-                          region == 'seoul' ? '서울' :
-                          region == 'incheon_gyeonggi' ? '인천/경기' :
-                          region == 'gangwon' ? '강원' :
-                          region == 'daejeon_chungnam' ? '대전/충남' :
-                          region == 'chungbuk' ? '충북' :
-                          region == 'gwangju_jeonnam' ? '광주/전남' :
-                          region == 'jeonbuk' ? '전북' :
-                          region == 'busan_gyeongnam' ? '부산/경남' :
-                          region == 'daegu_gyeongbuk' ? '대구/경북' :
-                          region == 'jeju' ? '제주도' : '전체'
-                      ),
-                    );
-                  }).toList(),
+                  items: [
+                    DropdownMenuItem(value: 'seoul', child: Text('서울')),
+                    DropdownMenuItem(value: 'incheon_gyeonggi', child: Text('인천/경기')),
+                    DropdownMenuItem(value: 'gangwon', child: Text('강원')),
+                    DropdownMenuItem(value: 'daejeon_chungnam', child: Text('대전/충남')),
+                    DropdownMenuItem(value: 'chungbuk', child: Text('충북')),
+                    DropdownMenuItem(value: 'gwangju_jeonnam', child: Text('광주/전남')),
+                    DropdownMenuItem(value: 'jeonbuk', child: Text('전북')),
+                    DropdownMenuItem(value: 'busan_gyeongnam', child: Text('부산/경남')),
+                    DropdownMenuItem(value: 'daegu_gyeongbuk', child: Text('대구/경북')),
+                    DropdownMenuItem(value: 'jeju', child: Text('제주도')),
+                  ],
                   onChanged: (value) {
                     setState(() {
                       _selectedRegion = value!;
                     });
                   },
                 ),
-                SizedBox(height: 16.h),
+                const SizedBox(height: 16),
 
+                // 가격
                 TextFormField(
                   controller: _priceController,
                   keyboardType: TextInputType.number,
                   decoration: const InputDecoration(
                     labelText: '가격',
-                    hintText: '예: 50000',
                     border: OutlineInputBorder(),
                     enabledBorder: OutlineInputBorder(
-                      borderSide: BorderSide(
-                        color: Color(0XFF2196F3),
-                      ),
+                      borderSide: BorderSide(color: Color(0XFF2196F3)),
                     ),
                     prefixText: '₩ ',
                   ),
@@ -327,24 +347,25 @@ class _AddPackageScreenState extends State<AddPackageScreen> {
                     return null;
                   },
                 ),
-                SizedBox(height: 16.h),
+                const SizedBox(height: 16),
 
+                // 박 수 선택
                 _buildNightsSelection(),
-                SizedBox(height: 16.h),
+                const SizedBox(height: 16),
 
+                // 출발 요일 선택
                 _buildDepartureDaysSelection(),
-                SizedBox(height: 16.h),
+                const SizedBox(height: 16),
+
+                // 최소 인원
                 TextFormField(
                   controller: _minParticipantsController,
                   keyboardType: TextInputType.number,
                   decoration: const InputDecoration(
                     labelText: '최소 인원',
-                    hintText: '예: 2',
                     border: OutlineInputBorder(),
                     enabledBorder: OutlineInputBorder(
-                      borderSide: BorderSide(
-                        color: Color(0XFF2196F3),
-                      ),
+                      borderSide: BorderSide(color: Color(0XFF2196F3)),
                     ),
                     suffixText: '명',
                   ),
@@ -356,26 +377,20 @@ class _AddPackageScreenState extends State<AddPackageScreen> {
                     if (minNumber == null || minNumber <= 0) {
                       return '유효한 인원 수를 입력해주세요';
                     }
-                    final maxNumber = int.tryParse(_maxParticipantsController.text) ?? 0;
-                    if (minNumber > maxNumber) {
-                      return '최소 인원이 최대 인원보다 클 수 없습니다';
-                    }
                     return null;
                   },
                 ),
-                SizedBox(height: 16.h),
+                const SizedBox(height: 16),
 
+                // 최대 인원
                 TextFormField(
                   controller: _maxParticipantsController,
                   keyboardType: TextInputType.number,
                   decoration: const InputDecoration(
                     labelText: '최대 인원',
-                    hintText: '예: 10',
                     border: OutlineInputBorder(),
                     enabledBorder: OutlineInputBorder(
-                      borderSide: BorderSide(
-                        color: Color(0XFF2196F3),
-                      ),
+                      borderSide: BorderSide(color: Color(0XFF2196F3)),
                     ),
                     suffixText: '명',
                   ),
@@ -383,26 +398,28 @@ class _AddPackageScreenState extends State<AddPackageScreen> {
                     if (value == null || value.isEmpty) {
                       return '최대 인원을 입력해주세요';
                     }
-                    final number = int.tryParse(value);
-                    if (number == null || number <= 0) {
+                    final maxNumber = int.tryParse(value);
+                    if (maxNumber == null || maxNumber <= 0) {
                       return '유효한 인원 수를 입력해주세요';
+                    }
+                    final minNumber = int.tryParse(_minParticipantsController.text) ?? 0;
+                    if (maxNumber < minNumber) {
+                      return '최대 인원은 최소 인원보다 작을 수 없습니다';
                     }
                     return null;
                   },
                 ),
-                SizedBox(height: 16.h),
+                const SizedBox(height: 16),
 
+                // 설명
                 TextFormField(
                   controller: _descriptionController,
                   maxLines: 5,
                   decoration: const InputDecoration(
                     labelText: '패키지 설명',
-                    hintText: '패키지에 대한 상세 설명을 입력해주세요',
                     border: OutlineInputBorder(),
                     enabledBorder: OutlineInputBorder(
-                      borderSide: BorderSide(
-                        color: Color(0XFF2196F3),
-                      ),
+                      borderSide: BorderSide(color: Color(0XFF2196F3)),
                     ),
                   ),
                   validator: (value) {
@@ -412,7 +429,7 @@ class _AddPackageScreenState extends State<AddPackageScreen> {
                     return null;
                   },
                 ),
-                SizedBox(height: 16.h),
+                const SizedBox(height: 16),
 
                 // 설명 이미지 목록
                 Column(
@@ -425,17 +442,49 @@ class _AddPackageScreenState extends State<AddPackageScreen> {
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    SizedBox(height: 8.h),
+                    const SizedBox(height: 8),
                     Wrap(
                       spacing: 8,
                       runSpacing: 8,
                       children: [
-                        ..._descriptionImages.asMap().entries.map((entry) {
+                        // 기존 이미지
+                        ..._existingDescriptionImages.asMap().entries.map((entry) {
                           return Stack(
                             children: [
                               Container(
-                                width: 100.w,
-                                height: 100.h,
+                                width: 100,
+                                height: 100,
+                                decoration: BoxDecoration(
+                                  border: Border.all(color: Colors.grey),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(8),
+                                  child: Image.network(
+                                    entry.value,
+                                    fit: BoxFit.cover,
+                                  ),
+                                ),
+                              ),
+                              Positioned(
+                                right: 0,
+                                top: 0,
+                                child: IconButton(
+                                  icon: const Icon(Icons.remove_circle),
+                                  color: Colors.red,
+                                  onPressed: () => _removeExistingDescriptionImage(entry.key),
+                                ),
+                              ),
+                            ],
+                          );
+                        }),
+                        // 새로 추가된 이미지
+                        ..._newDescriptionImages.asMap().entries.map((entry) {
+                          return Stack(
+                            children: [
+                              Container(
+                                width: 100,
+                                height: 100,
                                 decoration: BoxDecoration(
                                   border: Border.all(color: Colors.grey),
                                   borderRadius: BorderRadius.circular(8),
@@ -454,7 +503,7 @@ class _AddPackageScreenState extends State<AddPackageScreen> {
                                 child: IconButton(
                                   icon: const Icon(Icons.remove_circle),
                                   color: Colors.red,
-                                  onPressed: () => _removeDescriptionImage(entry.key),
+                                  onPressed: () => _removeNewDescriptionImage(entry.key),
                                 ),
                               ),
                             ],
@@ -464,8 +513,8 @@ class _AddPackageScreenState extends State<AddPackageScreen> {
                         GestureDetector(
                           onTap: _pickDescriptionImage,
                           child: Container(
-                            width: 100.w,
-                            height: 100.h,
+                            width: 100,
+                            height: 100,
                             decoration: BoxDecoration(
                               border: Border.all(color: Colors.grey),
                               borderRadius: BorderRadius.circular(8),
@@ -483,15 +532,16 @@ class _AddPackageScreenState extends State<AddPackageScreen> {
                     ),
                   ],
                 ),
-                SizedBox(height: 24.h),
+                const SizedBox(height: 24),
 
+                // 수정 버튼
                 ElevatedButton(
                   onPressed: _submitForm,
                   style: ElevatedButton.styleFrom(
-                    padding: EdgeInsets.symmetric(vertical: 16.h),
+                    padding: const EdgeInsets.symmetric(vertical: 16),
                   ),
                   child: const Text(
-                    '패키지 등록',
+                    '패키지 수정',
                     style: TextStyle(fontSize: 16),
                   ),
                 ),
