@@ -10,7 +10,7 @@ import '../../domain/entities/travel_package.dart';
 
 // 패키지 목록 위젯
 class PackageList extends StatelessWidget {
-  const PackageList({Key? key}) : super(key: key);
+  const PackageList({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -46,9 +46,9 @@ class LikeablePackageCard extends StatefulWidget {
   final TravelPackage package;
 
   const LikeablePackageCard({
-    Key? key,
+    super.key,
     required this.package,
-  }) : super(key: key);
+  });
 
   @override
   State<LikeablePackageCard> createState() => _LikeablePackageCardState();
@@ -72,7 +72,8 @@ class _LikeablePackageCardState extends State<LikeablePackageCard> {
     return Consumer2<AuthProvider, TravelProvider>(
       builder: (context, authProvider, travelProvider, _) {
         final userId = authProvider.currentUser?.id;
-        final isLiked = userId != null && widget.package.likedBy.contains(userId);
+        final isLiked =
+            userId != null && widget.package.likedBy.contains(userId);
 
         return Card(
           margin: const EdgeInsets.only(bottom: 16),
@@ -82,7 +83,8 @@ class _LikeablePackageCardState extends State<LikeablePackageCard> {
               // 패키지 정보 부분
               InkWell(
                 onTap: () {
-                  context.push('/package-detail/${widget.package.id}', extra: widget.package);
+                  context.push('/package-detail/${widget.package.id}',
+                      extra: widget.package);
                 },
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -103,7 +105,8 @@ class _LikeablePackageCardState extends State<LikeablePackageCard> {
 
   // 패키지 이미지 위젯
   Widget _buildPackageImage() {
-    if (widget.package.mainImage != null && widget.package.mainImage!.isNotEmpty) {
+    if (widget.package.mainImage != null &&
+        widget.package.mainImage!.isNotEmpty) {
       return Image.network(
         widget.package.mainImage!,
         height: 200.h,
@@ -192,25 +195,26 @@ class _LikeablePackageCardState extends State<LikeablePackageCard> {
             if (snapshot.hasData && snapshot.data != null) {
               final data = snapshot.data!.data() as Map<String, dynamic>;
               final likesCount = data['likesCount'] ?? 0;
-              final List<String> likedBy = List<String>.from(data['likedBy'] ?? []);
+              final List<String> likedBy =
+                  List<String>.from(data['likedBy'] ?? []);
               final isLiked = userId != null && likedBy.contains(userId);
 
               return Row(
                 children: [
-                  Text(
-                    '$likesCount',
-                    style: TextStyle(
-                      fontSize: 20.sp,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  SizedBox(width: 4.w),
                   IconButton(
                     icon: Icon(
                       isLiked ? Icons.favorite : Icons.favorite_border,
                       color: isLiked ? Colors.red : Colors.grey,
                     ),
                     onPressed: () => _handleLikeButton(userId, context),
+                  ),
+                  SizedBox(width: 4.w),
+                  Text(
+                    '$likesCount',
+                    style: TextStyle(
+                      fontSize: 20.sp,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ],
               );
