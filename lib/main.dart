@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart' hide AuthProvider;  // AuthProvider 숨기기
+import 'package:firebase_auth/firebase_auth.dart'
+    hide AuthProvider; // AuthProvider 숨기기
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:travel_on_final/features/home/data/repositories/home_repository_impl.dart';
@@ -17,7 +18,8 @@ import 'package:travel_on_final/firebase_options.dart';
 // provider
 import 'package:provider/provider.dart';
 import 'package:travel_on_final/core/providers/navigation_provider.dart';
-import 'package:travel_on_final/features/auth/presentation/providers/auth_provider.dart' as app;  // alias 추가
+import 'package:travel_on_final/features/auth/presentation/providers/auth_provider.dart'
+    as app; // alias 추가
 import 'package:travel_on_final/features/chat/presentation/providers/chat_provider.dart';
 import 'package:travel_on_final/features/search/presentation/providers/travel_provider.dart';
 // social_login
@@ -26,6 +28,8 @@ import 'package:kakao_flutter_sdk/kakao_flutter_sdk.dart';
 import 'package:travel_on_final/features/auth/domain/usecases/kakao_login_usecase.dart';
 import 'package:travel_on_final/features/auth/data/repositories/auth_repository_impl.dart';
 import 'package:travel_on_final/features/auth/domain/repositories/auth_repository.dart';
+import 'package:travel_on_final/features/gallery/data/repositories/gallery_repository.dart';
+import 'package:travel_on_final/features/gallery/presentation/providers/gallery_provider.dart';
 
 Future<void> main() async {
   await dotenv.load(fileName: ".env");
@@ -56,9 +60,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => NavigationProvider()),
 
         // Auth 관련 Providers
-        Provider<AuthRepository>(
-            create: (_) => AuthRepositoryImpl()
-        ),
+        Provider<AuthRepository>(create: (_) => AuthRepositoryImpl()),
 
         // Travel 관련 Providers
         ChangeNotifierProvider(
@@ -74,13 +76,14 @@ class MyApp extends StatelessWidget {
         ),
 
         // Auth Provider
-        ChangeNotifierProxyProvider2<KakaoLoginUseCase, TravelProvider, app.AuthProvider>(
+        ChangeNotifierProxyProvider2<KakaoLoginUseCase, TravelProvider,
+            app.AuthProvider>(
           create: (context) => app.AuthProvider(
             context.read<KakaoLoginUseCase>(),
             context.read<TravelProvider>(),
           ),
           update: (context, kakaoLoginUseCase, travelProvider, previous) =>
-          previous ?? app.AuthProvider(kakaoLoginUseCase, travelProvider!),
+              previous ?? app.AuthProvider(kakaoLoginUseCase, travelProvider),
         ),
 
         // 기타 Providers
@@ -96,6 +99,11 @@ class MyApp extends StatelessWidget {
           ),
         ),
         ChangeNotifierProvider(create: (_) => WeatherProvider()),
+        ChangeNotifierProvider(
+          create: (context) => GalleryProvider(
+            GalleryRepository(),
+          ),
+        ),
       ],
       child: ScreenUtilInit(
         designSize: const Size(375, 812),

@@ -1,12 +1,18 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:provider/provider.dart';
+import 'package:travel_on_final/features/auth/presentation/providers/auth_provider.dart';
+import '../providers/gallery_provider.dart';
 
 class GalleryPost extends StatefulWidget {
   final String imgUrl;
   final String username;
   final String location;
   final String description;
+  final String postId;
+  final List<String> likedBy;
+  final int likeCount;
 
   const GalleryPost({
     super.key,
@@ -14,6 +20,9 @@ class GalleryPost extends StatefulWidget {
     required this.username,
     required this.location,
     required this.description,
+    required this.postId,
+    required this.likedBy,
+    required this.likeCount,
   });
 
   @override
@@ -21,8 +30,59 @@ class GalleryPost extends StatefulWidget {
 }
 
 class _GalleryPostState extends State<GalleryPost> {
-  bool isLiked = false;
-  int likeCount = 0;
+  late bool isLiked;
+  late int likeCount;
+
+  @override
+  void initState() {
+    super.initState();
+    _updateLikeStatus();
+  }
+
+  @override
+  void didUpdateWidget(GalleryPost oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // 위젯이 업데이트될 때마다 좋아요 상태 갱신
+    if (oldWidget.likedBy != widget.likedBy ||
+        oldWidget.likeCount != widget.likeCount) {
+      _updateLikeStatus();
+    }
+  }
+
+  void _updateLikeStatus() {
+    final user = context.read<AuthProvider>().currentUser;
+    isLiked = user != null && widget.likedBy.contains(user.id);
+    likeCount = widget.likeCount;
+  }
+
+  Future<void> _handleLikePress() async {
+    final user = context.read<AuthProvider>().currentUser;
+    if (user != null) {
+      // 즉각적인 UI 업데이트를 위해 상태 먼저 변경
+      setState(() {
+        isLiked = !isLiked;
+        likeCount = isLiked ? likeCount + 1 : likeCount - 1;
+      });
+
+      try {
+        await context.read<GalleryProvider>().toggleLike(
+              widget.postId,
+              user.id,
+            );
+      } catch (e) {
+        // 에러 발생 시 상태 롤백
+        setState(() {
+          isLiked = !isLiked;
+          likeCount = isLiked ? likeCount + 1 : likeCount - 1;
+        });
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('좋아요 처리 중 오류가 발생했습니다')),
+          );
+        }
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -35,7 +95,9 @@ class _GalleryPostState extends State<GalleryPost> {
             children: [
               CircleAvatar(
                 radius: 20.r,
-                backgroundImage: NetworkImage(widget.imgUrl),
+                backgroundImage:
+                    const AssetImage('assets/images/default_profile.png'),
+                backgroundColor: Colors.grey[200],
               ),
               SizedBox(width: 10.w),
               Column(
@@ -69,12 +131,7 @@ class _GalleryPostState extends State<GalleryPost> {
         Row(
           children: [
             IconButton(
-              onPressed: () {
-                setState(() {
-                  isLiked = !isLiked;
-                  isLiked ? likeCount++ : likeCount--;
-                });
-              },
+              onPressed: _handleLikePress,
               icon: Icon(
                 isLiked ? CupertinoIcons.heart_fill : CupertinoIcons.heart,
                 color: isLiked ? Colors.red : null,
