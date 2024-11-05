@@ -14,7 +14,7 @@
       },
       "oauth_client": [
         {
-          "client_id": "828007872799-g72lrogdp24siiiovui138feqoi05f27.apps.googleusercontent.com",
+          "client_id": "828007872799-rm5jiv7sbl22kenhs4c63fu40g2f17hm.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.example.travel_on_final",
@@ -22,7 +22,14 @@
           }
         },
         {
-          "client_id": "828007872799-q66d8fvlmp1t2u1p55djj2q5b4r1td6c.apps.googleusercontent.com",
+          "client_id": "828007872799-ahi2t2qi532qc0403hrbrlcjgapurevl.apps.googleusercontent.com",
+          "client_type": 2,
+          "ios_info": {
+            "bundle_id": "com.example.travelOnFinal"
+          }
+        },
+        {
+          "client_id": "828007872799-qb327b1gs2rj7o1qvaqn4gt1lddffsg8.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
@@ -35,11 +42,11 @@
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "828007872799-q66d8fvlmp1t2u1p55djj2q5b4r1td6c.apps.googleusercontent.com",
+              "client_id": "828007872799-qb327b1gs2rj7o1qvaqn4gt1lddffsg8.apps.googleusercontent.com",
               "client_type": 3
             },
             {
-              "client_id": "828007872799-0spp668cgokgm230t7ouacfd08nmtgk8.apps.googleusercontent.com",
+              "client_id": "828007872799-ahi2t2qi532qc0403hrbrlcjgapurevl.apps.googleusercontent.com",
               "client_type": 2,
               "ios_info": {
                 "bundle_id": "com.example.travelOnFinal"

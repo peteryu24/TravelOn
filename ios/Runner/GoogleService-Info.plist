@@ -3,11 +3,11 @@
 <plist version="1.0">
 <dict>
 	<key>CLIENT_ID</key>
-	<string>828007872799-0spp668cgokgm230t7ouacfd08nmtgk8.apps.googleusercontent.com</string>
+	<string>828007872799-ahi2t2qi532qc0403hrbrlcjgapurevl.apps.googleusercontent.com</string>
 	<key>REVERSED_CLIENT_ID</key>
-	<string>com.googleusercontent.apps.828007872799-0spp668cgokgm230t7ouacfd08nmtgk8</string>
+	<string>com.googleusercontent.apps.828007872799-ahi2t2qi532qc0403hrbrlcjgapurevl</string>
 	<key>ANDROID_CLIENT_ID</key>
-	<string>828007872799-g72lrogdp24siiiovui138feqoi05f27.apps.googleusercontent.com</string>
+	<string>828007872799-rm5jiv7sbl22kenhs4c63fu40g2f17hm.apps.googleusercontent.com</string>
 	<key>API_KEY</key>
 	<string>AIzaSyDVYs2PDnrlEAp_1rnYmDDCVqHXBlc3poA</string>
 	<key>GCM_SENDER_ID</key>
@@ -21,15 +21,15 @@
 	<key>STORAGE_BUCKET</key>
 	<string>travel-on-app.appspot.com</string>
 	<key>IS_ADS_ENABLED</key>
-	<false></false>
+	<false/>
 	<key>IS_ANALYTICS_ENABLED</key>
-	<false></false>
+	<false/>
 	<key>IS_APPINVITE_ENABLED</key>
-	<true></true>
+	<true/>
 	<key>IS_GCM_ENABLED</key>
-	<true></true>
+	<true/>
 	<key>IS_SIGNIN_ENABLED</key>
-	<true></true>
+	<true/>
 	<key>GOOGLE_APP_ID</key>
 	<string>1:828007872799:ios:26950953dfd5ddc9e6582a</string>
 	<key>CFBundleURLTypes</key>
@@ -39,10 +39,9 @@
 			<string>Editor</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>com.googleusercontent.apps.828007872799-0spp668cgokgm230t7ouacfd08nmtgk8</string>
+				<string>com.googleusercontent.apps.828007872799-ahi2t2qi532qc0403hrbrlcjgapurevl</string>
 			</array>
 		</dict>
 	</array>
-
 </dict>
 </plist>

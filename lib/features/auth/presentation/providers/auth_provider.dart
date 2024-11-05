@@ -214,6 +214,95 @@ class AuthProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  /////////////////////////////////////////////////////////////////////
+  /// 소셜 로그인
+  // Future<void> loginWithKakao() async {
+  //   try {
+  //     final userModel = await _kakaoLoginUseCase.execute();
+  //     if (userModel != null) {
+  //       await _firestore.collection('users').doc(userModel.id).set({
+  //         'id': userModel.id,
+  //         'name': userModel.name,
+  //         'email': userModel.email,
+  //         'profileImageUrl': userModel.profileImageUrl,
+  //         'isGuide': userModel.isGuide,
+  //       }, SetOptions(merge: true));
+
+  //       _currentUser = userModel;
+  //       notifyListeners();
+  //     } else {
+  //       print('카카오톡 로그인 실패');
+  //     }
+  //   } catch (e) {
+  //     print('카카오톡 로그인 에러: $e');
+  //   }
+  // }
+
+  // Future<void> loginWithGoogle() async {
+  //   final userModel = await _googleLoginUseCase.execute();
+  //   if (userModel != null) {
+  //     await _firestore.collection('users').doc(userModel.id).set({
+  //       'id': userModel.id,
+  //       'name': userModel.name,
+  //       'email': userModel.email,
+  //       'profileImageUrl': userModel.profileImageUrl ?? '',
+  //       'isGuide': userModel.isGuide ?? false,
+  //     }, SetOptions(merge: true));
+
+  //     _currentUser = userModel;
+  //     notifyListeners();
+  //   } else {
+  //     print('Google 로그인 실패');
+  //   }
+  // }
+
+
+
+  // // Facebook 로그인 메서드
+  // Future<void> loginWithFacebook() async {
+  //   try {
+  //     final userModel = await _facebookLoginUseCase.execute();
+  //     if (userModel != null) {
+  //       await _firestore.collection('users').doc(userModel.id).set({
+  //         'id': userModel.id,
+  //         'name': userModel.name,
+  //         'email': userModel.email,
+  //         'profileImageUrl': userModel.profileImageUrl ?? '',
+  //         'isGuide': userModel.isGuide ?? false,
+  //       }, SetOptions(merge: true));
+
+  //       _currentUser = userModel;
+  //       notifyListeners();
+  //     } else {
+  //       print('Facebook 로그인 실패');
+  //     }
+  //   } catch (e) {
+  //     print('Facebook 로그인 에러: $e');
+  //   }
+  // }
+
+  // Future<void> loginWithNaver() async {
+  //   try {
+  //     final userModel = await _naverLoginUseCase.execute();
+  //     if (userModel != null) {
+  //       await _firestore.collection('users').doc(userModel.id).set({
+  //         'id': userModel.id,
+  //         'name': userModel.name,
+  //         'email': userModel.email,
+  //         'profileImageUrl': userModel.profileImageUrl ?? '',
+  //         'isGuide': userModel.isGuide ?? false,
+  //       }, SetOptions(merge: true));
+
+  //       _currentUser = userModel;
+  //       notifyListeners();
+  //     } else {
+  //       print('Naver 로그인 실패');
+  //     }
+  //   } catch (e) {
+  //     print('Naver 로그인 에러: $e');
+  //   }
+  // }
+
   Future<void> toggleLikePackage(String packageId) async {
     if (_currentUser == null) throw '로그인이 필요합니다';
 
@@ -257,38 +346,6 @@ class AuthProvider with ChangeNotifier {
     } catch (e) {
       print('Error toggling like in AuthProvider: $e');
       rethrow;
-    }
-  }
-
-  Future<void> loginWithGoogle() async {
-    final userModel = await _googleLoginUseCase.execute();
-    if (userModel != null) {
-      _currentUser = userModel;
-      notifyListeners();
-    }
-  }
-
-  Future<void> loginWithKakao() async {
-    final userModel = await _kakaoLoginUseCase.execute();
-    if (userModel != null) {
-      _currentUser = userModel;
-      notifyListeners();
-    }
-  }
-
-  Future<void> loginWithFacebook() async {
-    final userModel = await _facebookLoginUseCase.execute();
-    if (userModel != null) {
-      _currentUser = userModel;
-      notifyListeners();
-    }
-  }
-
-  Future<void> loginWithNaver() async {
-    final userModel = await _naverLoginUseCase.execute();
-    if (userModel != null) {
-      _currentUser = userModel;
-      notifyListeners();
     }
   }
 }
