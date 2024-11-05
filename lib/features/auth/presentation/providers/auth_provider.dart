@@ -16,7 +16,7 @@ class AuthProvider with ChangeNotifier {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseStorage _storage = FirebaseStorage.instance;
   final KakaoLoginUseCase _kakaoLoginUseCase;
-  final TravelProvider _travelProvider;  // final로 변경
+  final TravelProvider _travelProvider;
   final GoogleLoginUseCase _googleLoginUseCase = GoogleLoginUseCase();
   final FacebookLoginUseCase _facebookLoginUseCase = FacebookLoginUseCase();
   final NaverLoginUseCase _naverLoginUseCase = NaverLoginUseCase();
@@ -27,7 +27,6 @@ class AuthProvider with ChangeNotifier {
   UserModel? get currentUser => _currentUser;
   bool get isAuthenticated => _currentUser != null;
 
-  // 생성자에서 둘 다 받도록 수정
   AuthProvider(this._kakaoLoginUseCase, this._travelProvider) {
     _auth.authStateChanges().listen(_onAuthStateChanged);
   }
@@ -99,7 +98,7 @@ class AuthProvider with ChangeNotifier {
         'email': email,
         'profileImageUrl': '',
         'isGuide': false,
-        'likedPackages': [],  // 빈 배열로 초기화
+        'likedPackages': [],
       };
       await _firestore.collection('users').doc(userCredential.user!.uid).set(userDoc);
       _currentUser = UserModel.fromJson(userDoc);
@@ -116,7 +115,6 @@ class AuthProvider with ChangeNotifier {
       rethrow;
     }
   }
-
 
   Future<void> checkEmailVerified() async {
     final user = _auth.currentUser;
@@ -175,10 +173,9 @@ class AuthProvider with ChangeNotifier {
             .doc(firebaseUser.uid)
             .get();
 
-        final userData = userDoc.data() ?? {};  // null 체크 추가
+        final userData = userDoc.data() ?? {};
 
         if (!userDoc.exists) {
-          // 사용자 문서가 없으면 생성
           final newUserDoc = {
             'id': firebaseUser.uid,
             'name': firebaseUser.displayName ?? 'No Name',
@@ -217,49 +214,13 @@ class AuthProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> loginWithKakao() async {
-    try {
-      final userModel = await _kakaoLoginUseCase.execute();
-      if (userModel != null) {
-        // 파이어베이스에서 사용자 정보 가져오기
-        final userDoc = await _firestore
-            .collection('users')
-            .doc(userModel.id)
-            .get();
-
-        _currentUser = UserModel(
-          id: userModel.id,
-          name: userModel.name,
-          email: userModel.email,
-          profileImageUrl: userModel.profileImageUrl,
-          isGuide: userDoc.exists ? userDoc['isGuide'] ?? false : false,
-          likedPackages: userDoc.exists
-              ? List<String>.from(userDoc['likedPackages'] ?? [])
-              : [], // 찜 목록 로드
-        );
-
-        // 찜 목록 로드
-        await _travelProvider.loadLikedPackages(_currentUser!.id);
-
-        notifyListeners();
-      } else {
-        print('카카오톡 로그인 실패');
-      }
-    } catch (e) {
-      print('카카오톡 로그인 에러: $e');
-      rethrow;
-    }
-  }
-
   Future<void> toggleLikePackage(String packageId) async {
     if (_currentUser == null) throw '로그인이 필요합니다';
 
     try {
-      // 사용자 문서 업데이트
       final userRef = _firestore.collection('users').doc(_currentUser!.id);
       final userDoc = await userRef.get();
 
-      // 패키지 문서 업데이트
       final packageRef = _firestore.collection('packages').doc(packageId);
       final packageDoc = await packageRef.get();
 
@@ -270,7 +231,6 @@ class AuthProvider with ChangeNotifier {
       List<String> userLikedPackages = List<String>.from(userDoc.data()!['likedPackages'] ?? []);
       List<String> packageLikedBy = List<String>.from(packageDoc.data()!['likedBy'] ?? []);
 
-      // 좋아요 토글
       bool isLiked = userLikedPackages.contains(packageId);
       if (isLiked) {
         userLikedPackages.remove(packageId);
@@ -280,7 +240,6 @@ class AuthProvider with ChangeNotifier {
         packageLikedBy.add(_currentUser!.id);
       }
 
-      // 두 문서 업데이트
       await userRef.update({
         'likedPackages': userLikedPackages
       });
@@ -290,9 +249,8 @@ class AuthProvider with ChangeNotifier {
         'likesCount': packageLikedBy.length
       });
 
-      // 현재 사용자 모델 업데이트
       _currentUser = _currentUser!.copyWith(
-          likedPackages: userLikedPackages
+        likedPackages: userLikedPackages,
       );
 
       notifyListeners();
@@ -301,38 +259,36 @@ class AuthProvider with ChangeNotifier {
       rethrow;
     }
   }
-}
 
   Future<void> loginWithGoogle() async {
     final userModel = await _googleLoginUseCase.execute();
     if (userModel != null) {
-      // Firestore에 유저 정보를 저장하는 로직 추가
       _currentUser = userModel;
       notifyListeners();
-    } else {
-      print('Google 로그인 실패');
+    }
+  }
+
+  Future<void> loginWithKakao() async {
+    final userModel = await _kakaoLoginUseCase.execute();
+    if (userModel != null) {
+      _currentUser = userModel;
+      notifyListeners();
     }
   }
 
   Future<void> loginWithFacebook() async {
     final userModel = await _facebookLoginUseCase.execute();
     if (userModel != null) {
-      // Firestore에 유저 정보를 저장하는 로직 추가
       _currentUser = userModel;
       notifyListeners();
-    } else {
-      print('Facebook 로그인 실패');
     }
   }
 
   Future<void> loginWithNaver() async {
-    // Naver 로그인 UseCase 호출
     final userModel = await _naverLoginUseCase.execute();
     if (userModel != null) {
       _currentUser = userModel;
       notifyListeners();
-    } else {
-      print('Naver 로그인 실패');
     }
   }
 }
