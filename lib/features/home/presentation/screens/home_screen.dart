@@ -87,13 +87,13 @@ class _HomeScreenState extends State<HomeScreen> {
                 crossAxisSpacing: 20.w,
                 children: [
                   _buildMenuItem(Icons.star, '여행꿀팁'),
-                  _buildMenuItem(Icons.map_outlined, '코스가이드'),
-                  _buildMenuItem(Icons.calendar_today, '일정만들기'),
-                  _buildMenuItem(Icons.photo_camera, '여행갤러리'),
-                  _buildMenuItem(Icons.wb_sunny, '생생날씨'),
                   _buildMenuItem(Icons.favorite_border, '추천여행지'),
                   _buildMenuItem(Icons.restaurant, '추천맛집'),
-                  _buildMenuItem(Icons.location_on, '전국지도'),
+                  _buildMenuItem(Icons.photo_camera, '여행갤러리'),
+                  // _buildMenuItem(Icons.map_outlined, '코스가이드'),
+                  // _buildMenuItem(Icons.calendar_today, '일정만들기'),
+                  // _buildMenuItem(Icons.wb_sunny, '생생날씨'),
+                  // _buildMenuItem(Icons.location_on, '전국지도'),
                 ],
               ),
               SizedBox(height: 30.h),
@@ -175,13 +175,20 @@ class _HomeScreenState extends State<HomeScreen> {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Container(
-          padding: EdgeInsets.all(12.r),
-          decoration: BoxDecoration(
-            color: Colors.grey.shade100,
-            borderRadius: BorderRadius.circular(12.r),
+        GestureDetector(
+          onTap: () {
+            if (label == '여행갤러리') {
+              context.push('/travel-gallery');
+            }
+          },
+          child: Container(
+            padding: EdgeInsets.all(12.r),
+            decoration: BoxDecoration(
+              color: Colors.grey.shade100,
+              borderRadius: BorderRadius.circular(12.r),
+            ),
+            child: Icon(icon, color: Colors.blue),
           ),
-          child: Icon(icon, color: Colors.blue),
         ),
         SizedBox(height: 3.h),
         Text(
