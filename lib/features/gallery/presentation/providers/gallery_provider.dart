@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import '../../data/repositories/gallery_repository.dart';
@@ -8,12 +9,15 @@ class GalleryProvider extends ChangeNotifier {
   List<GalleryPost> _posts = [];
   bool _isLoading = false;
   Stream<List<GalleryPost>>? _postsStream;
+  StreamSubscription<List<GalleryPost>>? _subscription;
 
   GalleryProvider(this._repository) {
-    // 생성자에서 스트림 초기화
+    _initStream();
+  }
+
+  void _initStream() {
     _postsStream = _repository.getGalleryPosts();
-    // 스트림 구독
-    _postsStream?.listen((posts) {
+    _subscription = _postsStream?.listen((posts) {
       _posts = posts;
       notifyListeners();
     });
@@ -56,7 +60,14 @@ class GalleryProvider extends ChangeNotifier {
 
   @override
   void dispose() {
-    // 메모리 누수 방지를 위해 스트림 구독 취소
+    _subscription?.cancel();
     super.dispose();
+  }
+
+  // 로그아웃 시 호출할 메서드
+  void reset() {
+    _subscription?.cancel();
+    _posts = [];
+    notifyListeners();
   }
 }

@@ -74,7 +74,7 @@ class _HomeScreenState extends State<HomeScreen> {
               const NextTripCard(),
               SizedBox(height: 20.h),
 
-              // 날씨 정보
+              // 날씨 정���
               const WeatherSlider(),
               SizedBox(height: 30.h),
 
