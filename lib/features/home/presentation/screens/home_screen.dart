@@ -110,7 +110,9 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ),
                   TextButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      context.push('/packages'); // 전체 패키지 목록 화면으로 이동
+                    },
                     child: Row(
                       children: [
                         const Text(
@@ -125,18 +127,18 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               SizedBox(height: 10.h),
 
-              // 가로 스크롤 되는 추천 이미지 카드 
+              // 가로 스크롤 되는 추천 이미지 카드
               Consumer<TravelProvider>(
                 builder: (context, provider, child) {
-                  final recentPackages = provider.recentPackages;
+                  final popularPackages = provider.popularPackages;
 
                   return SizedBox(
                     height: 200.h,
                     child: ListView.builder(
                       scrollDirection: Axis.horizontal,
-                      itemCount: recentPackages.length,
+                      itemCount: popularPackages.length,
                       itemBuilder: (context, index) {
-                        final package = recentPackages[index];
+                        final package = popularPackages[index];
                         return Padding(
                           padding: EdgeInsets.only(
                             right: 16.w,
