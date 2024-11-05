@@ -1,0 +1,37 @@
+import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
+import 'package:travel_on_final/core/providers/navigation_provider.dart';
+import 'package:travel_on_final/features/chat/presentation/screens/chat_list_screen.dart';
+import 'package:travel_on_final/features/home/presentation/screens/home_screen.dart';
+import 'package:travel_on_final/features/home/presentation/widgets/bottom_navigation_bar.dart';
+import 'package:travel_on_final/features/profile/presentation/screens/profile_screen.dart';
+import 'package:travel_on_final/features/search/presentation/screens/detail_screens.dart';
+
+class ScaffoldWithBottomNavBar extends StatelessWidget {
+  // child 매개변수는 더 이상 필요 없으므로 제거
+  const ScaffoldWithBottomNavBar({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: IndexedStack(
+        index: context.watch<NavigationProvider>().currentIndex,
+        children: [
+          const HomeScreen(),
+          const DetailScreen(),
+          ChatListScreen(),
+          const ProfileScreen(),
+        ],
+      ),
+      bottomNavigationBar: Consumer<NavigationProvider>(
+        builder: (context, navigationProvider, _) {
+          return CustomBottomNavigationBar(
+            selectedIndex: navigationProvider.currentIndex,
+            onItemTapped: (index) => navigationProvider.setIndex(index),
+          );
+        },
+      ),
+    );
+  }
+}

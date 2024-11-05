@@ -1,0 +1,61 @@
+{
+  "project_info": {
+    "project_number": "828007872799",
+    "project_id": "travel-on-app",
+    "storage_bucket": "travel-on-app.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:828007872799:android:431d8a7adf5e3a33e6582a",
+        "android_client_info": {
+          "package_name": "com.example.travel_on_final"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "828007872799-rm5jiv7sbl22kenhs4c63fu40g2f17hm.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.travel_on_final",
+            "certificate_hash": "b5a2e75c47c9a9e41921748feb75d5ee0707f87f"
+          }
+        },
+        {
+          "client_id": "828007872799-ahi2t2qi532qc0403hrbrlcjgapurevl.apps.googleusercontent.com",
+          "client_type": 2,
+          "ios_info": {
+            "bundle_id": "com.example.travelOnFinal"
+          }
+        },
+        {
+          "client_id": "828007872799-qb327b1gs2rj7o1qvaqn4gt1lddffsg8.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAhsvq-x3COMgmn8foKPzQIyBnW12KE_fM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "828007872799-qb327b1gs2rj7o1qvaqn4gt1lddffsg8.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "828007872799-ahi2t2qi532qc0403hrbrlcjgapurevl.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.travelOnFinal"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
