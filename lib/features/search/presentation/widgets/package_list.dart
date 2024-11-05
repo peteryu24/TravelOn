@@ -1,14 +1,14 @@
-import 'dart:io';
-
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
-import 'package:travel_on_final/features/auth/presentation/screens/login_screen.dart';
+import 'package:travel_on_final/features/auth/presentation/providers/auth_provider.dart';
 import '../providers/travel_provider.dart';
 import '../../domain/entities/travel_package.dart';
 
+// 패키지 목록 위젯
 class PackageList extends StatelessWidget {
   const PackageList({Key? key}) : super(key: key);
 
@@ -30,11 +30,10 @@ class PackageList extends StatelessWidget {
         }
 
         return ListView.builder(
-          padding: EdgeInsets.all(16.w),
+          padding: const EdgeInsets.all(16),
           itemCount: packages.length,
           itemBuilder: (context, index) {
-            final package = packages[index];
-            return PackageCard(package: package);
+            return LikeablePackageCard(package: packages[index]);
           },
         );
       },
@@ -42,118 +41,227 @@ class PackageList extends StatelessWidget {
   }
 }
 
-class PackageCard extends StatelessWidget {
+// 패키지 카드 위젯
+class LikeablePackageCard extends StatefulWidget {
   final TravelPackage package;
-  final NumberFormat _priceFormat = NumberFormat('#,###');
 
-  PackageCard({
+  const LikeablePackageCard({
     Key? key,
     required this.package,
   }) : super(key: key);
 
   @override
+  State<LikeablePackageCard> createState() => _LikeablePackageCardState();
+}
+
+class _LikeablePackageCardState extends State<LikeablePackageCard> {
+  final NumberFormat _priceFormat = NumberFormat('#,###');
+  Stream<DocumentSnapshot>? packageStream;
+
+  @override
+  void initState() {
+    super.initState();
+    packageStream = FirebaseFirestore.instance
+        .collection('packages')
+        .doc(widget.package.id)
+        .snapshots();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Card(
-      margin: EdgeInsets.only(bottom: 16.h),
-      clipBehavior: Clip.antiAlias,
-      child: InkWell(
-        onTap: () {
-          context.push('/package-detail/${package.id}', extra: package);
-        },
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // 메인 이미지 - Image.file을 Image.network로 변경
-            if (package.mainImage != null && package.mainImage!.isNotEmpty)
-              Image.network(
-                package.mainImage!,
-                height: 200.h,
-                width: double.infinity,
-                fit: BoxFit.cover,
-                // 로딩 중 표시
-                loadingBuilder: (context, child, loadingProgress) {
-                  if (loadingProgress == null) return child;
-                  return Container(
-                    height: 200.h,
-                    width: double.infinity,
-                    color: Colors.grey[200],
-                    child: Center(
-                      child: CircularProgressIndicator(
-                        value: loadingProgress.expectedTotalBytes != null
-                            ? loadingProgress.cumulativeBytesLoaded /
-                            loadingProgress.expectedTotalBytes!
-                            : null,
-                      ),
-                    ),
-                  );
+    return Consumer2<AuthProvider, TravelProvider>(
+      builder: (context, authProvider, travelProvider, _) {
+        final userId = authProvider.currentUser?.id;
+        final isLiked = userId != null && widget.package.likedBy.contains(userId);
+
+        return Card(
+          margin: const EdgeInsets.only(bottom: 16),
+          clipBehavior: Clip.antiAlias,
+          child: Stack(
+            children: [
+              // 패키지 정보 부분
+              InkWell(
+                onTap: () {
+                  context.push('/package-detail/${widget.package.id}', extra: widget.package);
                 },
-                // 에러 발생 시 표시
-                errorBuilder: (context, error, stackTrace) {
-                  return Container(
-                    height: 200.h,
-                    width: double.infinity,
-                    color: Colors.grey[200],
-                    child: const Center(
-                      child: Icon(
-                        Icons.error_outline,
-                        size: 40,
-                        color: Colors.grey,
-                      ),
-                    ),
-                  );
-                },
-              )
-            else
-              Container(
-                height: 200.h,
-                width: double.infinity,
-                color: Colors.grey[200],
-                child: Center(
-                  child: Icon(
-                    Icons.landscape,
-                    size: 50,
-                    color: Colors.grey[400],
-                  ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _buildPackageImage(),
+                    _buildPackageInfo(),
+                  ],
                 ),
               ),
+              // 좋아요 버튼 부분
+              _buildLikeButton(userId, isLiked),
+            ],
+          ),
+        );
+      },
+    );
+  }
 
-            Padding(
-              padding: EdgeInsets.all(16.w),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    package.title,
-                    style: TextStyle(
-                      fontSize: 18.sp,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  SizedBox(height: 8.h),
-                  Text(
-                    package.description,
-                    style: TextStyle(
-                      color: Colors.grey,
-                      fontSize: 14.sp,
-                    ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  SizedBox(height: 8.h),
-                  Text(
-                    '₩${_priceFormat.format(package.price.toInt())}',
-                    style: TextStyle(
-                      fontSize: 16.sp,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.blue,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
+  // 패키지 이미지 위젯
+  Widget _buildPackageImage() {
+    if (widget.package.mainImage != null && widget.package.mainImage!.isNotEmpty) {
+      return Image.network(
+        widget.package.mainImage!,
+        height: 200.h,
+        width: double.infinity,
+        fit: BoxFit.cover,
+        loadingBuilder: (context, child, loadingProgress) {
+          if (loadingProgress == null) return child;
+          return _buildImagePlaceholder();
+        },
+        errorBuilder: (context, error, stackTrace) {
+          return _buildImagePlaceholder();
+        },
+      );
+    }
+    return _buildImagePlaceholder();
+  }
+
+  // 이미지 플레이스홀더 위젯
+  Widget _buildImagePlaceholder() {
+    return Container(
+      height: 200.h,
+      width: double.infinity,
+      color: Colors.grey[200],
+      child: Center(
+        child: Icon(
+          Icons.landscape,
+          size: 50,
+          color: Colors.grey[400],
         ),
       ),
     );
+  }
+
+  // 패키지 정보 위젯
+  Widget _buildPackageInfo() {
+    return Padding(
+      padding: EdgeInsets.all(16.w),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            widget.package.title,
+            style: TextStyle(
+              fontSize: 18.sp,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          SizedBox(height: 8.h),
+          Text(
+            widget.package.description,
+            style: TextStyle(
+              color: Colors.grey,
+              fontSize: 14.sp,
+            ),
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+          ),
+          SizedBox(height: 8.h),
+          Text(
+            '₩${_priceFormat.format(widget.package.price.toInt())}',
+            style: TextStyle(
+              fontSize: 16.sp,
+              fontWeight: FontWeight.bold,
+              color: Colors.blue,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // 좋아요 버튼 위젯
+  Widget _buildLikeButton(String? userId, bool isLiked) {
+    return Positioned(
+      top: 8,
+      right: 8,
+      child: Container(
+        padding: EdgeInsets.all(8.w),
+        decoration: BoxDecoration(
+          color: Colors.white.withOpacity(0.5),
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: StreamBuilder<DocumentSnapshot>(
+          stream: packageStream,
+          builder: (context, snapshot) {
+            if (snapshot.hasData && snapshot.data != null) {
+              final data = snapshot.data!.data() as Map<String, dynamic>;
+              final likesCount = data['likesCount'] ?? 0;
+              final List<String> likedBy = List<String>.from(data['likedBy'] ?? []);
+              final isLiked = userId != null && likedBy.contains(userId);
+
+              return Row(
+                children: [
+                  Text(
+                    '$likesCount',
+                    style: TextStyle(
+                      fontSize: 20.sp,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  SizedBox(width: 4.w),
+                  IconButton(
+                    icon: Icon(
+                      isLiked ? Icons.favorite : Icons.favorite_border,
+                      color: isLiked ? Colors.red : Colors.grey,
+                    ),
+                    onPressed: () => _handleLikeButton(userId, context),
+                  ),
+                ],
+              );
+            }
+            return _buildLikeButtonPlaceholder();
+          },
+        ),
+      ),
+    );
+  }
+
+  // 좋아요 버튼 플레이스홀더
+  Widget _buildLikeButtonPlaceholder() {
+    return Row(
+      children: [
+        Text(
+          '${widget.package.likesCount}',
+          style: TextStyle(
+            fontSize: 24.sp,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        SizedBox(width: 4.w),
+        const Icon(Icons.favorite_border, color: Colors.grey),
+      ],
+    );
+  }
+
+  // 좋아요 버튼 핸들러
+  Future<void> _handleLikeButton(String? userId, BuildContext context) async {
+    if (userId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('로그인이 필요합니다')),
+      );
+      context.push('/login');
+      return;
+    }
+
+    try {
+      final authProvider = context.read<AuthProvider>();
+      await authProvider.toggleLikePackage(widget.package.id);
+
+      if (context.mounted) {
+        await context.read<TravelProvider>().loadPackages();
+      }
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('오류가 발생했습니다: $e')),
+        );
+      }
+    }
   }
 }

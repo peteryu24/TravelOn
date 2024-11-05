@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart' hide AuthProvider;  // AuthProvider 숨기기
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:travel_on_final/features/home/data/repositories/home_repository_impl.dart';
@@ -16,7 +17,7 @@ import 'package:travel_on_final/firebase_options.dart';
 // provider
 import 'package:provider/provider.dart';
 import 'package:travel_on_final/core/providers/navigation_provider.dart';
-import 'package:travel_on_final/features/auth/presentation/providers/auth_provider.dart';
+import 'package:travel_on_final/features/auth/presentation/providers/auth_provider.dart' as app;  // alias 추가
 import 'package:travel_on_final/features/chat/presentation/providers/chat_provider.dart';
 import 'package:travel_on_final/features/search/presentation/providers/travel_provider.dart';
 // social_login
@@ -51,20 +52,39 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
+        // Navigation
         ChangeNotifierProvider(create: (_) => NavigationProvider()),
-        Provider<AuthRepository>(create: (_) => AuthRepositoryImpl()),
+
+        // Auth 관련 Providers
+        Provider<AuthRepository>(
+            create: (_) => AuthRepositoryImpl()
+        ),
+
+        // Travel 관련 Providers
+        ChangeNotifierProvider(
+          create: (_) => TravelProvider(
+            TravelRepositoryImpl(),
+            auth: FirebaseAuth.instance,
+          ),
+        ),
+
+        // KakaoLogin UseCase
         ProxyProvider<AuthRepository, KakaoLoginUseCase>(
           update: (_, authRepository, __) => KakaoLoginUseCase(authRepository),
         ),
-        ChangeNotifierProvider(
-          create: (context) => AuthProvider(
+
+        // Auth Provider
+        ChangeNotifierProxyProvider2<KakaoLoginUseCase, TravelProvider, app.AuthProvider>(
+          create: (context) => app.AuthProvider(
             context.read<KakaoLoginUseCase>(),
+            context.read<TravelProvider>(),
           ),
+          update: (context, kakaoLoginUseCase, travelProvider, previous) =>
+          previous ?? app.AuthProvider(kakaoLoginUseCase, travelProvider!),
         ),
+
+        // 기타 Providers
         ChangeNotifierProvider(create: (_) => ChatProvider()),
-        ChangeNotifierProvider(
-          create: (_) => TravelProvider(TravelRepositoryImpl()),
-        ),
         ChangeNotifierProvider(
           create: (_) => ReservationProvider(FirebaseFirestore.instance),
         ),

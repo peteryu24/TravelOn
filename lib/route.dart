@@ -12,6 +12,7 @@ import 'package:travel_on_final/features/chat/presentation/screens/chat_list_scr
 import 'package:travel_on_final/features/profile/presentation/screens/edit_packages_screen.dart';
 import 'package:travel_on_final/features/profile/presentation/screens/guide_certification_screen.dart';
 import 'package:travel_on_final/features/profile/presentation/screens/guide_reservation_screen.dart';
+import 'package:travel_on_final/features/profile/presentation/screens/liked_packages_screen.dart';
 import 'package:travel_on_final/features/profile/presentation/screens/my_packages_screen.dart';
 import 'package:travel_on_final/features/profile/presentation/screens/reservation_screen.dart';
 import 'package:travel_on_final/features/reservation/presentation/screens/reservation_calendar_screen.dart';
@@ -84,6 +85,10 @@ final goRouter = GoRouter(
     GoRoute(
       path: '/signup',
       builder: (context, state) => SignupScreen(),
+    ),
+    GoRoute(
+      path: '/liked-packages',
+      builder: (context, state) => const LikedPackagesScreen(),
     ),
     ////////////////////////////////////////////////////////////////////////////////////
     //                ↓↓↓ 바텀 내비게이션 바가 필요한 화면 라우팅 ↓↓↓                    //

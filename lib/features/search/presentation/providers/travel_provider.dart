@@ -1,16 +1,24 @@
 import 'package:flutter/foundation.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:travel_on_final/features/auth/data/models/user_model.dart';
 import '../../domain/repositories/travel_repositories.dart';
 import '../../domain/entities/travel_package.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'dart:math' as math;
 
 class TravelProvider extends ChangeNotifier {
   final TravelRepository _repository;
+  final FirebaseAuth _auth;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;  // 추가
   List<TravelPackage> _packages = [];
+  Set<String> _likedPackageIds = {};  // 찜한 패키지 ID 목록
   String _selectedRegion = 'all';
   String _searchQuery = '';
   bool _isLoading = false;
   String? _error;
 
-  TravelProvider(this._repository) {
+  TravelProvider(this._repository, {required FirebaseAuth auth})
+      : _auth = auth {
     loadPackages();
   }
 
@@ -68,14 +76,78 @@ class TravelProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> toggleLike(String packageId, UserModel user) async {
+    try {
+      // 패키지와 유저 문서 참조
+      final userRef = _firestore.collection('users').doc(user.id);
+      final packageRef = _firestore.collection('packages').doc(packageId);
+
+      // 현재 상태 확인
+      final userDoc = await userRef.get();
+      final packageDoc = await packageRef.get();
+
+      if (!userDoc.exists || !packageDoc.exists) {
+        throw '사용자 또는 패키지를 찾을 수 없습니다';
+      }
+
+      // 현재 상태 가져오기
+      List<String> userLikedPackages = List<String>.from(userDoc.data()!['likedPackages'] ?? []);
+      List<String> packageLikedBy = List<String>.from(packageDoc.data()!['likedBy'] ?? []);
+      int currentLikesCount = packageDoc.data()!['likesCount'] ?? 0;
+
+      // 좋아요 토글
+      bool isLiked = userLikedPackages.contains(packageId);
+      if (isLiked) {
+        // 좋아요 취소
+        userLikedPackages.remove(packageId);
+        packageLikedBy.remove(user.id);
+        currentLikesCount = math.max(0, currentLikesCount - 1);
+        _likedPackageIds.remove(packageId);
+      } else {
+        // 좋아요 추가
+        userLikedPackages.add(packageId);
+        packageLikedBy.add(user.id);
+        currentLikesCount++;
+        _likedPackageIds.add(packageId);
+      }
+
+      // 각각 업데이트
+      await userRef.update({
+        'likedPackages': userLikedPackages,
+      });
+
+      await packageRef.update({
+        'likedBy': packageLikedBy,
+        'likesCount': currentLikesCount,
+      });
+
+      // 로컬 상태 업데이트
+      final packageIndex = _packages.indexWhere((p) => p.id == packageId);
+      if (packageIndex != -1) {
+        final package = _packages[packageIndex];
+        package.likedBy = packageLikedBy;
+        package.likesCount = currentLikesCount;
+      }
+
+      notifyListeners();
+    } catch (e) {
+      print('Error toggling like: $e');
+      rethrow;
+    }
+  }
   // 패키지 목록 로드
   Future<void> loadPackages() async {
     try {
       _isLoading = true;
-      _error = null;
       notifyListeners();
 
       _packages = await _repository.getPackages();
+
+      // 현재 로그인한 사용자가 있다면 찜 상태 업데이트
+      final currentUser = _auth.currentUser;
+      if (currentUser != null) {
+        await loadLikedPackages(currentUser.uid);
+      }
 
       _isLoading = false;
       notifyListeners();
@@ -83,7 +155,6 @@ class TravelProvider extends ChangeNotifier {
       _error = e.toString();
       _isLoading = false;
       notifyListeners();
-      print('Error loading packages: $e');
     }
   }
 
@@ -107,25 +178,54 @@ class TravelProvider extends ChangeNotifier {
     }
   }
 
+  // 패키지 삭제
   Future<void> deletePackage(String packageId) async {
     try {
       await _repository.deletePackage(packageId);
-      await loadPackages(); // 목록 새로고침
+      await loadPackages();
+      notifyListeners();
     } catch (e) {
       print('Error deleting package: $e');
       rethrow;
     }
   }
 
+  // 패키지 업데이트
   Future<void> updatePackage(TravelPackage package) async {
     try {
       await _repository.updatePackage(package);
-      await loadPackages(); // 목록 새로고침
+      await loadPackages();
       notifyListeners();
     } catch (e) {
       print('Error updating package: $e');
       rethrow;
     }
+  }
+
+  Future<void> loadLikedPackages(String userId) async {
+    try {
+      final userDoc = await _firestore.collection('users').doc(userId).get();
+      if (!userDoc.exists) return;
+
+      final likedPackages = List<String>.from(userDoc.data()!['likedPackages'] ?? []);
+      _likedPackageIds = Set.from(likedPackages);
+
+      // 로컬 패키지 상태 업데이트
+      for (var package in _packages) {
+        package.likedBy.clear(); // 기존 상태 초기화
+        if (_likedPackageIds.contains(package.id)) {
+          package.likedBy.add(userId);
+        }
+      }
+
+      notifyListeners();
+    } catch (e) {
+      print('Error loading liked packages: $e');
+    }
+  }
+
+  List<TravelPackage> getLikedPackages() {
+    return _packages.where((package) => _likedPackageIds.contains(package.id)).toList();
   }
 
   // 특정 패키지 검색
@@ -137,16 +237,28 @@ class TravelProvider extends ChangeNotifier {
     }
   }
 
+  // 패키지 좋아요 상태 확인
+  bool isPackageLiked(String packageId) {
+    return _likedPackageIds.contains(packageId);
+  }
+
   // 에러 상태 초기화
   void clearError() {
     _error = null;
     notifyListeners();
   }
 
-  // 최신 패키지 5개 getter
+  // 찜 목록 초기화
+  void clearLikedPackages() {
+    _likedPackageIds.clear();
+    for (var package in _packages) {
+      package.likedBy.clear();
+    }
+    notifyListeners();
+  }
+
+  // 최신 패키지 5개 조회
   List<TravelPackage> get recentPackages {
-    return _packages
-        .take(5) // 최대 5개만 가져옴
-        .toList();
+    return _packages.take(5).toList();
   }
 }

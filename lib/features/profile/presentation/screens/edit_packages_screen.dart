@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:image_picker/image_picker.dart';
@@ -102,7 +103,7 @@ class _EditPackageScreenState extends State<EditPackageScreen> {
 
   Widget _buildNightsSelection() {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
       decoration: BoxDecoration(
         border: Border.all(color: const Color(0XFF2196F3)),
         borderRadius: BorderRadius.circular(4),
@@ -134,7 +135,7 @@ class _EditPackageScreenState extends State<EditPackageScreen> {
 
   Widget _buildDepartureDaysSelection() {
     return Container(
-      padding: const EdgeInsets.all(12),
+      padding: EdgeInsets.all(12.w),
       decoration: BoxDecoration(
         border: Border.all(color: const Color(0XFF2196F3)),
         borderRadius: BorderRadius.circular(4),
@@ -142,8 +143,8 @@ class _EditPackageScreenState extends State<EditPackageScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('출발 요일', style: TextStyle(fontSize: 16)),
-          const SizedBox(height: 8),
+          Text('출발 요일', style: TextStyle(fontSize: 16.sp)),
+          SizedBox(height: 8.h),
           Wrap(
             spacing: 6,
             runSpacing: 6,
@@ -232,7 +233,7 @@ class _EditPackageScreenState extends State<EditPackageScreen> {
       ),
       body: SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.all(16.0),
+          padding: EdgeInsets.all(16.0.w),
           child: Form(
             key: _formKey,
             child: Column(
@@ -242,7 +243,7 @@ class _EditPackageScreenState extends State<EditPackageScreen> {
                 GestureDetector(
                   onTap: _pickMainImage,
                   child: Container(
-                    height: 200,
+                    height: 200.h,
                     decoration: BoxDecoration(
                       border: Border.all(color: const Color(0XFF2196F3)),
                       borderRadius: BorderRadius.circular(8),
@@ -293,7 +294,7 @@ class _EditPackageScreenState extends State<EditPackageScreen> {
                     return null;
                   },
                 ),
-                const SizedBox(height: 16),
+                SizedBox(height: 16.h),
 
                 // 지역 선택
                 DropdownButtonFormField<String>(
@@ -323,7 +324,7 @@ class _EditPackageScreenState extends State<EditPackageScreen> {
                     });
                   },
                 ),
-                const SizedBox(height: 16),
+                SizedBox(height: 16.h),
 
                 // 가격
                 TextFormField(
@@ -347,15 +348,15 @@ class _EditPackageScreenState extends State<EditPackageScreen> {
                     return null;
                   },
                 ),
-                const SizedBox(height: 16),
+                SizedBox(height: 16.h),
 
                 // 박 수 선택
                 _buildNightsSelection(),
-                const SizedBox(height: 16),
+                SizedBox(height: 16.h),
 
                 // 출발 요일 선택
                 _buildDepartureDaysSelection(),
-                const SizedBox(height: 16),
+                SizedBox(height: 16.h),
 
                 // 최소 인원
                 TextFormField(
@@ -380,7 +381,7 @@ class _EditPackageScreenState extends State<EditPackageScreen> {
                     return null;
                   },
                 ),
-                const SizedBox(height: 16),
+                SizedBox(height: 16.h),
 
                 // 최대 인원
                 TextFormField(
@@ -409,7 +410,7 @@ class _EditPackageScreenState extends State<EditPackageScreen> {
                     return null;
                   },
                 ),
-                const SizedBox(height: 16),
+                SizedBox(height: 16.h),
 
                 // 설명
                 TextFormField(
@@ -429,20 +430,20 @@ class _EditPackageScreenState extends State<EditPackageScreen> {
                     return null;
                   },
                 ),
-                const SizedBox(height: 16),
+                SizedBox(height: 16.h),
 
                 // 설명 이미지 목록
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
+                    Text(
                       '설명 이미지',
                       style: TextStyle(
-                        fontSize: 16,
+                        fontSize: 16.sp,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    const SizedBox(height: 8),
+                    SizedBox(height: 8.h),
                     Wrap(
                       spacing: 8,
                       runSpacing: 8,
@@ -452,8 +453,8 @@ class _EditPackageScreenState extends State<EditPackageScreen> {
                           return Stack(
                             children: [
                               Container(
-                                width: 100,
-                                height: 100,
+                                width: 100.w,
+                                height: 100.h,
                                 decoration: BoxDecoration(
                                   border: Border.all(color: Colors.grey),
                                   borderRadius: BorderRadius.circular(8),
@@ -483,8 +484,8 @@ class _EditPackageScreenState extends State<EditPackageScreen> {
                           return Stack(
                             children: [
                               Container(
-                                width: 100,
-                                height: 100,
+                                width: 100.w,
+                                height: 100.h,
                                 decoration: BoxDecoration(
                                   border: Border.all(color: Colors.grey),
                                   borderRadius: BorderRadius.circular(8),
@@ -513,8 +514,8 @@ class _EditPackageScreenState extends State<EditPackageScreen> {
                         GestureDetector(
                           onTap: _pickDescriptionImage,
                           child: Container(
-                            width: 100,
-                            height: 100,
+                            width: 100.w,
+                            height: 100.h,
                             decoration: BoxDecoration(
                               border: Border.all(color: Colors.grey),
                               borderRadius: BorderRadius.circular(8),
@@ -532,7 +533,7 @@ class _EditPackageScreenState extends State<EditPackageScreen> {
                     ),
                   ],
                 ),
-                const SizedBox(height: 24),
+                SizedBox(height: 24.h),
 
                 // 수정 버튼
                 ElevatedButton(
@@ -540,9 +541,9 @@ class _EditPackageScreenState extends State<EditPackageScreen> {
                   style: ElevatedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 16),
                   ),
-                  child: const Text(
+                  child: Text(
                     '패키지 수정',
-                    style: TextStyle(fontSize: 16),
+                    style: TextStyle(fontSize: 16.sp),
                   ),
                 ),
               ],
