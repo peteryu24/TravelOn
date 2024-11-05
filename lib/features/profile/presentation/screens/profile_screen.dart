@@ -145,7 +145,21 @@ class ProfileScreen extends StatelessWidget {
                   ),
                 ),
 
-                const SizedBox(height: 24),
+                Card(
+                  child: Column(
+                    children: [
+                      ListTile(
+                        leading: const Icon(Icons.favorite),
+                        title: const Text('찜한 패키지'),
+                        subtitle: const Text('관심있는 패키지를 확인합니다'),
+                        trailing: const Icon(Icons.chevron_right),
+                        onTap: () {
+                          context.push('/liked-packages');
+                        },
+                      ),
+                    ],
+                  ),
+                ),
 
                 // 로그아웃 버튼
                 Padding(

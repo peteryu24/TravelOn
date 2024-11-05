@@ -259,206 +259,211 @@ class _ReservationCalendarScreenState extends State<ReservationCalendarScreen> {
       appBar: AppBar(
         title: const Text('예약 날짜 선택'),
       ),
-      body: Column(
-        children: [
-          if (_isLoading)
-            const LinearProgressIndicator(),
-          TableCalendar(
-            firstDay: DateTime.now(),
-            lastDay: DateTime.now().add(const Duration(days: 365)),
-            focusedDay: _focusedDay,
-            selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
-            enabledDayPredicate: (day) {
-              if (day.isBefore(DateTime.now())) return false;
-              if (!_isValidDepartureDay(day)) return false;
-              final dateKey = _getDateKey(day);
-              return _availabilityCache[dateKey] ?? true;
-            },
-            onDaySelected: (selectedDay, focusedDay) {
-              if (selectedDay.isBefore(DateTime.now())) return;
+      body: SafeArea(
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              if (_isLoading)
+                const LinearProgressIndicator(),
+              TableCalendar(
+                firstDay: DateTime.now(),
+                lastDay: DateTime.now().add(const Duration(days: 365)),
+                focusedDay: _focusedDay,
+                selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
+                enabledDayPredicate: (day) {
+                  if (day.isBefore(DateTime.now())) return false;
+                  if (!_isValidDepartureDay(day)) return false;
+                  final dateKey = _getDateKey(day);
+                  return _availabilityCache[dateKey] ?? true;
+                },
+                onDaySelected: (selectedDay, focusedDay) {
+                  if (selectedDay.isBefore(DateTime.now())) return;
 
-              if (!_isValidDepartureDay(selectedDay)) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('선택할 수 없는 출발일입니다')),
-                );
-                return;
-              }
+                  if (!_isValidDepartureDay(selectedDay)) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('선택할 수 없는 출발일입니다')),
+                    );
+                    return;
+                  }
 
-              final dateKey = _getDateKey(selectedDay);
-              final isAvailable = _availabilityCache[dateKey] ?? true;
+                  final dateKey = _getDateKey(selectedDay);
+                  final isAvailable = _availabilityCache[dateKey] ?? true;
 
-              if (isAvailable) {
-                setState(() {
-                  _selectedDay = selectedDay;
-                  _focusedDay = focusedDay;
-                });
-              } else {
-                if (mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('선택한 날짜는 예약이 마감되었습니다')),
-                  );
-                }
-              }
-            },
-            onPageChanged: (focusedDay) {
-              setState(() {
-                _focusedDay = focusedDay;
-                _availabilityCache.clear();
-              });
-              _preloadAvailability();
-            },
-            calendarBuilders: CalendarBuilders(
-              defaultBuilder: (context, date, _) {
-                bool isDepartureDay = _isValidDepartureDay(date);
-                return Container(
-                  margin: EdgeInsets.all(4.w),
-                  decoration: BoxDecoration(
-                    color: isDepartureDay ? Colors.blue.shade50 : Colors.grey.shade200,
-                    shape: BoxShape.circle,
-                  ),
-                  child: Center(
-                    child: Text(
-                      '${date.day}',
-                      style: TextStyle(
-                        color: isDepartureDay && !date.isBefore(DateTime.now())
-                            ? Colors.black
-                            : Colors.grey,
+                  if (isAvailable) {
+                    setState(() {
+                      _selectedDay = selectedDay;
+                      _focusedDay = focusedDay;
+                    });
+                  } else {
+                    if (mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('선택한 날짜는 예약이 마감되었습니다')),
+                      );
+                    }
+                  }
+                },
+                onPageChanged: (focusedDay) {
+                  setState(() {
+                    _focusedDay = focusedDay;
+                    _availabilityCache.clear();
+                  });
+                  _preloadAvailability();
+                },
+                calendarBuilders: CalendarBuilders(
+                  defaultBuilder: (context, date, _) {
+                    bool isDepartureDay = _isValidDepartureDay(date);
+                    return Container(
+                      margin: EdgeInsets.all(4.w),
+                      decoration: BoxDecoration(
+                        color: isDepartureDay ? Colors.blue.shade50 : Colors.grey.shade200,
+                        shape: BoxShape.circle,
                       ),
-                    ),
-                  ),
-                );
-              },
-              selectedBuilder: (context, date, _) {
-                return Container(
-                  margin: EdgeInsets.all(4.w),
-                  decoration: const BoxDecoration(
+                      child: Center(
+                        child: Text(
+                          '${date.day}',
+                          style: TextStyle(
+                            color: isDepartureDay && !date.isBefore(DateTime.now())
+                                ? Colors.black
+                                : Colors.grey,
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                  selectedBuilder: (context, date, _) {
+                    return Container(
+                      margin: EdgeInsets.all(4.w),
+                      decoration: const BoxDecoration(
+                        color: Colors.blue,
+                        shape: BoxShape.circle,
+                      ),
+                      child: Center(
+                        child: Text(
+                          '${date.day}',
+                          style: const TextStyle(color: Colors.white),
+                        ),
+                      ),
+                    );
+                  },
+                  disabledBuilder: (context, date, _) {
+                    return Container(
+                      margin: EdgeInsets.all(4.w),
+                      decoration: BoxDecoration(
+                        color: Colors.grey.shade200,
+                        shape: BoxShape.circle,
+                      ),
+                      child: Center(
+                        child: Text(
+                          '${date.day}',
+                          style: const TextStyle(color: Colors.grey),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+                calendarStyle: CalendarStyle(
+                  selectedDecoration: const BoxDecoration(
                     color: Colors.blue,
                     shape: BoxShape.circle,
                   ),
-                  child: Center(
-                    child: Text(
-                      '${date.day}',
-                      style: const TextStyle(color: Colors.white),
-                    ),
-                  ),
-                );
-              },
-              disabledBuilder: (context, date, _) {
-                return Container(
-                  margin: EdgeInsets.all(4.w),
-                  decoration: BoxDecoration(
-                    color: Colors.grey.shade200,
+                  selectedTextStyle: const TextStyle(color: Colors.white),
+                  todayDecoration: BoxDecoration(
+                    border: Border.all(color: Colors.blue),
                     shape: BoxShape.circle,
                   ),
-                  child: Center(
-                    child: Text(
-                      '${date.day}',
-                      style: const TextStyle(color: Colors.grey),
-                    ),
-                  ),
-                );
-              },
-            ),
-            calendarStyle: CalendarStyle(
-              selectedDecoration: const BoxDecoration(
-                color: Colors.blue,
-                shape: BoxShape.circle,
+                  todayTextStyle: const TextStyle(color: Colors.blue),
+                  disabledTextStyle: const TextStyle(color: Colors.grey),
+                  defaultDecoration: const BoxDecoration(shape: BoxShape.circle),
+                  weekendDecoration: const BoxDecoration(shape: BoxShape.circle),
+                  outsideDecoration: const BoxDecoration(shape: BoxShape.circle),
+                ),
+                headerStyle: const HeaderStyle(
+                  formatButtonVisible: false,
+                  titleCentered: true,
+                ),
               ),
-              selectedTextStyle: const TextStyle(color: Colors.white),
-              todayDecoration: BoxDecoration(
-                border: Border.all(color: Colors.blue),
-                shape: BoxShape.circle,
-              ),
-              todayTextStyle: const TextStyle(color: Colors.blue),
-              disabledTextStyle: const TextStyle(color: Colors.grey),
-              defaultDecoration: const BoxDecoration(shape: BoxShape.circle),
-              weekendDecoration: const BoxDecoration(shape: BoxShape.circle),
-              outsideDecoration: const BoxDecoration(shape: BoxShape.circle),
-            ),
-            headerStyle: const HeaderStyle(
-              formatButtonVisible: false,
-              titleCentered: true,
-            ),
-          ),
-          if (_selectedDay != null) ...[
-            Padding(
-              padding: EdgeInsets.all(16.0.w),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    '선택한 날짜: ${DateFormat('yyyy년 MM월 dd일').format(_selectedDay!)}',
-                    style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold),
-                  ),
-                  SizedBox(height: 8.h),
-                  Text(
-                    '패키지: ${widget.package.title}',
-                    style: TextStyle(fontSize: 16.sp),
-                  ),
-                  SizedBox(height: 4.h),
-                  Text(
-                    '${widget.package.nights}박${widget.package.nights + 1}일',
-                    style: TextStyle(fontSize: 16.sp),
-                  ),
-                  Row(
+              if (_selectedDay != null) ...[
+                Padding(
+                  padding: EdgeInsets.all(16.0.w),
+                  child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('출발 요일: ', style: TextStyle(fontSize: 16.sp)),
-                      Expanded(
-                        child: Wrap(
-                          spacing: 4,
-                          runSpacing: 4,
-                          children: widget.package.departureDays.map((day) {
-                            final weekday = ['월', '화', '수', '목', '금', '토', '일'][day - 1];
-                            return Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                              decoration: BoxDecoration(
-                                color: Colors.blue.shade50,
-                                borderRadius: BorderRadius.circular(12),
-                                border: Border.all(color: Colors.blue.shade200),
-                              ),
-                              child: Text(
-                                weekday,
-                                style: TextStyle(
-                                  fontSize: 14.sp,
-                                  color: Colors.blue.shade900,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            );
-                          }).toList(),
-                        ),
+                      Text(
+                        '선택한 날짜: ${DateFormat('yyyy년 MM월 dd일').format(_selectedDay!)}',
+                        style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold),
                       ),
+                      SizedBox(height: 8.h),
+                      Text(
+                        '패키지: ${widget.package.title}',
+                        style: TextStyle(fontSize: 16.sp),
+                      ),
+                      SizedBox(height: 4.h),
+                      Text(
+                        '${widget.package.nights}박${widget.package.nights + 1}일',
+                        style: TextStyle(fontSize: 16.sp),
+                      ),
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('출발 요일: ', style: TextStyle(fontSize: 16.sp)),
+                          Expanded(
+                            child: Wrap(
+                              spacing: 4,
+                              runSpacing: 4,
+                              children: widget.package.departureDays.map((day) {
+                                final weekday = ['월', '화', '수', '목', '금', '토', '일'][day - 1];
+                                return Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                  decoration: BoxDecoration(
+                                    color: Colors.blue.shade50,
+                                    borderRadius: BorderRadius.circular(12),
+                                    border: Border.all(color: Colors.blue.shade200),
+                                  ),
+                                  child: Text(
+                                    weekday,
+                                    style: TextStyle(
+                                      fontSize: 14.sp,
+                                      color: Colors.blue.shade900,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                );
+                              }).toList(),
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 4.h),
+                      Text(
+                        '가격: ₩${NumberFormat('#,###').format(widget.package.price.toInt())}',
+                        style: TextStyle(fontSize: 16.sp),
+                      ),
+                      SizedBox(height: 16.h),
+                      _buildParticipantSelector(),
                     ],
                   ),
-                  SizedBox(height: 4.h),
-                  Text(
-                    '가격: ₩${NumberFormat('#,###').format(widget.package.price.toInt())}',
-                    style: TextStyle(fontSize: 16.sp),
-                  ),
-                  SizedBox(height: 16.h),
-                  _buildParticipantSelector(),
-                ],
-              ),
-            ),
-            const Spacer(),
-            Padding(
-              padding: EdgeInsets.all(16.0.w),
-              child: ElevatedButton(
-                onPressed: () => _requestReservation(context),
-                style: ElevatedButton.styleFrom(
-                  padding: EdgeInsets.symmetric(vertical: 16.h),
-                  minimumSize: Size(double.infinity, 50),
                 ),
-                child: Text(
-                  '예약 신청하기',
-                  style: TextStyle(fontSize: 16.sp),
-                ),
-              ),
-            ),
-          ],
-        ],
+              ],
+            ],
+          ),
+        ),
       ),
+      bottomNavigationBar: _selectedDay != null  // 예약 버튼을 bottomNavigationBar로 이동
+          ? Padding(
+        padding: EdgeInsets.all(16.0.w),
+        child: ElevatedButton(
+          onPressed: () => _requestReservation(context),
+          style: ElevatedButton.styleFrom(
+            padding: EdgeInsets.symmetric(vertical: 16.h),
+            minimumSize: Size(double.infinity, 50.h),
+          ),
+          child: Text(
+            '예약 신청하기',
+            style: TextStyle(fontSize: 16.sp),
+          ),
+        ),
+      )
+          : null,
     );
   }
 }
