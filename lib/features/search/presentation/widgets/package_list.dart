@@ -192,34 +192,43 @@ class _LikeablePackageCardState extends State<LikeablePackageCard> {
         child: StreamBuilder<DocumentSnapshot>(
           stream: packageStream,
           builder: (context, snapshot) {
-            if (snapshot.hasData && snapshot.data != null) {
-              final data = snapshot.data!.data() as Map<String, dynamic>;
-              final likesCount = data['likesCount'] ?? 0;
-              final List<String> likedBy =
-                  List<String>.from(data['likedBy'] ?? []);
-              final isLiked = userId != null && likedBy.contains(userId);
-
-              return Row(
-                children: [
-                  IconButton(
-                    icon: Icon(
-                      isLiked ? Icons.favorite : Icons.favorite_border,
-                      color: isLiked ? Colors.red : Colors.grey,
-                    ),
-                    onPressed: () => _handleLikeButton(userId, context),
-                  ),
-                  SizedBox(width: 4.w),
-                  Text(
-                    '$likesCount',
-                    style: TextStyle(
-                      fontSize: 20.sp,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
-              );
+            // 데이터가 없거나 오류가 있거나 문서가 존재하지 않는 경우 플레이스홀더 반환
+            if (!snapshot.hasData ||
+                snapshot.hasError ||
+                !snapshot.data!.exists) {
+              return _buildLikeButtonPlaceholder();
             }
-            return _buildLikeButtonPlaceholder();
+
+            // 안전한 데이터 타입 캐스팅
+            final data = snapshot.data!.data();
+            if (data == null || data is! Map<String, dynamic>) {
+              return _buildLikeButtonPlaceholder();
+            }
+
+            final likesCount = data['likesCount'] ?? 0;
+            final List<String> likedBy =
+                List<String>.from(data['likedBy'] ?? []);
+            final isLiked = userId != null && likedBy.contains(userId);
+
+            return Row(
+              children: [
+                IconButton(
+                  icon: Icon(
+                    isLiked ? Icons.favorite : Icons.favorite_border,
+                    color: isLiked ? Colors.red : Colors.grey,
+                  ),
+                  onPressed: () => _handleLikeButton(userId, context),
+                ),
+                SizedBox(width: 4.w),
+                Text(
+                  '$likesCount',
+                  style: TextStyle(
+                    fontSize: 20.sp,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            );
           },
         ),
       ),
