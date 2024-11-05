@@ -33,9 +33,19 @@
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="com.googleusercontent.apps.828007872799-q66d8fvlmp1t2u1p55djj2q5b4r1td6c" />
+                <data android:scheme="com.googleusercontent.apps.828007872799-g72lrogdp24siiiovui138feqoi05f27" />
             </intent-filter>
         </activity>
+
+        <activity android:name="com.kakao.sdk.flutter.AuthCodeCustomTabsActivity">
+            <intent-filter android:label="flutter_web_auth">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="kakaoac1aeb4d578457a2abd73ebfab67b3b6" android:host="oauth"/>
+            </intent-filter>
+        </activity>
+
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />

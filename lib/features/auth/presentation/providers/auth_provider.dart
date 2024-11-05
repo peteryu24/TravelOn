@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -168,58 +167,90 @@ class AuthProvider with ChangeNotifier {
 
   /////////////////////////////////////////////////////////////////////
   /// 소셜 로그인
-  Future<void> loginWithKakao() async {
-    try {
-      final userModel = await _kakaoLoginUseCase.execute();
-      if (userModel != null) {
-        await _firestore.collection('users').doc(userModel.id).set({
-          'id': userModel.id,
-          'name': userModel.name,
-          'email': userModel.email,
-          'profileImageUrl': userModel.profileImageUrl,
-          'isGuide': userModel.isGuide,
-        }, SetOptions(merge: true));
+  // Future<void> loginWithKakao() async {
+  //   try {
+  //     final userModel = await _kakaoLoginUseCase.execute();
+  //     if (userModel != null) {
+  //       await _firestore.collection('users').doc(userModel.id).set({
+  //         'id': userModel.id,
+  //         'name': userModel.name,
+  //         'email': userModel.email,
+  //         'profileImageUrl': userModel.profileImageUrl,
+  //         'isGuide': userModel.isGuide,
+  //       }, SetOptions(merge: true));
 
-        _currentUser = userModel;
-        notifyListeners();
-      } else {
-        print('카카오톡 로그인 실패');
-      }
-    } catch (e) {
-      print('카카오톡 로그인 에러: $e');
-    }
-  }
+  //       _currentUser = userModel;
+  //       notifyListeners();
+  //     } else {
+  //       print('카카오톡 로그인 실패');
+  //     }
+  //   } catch (e) {
+  //     print('카카오톡 로그인 에러: $e');
+  //   }
+  // }
 
-  Future<void> loginWithGoogle() async {
-    final userModel = await _googleLoginUseCase.execute();
-    if (userModel != null) {
-      // Firestore에 유저 정보를 저장하는 로직 추가
-      _currentUser = userModel;
-      notifyListeners();
-    } else {
-      print('Google 로그인 실패');
-    }
-  }
+  // Future<void> loginWithGoogle() async {
+  //   final userModel = await _googleLoginUseCase.execute();
+  //   if (userModel != null) {
+  //     await _firestore.collection('users').doc(userModel.id).set({
+  //       'id': userModel.id,
+  //       'name': userModel.name,
+  //       'email': userModel.email,
+  //       'profileImageUrl': userModel.profileImageUrl ?? '',
+  //       'isGuide': userModel.isGuide ?? false,
+  //     }, SetOptions(merge: true));
 
-  Future<void> loginWithFacebook() async {
-    final userModel = await _facebookLoginUseCase.execute();
-    if (userModel != null) {
-      // Firestore에 유저 정보를 저장하는 로직 추가
-      _currentUser = userModel;
-      notifyListeners();
-    } else {
-      print('Facebook 로그인 실패');
-    }
-  }
+  //     _currentUser = userModel;
+  //     notifyListeners();
+  //   } else {
+  //     print('Google 로그인 실패');
+  //   }
+  // }
 
-  Future<void> loginWithNaver() async {
-    // Naver 로그인 UseCase 호출
-    final userModel = await _naverLoginUseCase.execute();
-    if (userModel != null) {
-      _currentUser = userModel;
-      notifyListeners();
-    } else {
-      print('Naver 로그인 실패');
-    }
-  }
+
+
+  // // Facebook 로그인 메서드
+  // Future<void> loginWithFacebook() async {
+  //   try {
+  //     final userModel = await _facebookLoginUseCase.execute();
+  //     if (userModel != null) {
+  //       await _firestore.collection('users').doc(userModel.id).set({
+  //         'id': userModel.id,
+  //         'name': userModel.name,
+  //         'email': userModel.email,
+  //         'profileImageUrl': userModel.profileImageUrl ?? '',
+  //         'isGuide': userModel.isGuide ?? false,
+  //       }, SetOptions(merge: true));
+
+  //       _currentUser = userModel;
+  //       notifyListeners();
+  //     } else {
+  //       print('Facebook 로그인 실패');
+  //     }
+  //   } catch (e) {
+  //     print('Facebook 로그인 에러: $e');
+  //   }
+  // }
+
+  // Future<void> loginWithNaver() async {
+  //   try {
+  //     final userModel = await _naverLoginUseCase.execute();
+  //     if (userModel != null) {
+  //       await _firestore.collection('users').doc(userModel.id).set({
+  //         'id': userModel.id,
+  //         'name': userModel.name,
+  //         'email': userModel.email,
+  //         'profileImageUrl': userModel.profileImageUrl ?? '',
+  //         'isGuide': userModel.isGuide ?? false,
+  //       }, SetOptions(merge: true));
+
+  //       _currentUser = userModel;
+  //       notifyListeners();
+  //     } else {
+  //       print('Naver 로그인 실패');
+  //     }
+  //   } catch (e) {
+  //     print('Naver 로그인 에러: $e');
+  //   }
+  // }
 }

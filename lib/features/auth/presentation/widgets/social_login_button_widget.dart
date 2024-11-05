@@ -29,8 +29,8 @@ class SocialLoginButton extends StatelessWidget {
           padding: EdgeInsets.only(left: 0.w, right: 0.w),
           child: Image.asset(
             assetPath,
-            height: 45.h,
-            width: 45.w,
+            height: 45,
+            width: 45,
             fit: BoxFit.cover,
           ),
         ),

@@ -4,17 +4,17 @@ import 'package:travel_on_final/features/auth/data/models/user_model.dart';
 
 class GoogleLoginUseCase {
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  final GoogleSignIn _googleSignIn = GoogleSignIn();
 
   Future<UserModel?> execute() async {
     try {
-      final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+      final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
       if (googleUser == null) {
-        // 로그인 취소
         return null;
       }
 
       final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
-      final AuthCredential credential = GoogleAuthProvider.credential(
+      final OAuthCredential credential = GoogleAuthProvider.credential(
         accessToken: googleAuth.accessToken,
         idToken: googleAuth.idToken,
       );
@@ -27,7 +27,7 @@ class GoogleLoginUseCase {
           id: user.uid,
           name: user.displayName ?? 'No Name',
           email: user.email ?? 'No Email',
-          profileImageUrl: user.photoURL,
+          profileImageUrl: user.photoURL ?? '',
         );
       }
     } catch (error) {
