@@ -3,6 +3,8 @@ import 'package:travel_on_final/features/search/domain/entities/travel_package.d
 abstract class TravelRepository {
   Future<List<TravelPackage>> getPackages();
   Future<void> addPackage(TravelPackage package);
-  Future<void> updatePackage(TravelPackage package); // 추가
-  Future<void> deletePackage(String packageId); // 추가
+  Future<void> updatePackage(TravelPackage package);
+  Future<void> deletePackage(String packageId);
+  Future<void> toggleLike(String packageId, String userId);
+  Future<List<String>> getLikedPackages(String userId);
 }

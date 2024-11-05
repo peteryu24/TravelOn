@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
+import 'package:travel_on_final/features/auth/presentation/screens/login_screen.dart';
 import 'dart:io';
 import '../../../auth/presentation/providers/auth_provider.dart';
 
@@ -73,18 +75,18 @@ class _GuideCertificationScreenState extends State<GuideCertificationScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            const Text(
+            Text(
               '가이드 자격을 인증하기 위해 자격증을 업로드해주세요.',
               style: TextStyle(
-                fontSize: 16,
+                fontSize: 16.sp,
                 color: Colors.grey,
               ),
             ),
-            const SizedBox(height: 24),
+            SizedBox(height: 24.h),
             GestureDetector(
               onTap: _pickImage,
               child: Container(
-                height: 200,
+                height: 200.h,
                 decoration: BoxDecoration(
                   border: Border.all(color: Colors.grey),
                   borderRadius: BorderRadius.circular(8),
@@ -100,24 +102,24 @@ class _GuideCertificationScreenState extends State<GuideCertificationScreen> {
                 )
                     : Column(
                   mainAxisAlignment: MainAxisAlignment.center,
-                  children: const [
+                  children: [
                     Icon(Icons.add_photo_alternate, size: 50),
-                    SizedBox(height: 8),
+                    SizedBox(height: 8.h),
                     Text('자격증 사진 추가'),
                   ],
                 ),
               ),
             ),
-            const SizedBox(height: 24),
+            SizedBox(height: 24.h),
             ElevatedButton(
               onPressed: _isLoading ? null : _submitCertification,
               style: ElevatedButton.styleFrom(
                 padding: const EdgeInsets.symmetric(vertical: 16),
               ),
               child: _isLoading
-                  ? const SizedBox(
-                width: 20,
-                height: 20,
+                  ? SizedBox(
+                width: 20.w,
+                height: 20.h,
                 child: CircularProgressIndicator(
                   strokeWidth: 2,
                 ),

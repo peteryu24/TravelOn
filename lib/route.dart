@@ -12,6 +12,7 @@ import 'package:travel_on_final/features/chat/presentation/screens/chat_list_scr
 import 'package:travel_on_final/features/profile/presentation/screens/edit_packages_screen.dart';
 import 'package:travel_on_final/features/profile/presentation/screens/guide_certification_screen.dart';
 import 'package:travel_on_final/features/profile/presentation/screens/guide_reservation_screen.dart';
+import 'package:travel_on_final/features/profile/presentation/screens/liked_packages_screen.dart';
 import 'package:travel_on_final/features/profile/presentation/screens/my_packages_screen.dart';
 import 'package:travel_on_final/features/profile/presentation/screens/reservation_screen.dart';
 import 'package:travel_on_final/features/reservation/presentation/screens/reservation_calendar_screen.dart';
@@ -24,6 +25,9 @@ import 'package:travel_on_final/features/search/presentation/screens/package_det
 import 'package:travel_on_final/features/home/presentation/screens/home_screen.dart';
 // profile
 import 'package:travel_on_final/features/profile/presentation/screens/profile_screen.dart';
+// gallery
+import 'package:travel_on_final/features/gallery/presentation/screens/travel_gallery_screen.dart';
+import 'package:travel_on_final/features/gallery/presentation/screens/add_gallery_post_screen.dart';
 
 final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>();
 
@@ -85,6 +89,10 @@ final goRouter = GoRouter(
       path: '/signup',
       builder: (context, state) => SignupScreen(),
     ),
+    GoRoute(
+      path: '/liked-packages',
+      builder: (context, state) => const LikedPackagesScreen(),
+    ),
     ////////////////////////////////////////////////////////////////////////////////////
     //                ↓↓↓ 바텀 내비게이션 바가 필요한 화면 라우팅 ↓↓↓                    //
     ////////////////////////////////////////////////////////////////////////////////////
@@ -110,6 +118,14 @@ final goRouter = GoRouter(
           builder: (context, state) => const ProfileScreen(),
         ),
       ],
+    ),
+    GoRoute(
+      path: '/travel-gallery',
+      builder: (context, state) => const TravelGalleryScreen(),
+    ),
+    GoRoute(
+      path: '/add-gallery-post',
+      builder: (context, state) => const AddGalleryPostScreen(),
     ),
   ],
 );
