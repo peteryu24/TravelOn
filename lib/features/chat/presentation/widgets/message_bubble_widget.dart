@@ -13,7 +13,6 @@ class MessageBubble extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // 일반 채팅 메시지 UI
     return Row(
       mainAxisAlignment: isMe ? MainAxisAlignment.end : MainAxisAlignment.start,
       children: <Widget>[
@@ -25,7 +24,7 @@ class MessageBubble extends StatelessWidget {
         Container(
           constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.6),
           decoration: BoxDecoration(
-            color: isMe ? Colors.grey[300] : Colors.blueAccent,
+            color: isMe ? Colors.blue.shade100 : Colors.blueAccent,
             borderRadius: BorderRadius.circular(12),
           ),
           padding: EdgeInsets.symmetric(vertical: 10, horizontal: 16),
@@ -47,3 +46,4 @@ class MessageBubble extends StatelessWidget {
     );
   }
 }
+

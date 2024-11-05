@@ -196,7 +196,7 @@ class _PackageDetailScreenState extends State<PackageDetailScreen> {
                                         final sortedIds = [userId, otherUserId]..sort((a, b) => b.compareTo(a));
                                         final chatId = '${sortedIds[0]}_${sortedIds[1]}';
 
-                                        context.push('/chat/$chatId');  // GoRouter로 채팅 화면으로 이동
+                                        context.push('/chat/$chatId');
                                       }
                                     },
                                     icon: Icon(Icons.chat),

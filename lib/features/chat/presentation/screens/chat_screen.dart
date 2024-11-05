@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:travel_on_final/features/auth/presentation/providers/auth_provider.dart';
 import 'package:travel_on_final/features/chat/presentation/providers/chat_provider.dart';
+import 'package:travel_on_final/features/chat/presentation/widgets/message_bubble_widget.dart';
 
 class ChatScreen extends StatefulWidget {
   final String chatId;
@@ -14,11 +15,30 @@ class ChatScreen extends StatefulWidget {
 
 class _ChatScreenState extends State<ChatScreen> {
   final TextEditingController messageController = TextEditingController();
+  String? otherUserId;
+  String otherUserName = "Chat";
 
   @override
   void initState() {
     super.initState();
+
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final userIds = widget.chatId.split('_');
+    otherUserId = userIds.first == authProvider.currentUser!.id ? userIds.last : userIds.first;
+
+    Provider.of<ChatProvider>(context, listen: false).fetchOtherUserInfo(otherUserId!).then((name) {
+      setState(() {
+        otherUserName = "$name";
+      });
+    });
+
     Provider.of<ChatProvider>(context, listen: false).startListeningToMessages(widget.chatId);
+  }
+
+  @override
+  void dispose() {
+    messageController.dispose();
+    super.dispose();
   }
 
   @override
@@ -26,7 +46,7 @@ class _ChatScreenState extends State<ChatScreen> {
     final chatProvider = Provider.of<ChatProvider>(context);
 
     return Scaffold(
-      appBar: AppBar(title: Text('Chat')),
+      appBar: AppBar(title: Text("${otherUserName}님과의 대화")),
       body: Column(
         children: [
           Expanded(
@@ -35,7 +55,11 @@ class _ChatScreenState extends State<ChatScreen> {
               itemCount: chatProvider.messages.length,
               itemBuilder: (ctx, index) {
                 final message = chatProvider.messages[index];
-                return ListTile(title: Text(message.text));
+                final isMe = message.uId == Provider.of<AuthProvider>(context, listen: false).currentUser!.id;
+                return MessageBubble(
+                  message: message,
+                  isMe: isMe,
+                );
               },
             ),
           ),
@@ -56,7 +80,7 @@ class _ChatScreenState extends State<ChatScreen> {
                     chatProvider.sendMessageToChat(
                       chatId: widget.chatId,
                       text: messageController.text,
-                      otherUserId: 'otherUserId', // 실제 상대방 사용자 ID 필요
+                      otherUserId: otherUserId!,
                       context: context,
                     );
                     messageController.clear();

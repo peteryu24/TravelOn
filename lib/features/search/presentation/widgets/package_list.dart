@@ -178,7 +178,7 @@ class _LikeablePackageCardState extends State<LikeablePackageCard> {
     );
   }
 
-  // 좋아요 버튼 위젯
+  // 좋아요 버튼 위젯  
   Widget _buildLikeButton(String? userId, bool isLiked) {
     return Positioned(
       top: 8,
