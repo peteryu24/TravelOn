@@ -125,7 +125,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               SizedBox(height: 10.h),
 
-              // 가로 스크롤 되는 추천 이미지 카드
+              // 가로 스크롤 되는 추천 이미지 카드 
               Consumer<TravelProvider>(
                 builder: (context, provider, child) {
                   final recentPackages = provider.recentPackages;
@@ -150,7 +150,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               imageUrl: package.mainImage ??
                                   'https://picsum.photos/300/200',
                               onTap: () {
-                                context.go('/package-detail/${package.id}',
+                                context.push('/package-detail/${package.id}',
                                     extra: package);
                               },
                             ),

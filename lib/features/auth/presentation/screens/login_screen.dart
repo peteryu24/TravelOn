@@ -173,21 +173,24 @@ class _LoginScreenState extends State<LoginScreen> {
                 SocialLoginButton(
                   assetPath: "assets/images/logo/google.png",
                   onPressed: () {
-                    // 구글
+                    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+                    authProvider.loginWithGoogle();
                   },
                 ),
                 SizedBox(width: 10.w),
                 SocialLoginButton(
                   assetPath: "assets/images/logo/naver.png",
                   onPressed: () {
-                    // 네이버
+                    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+                    authProvider.loginWithNaver();
                   },
                 ),
                 SizedBox(width: 10.w),
                 SocialLoginButton(
                   assetPath: "assets/images/logo/facebook.png",
                   onPressed: () {
-                    // 페이스북
+                    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+                    authProvider.loginWithFacebook();
                   },
                 ),
               ],
