@@ -426,6 +426,10 @@ class _PackageDetailScreenState extends State<PackageDetailScreen> {
 
         // 평균 별점 계산
         double averageRating = 0.0;
+        if (reviewCount > 0) {
+          double totalRating = reviews.fold(0.0, (sum, review) => sum + review.rating);
+          averageRating = totalRating / reviewCount;
+        }
 
         return TextButton(
           onPressed: () {
