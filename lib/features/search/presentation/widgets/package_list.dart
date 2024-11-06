@@ -186,7 +186,7 @@ class _LikeablePackageCardState extends State<LikeablePackageCard> {
       child: Container(
         padding: EdgeInsets.all(8.w),
         decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.5),
+          color: Colors.white.withOpacity(0.8),
           borderRadius: BorderRadius.circular(20),
         ),
         child: StreamBuilder<DocumentSnapshot>(

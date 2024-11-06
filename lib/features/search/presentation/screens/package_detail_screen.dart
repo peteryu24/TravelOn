@@ -3,6 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
+import 'package:travel_on_final/features/auth/presentation/providers/auth_provider.dart';
+import 'package:travel_on_final/features/review/presentation/provider/review_provider.dart';
+import 'package:travel_on_final/features/review/presentation/screens/add_review_screen.dart';
+import 'package:travel_on_final/features/review/presentation/screens/review_detail_screen.dart';
+import 'package:travel_on_final/features/review/presentation/widgets/review_list.dart';
+import 'package:travel_on_final/features/search/presentation/providers/travel_provider.dart';
 import '../../domain/entities/travel_package.dart';
 
 class PackageDetailScreen extends StatefulWidget {
@@ -21,6 +28,7 @@ class _PackageDetailScreenState extends State<PackageDetailScreen> {
   final NumberFormat _priceFormat = NumberFormat('#,###');
   Future<int>? _todayParticipants;
   bool _isAvailable = true;
+  bool _showReviews = false;
   late final int _minParticipants;
   late final int _maxParticipants;
 
@@ -31,6 +39,13 @@ class _PackageDetailScreenState extends State<PackageDetailScreen> {
     _minParticipants = widget.package.minParticipants;
     _maxParticipants = widget.package.maxParticipants;
     _loadTodayParticipants();
+
+    // 리뷰 데이터 초기 로드
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        context.read<ReviewProvider>().loadReviews(widget.package.id);
+      }
+    });
   }
 
   Future<void> _loadTodayParticipants() async {
@@ -157,6 +172,10 @@ class _PackageDetailScreenState extends State<PackageDetailScreen> {
                       ),
                     ],
                   ),
+
+                  _buildReviewSection(), // 여기로 리뷰 섹션 이동
+
+
                   SizedBox(height: 16.h),
                   Container(
                     padding: EdgeInsets.all(3.w),
@@ -224,6 +243,7 @@ class _PackageDetailScreenState extends State<PackageDetailScreen> {
                             ),
                           ],
                         ),
+
                       ],
                     ),
                   ),
@@ -270,6 +290,7 @@ class _PackageDetailScreenState extends State<PackageDetailScreen> {
                     ),
                   ),
 
+                  SizedBox(height: 24.h),
                   // 설명 이미지들
                   if (widget.package.descriptionImages.isNotEmpty) ...[
                     SizedBox(height: 24.h),
@@ -389,5 +410,61 @@ class _PackageDetailScreenState extends State<PackageDetailScreen> {
       default:
         return '전체';
     }
+  }
+
+  Widget _buildReviewSection() {
+    return Consumer<ReviewProvider>(
+      builder: (context, reviewProvider, _) {
+        // 실시간으로 리뷰 데이터 가져오기
+        final reviews = reviewProvider.reviews;
+        final reviewCount = reviews.length;
+
+        // 평균 별점 계산
+        double averageRating = 0.0;
+
+        return TextButton(
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => ReviewDetailScreen(package: widget.package),
+              ),
+            ).then((_) {
+              // 리뷰 화면에서 돌아올 때 리뷰 데이터 새로고침
+              reviewProvider.loadReviews(widget.package.id);
+            });
+          },
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                '리뷰($reviewCount)',
+                style: TextStyle(
+                  fontSize: 18.sp,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
+                ),
+              ),
+              SizedBox(width: 8.w),
+              Icon(
+                Icons.star,
+                color: Colors.amber,
+                size: 20.sp,
+              ),
+              SizedBox(width: 4.w),
+              Text(
+                averageRating.toStringAsFixed(1),
+                style: TextStyle(
+                  fontSize: 16.sp,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
+                ),
+              ),
+              Icon(Icons.chevron_right),
+            ],
+          ),
+        );
+      },
+    );
   }
 }

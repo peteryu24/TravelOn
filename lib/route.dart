@@ -16,6 +16,7 @@ import 'package:travel_on_final/features/profile/presentation/screens/liked_pack
 import 'package:travel_on_final/features/profile/presentation/screens/my_packages_screen.dart';
 import 'package:travel_on_final/features/profile/presentation/screens/reservation_screen.dart';
 import 'package:travel_on_final/features/reservation/presentation/screens/reservation_calendar_screen.dart';
+import 'package:travel_on_final/features/review/presentation/screens/add_review_screen.dart';
 // search
 import 'package:travel_on_final/features/search/domain/entities/travel_package.dart';
 import 'package:travel_on_final/features/search/presentation/screens/add_package_screen.dart';
@@ -79,6 +80,16 @@ final goRouter = GoRouter(
     GoRoute(
       path: '/reservations/customer',
       builder: (context, state) => const CustomerReservationsScreen(),
+    ),
+    GoRoute(
+      path: '/review/add',
+      builder: (context, state) {
+        final Map<String, dynamic> extra = state.extra as Map<String, dynamic>;
+        return AddReviewScreen(
+          packageId: extra['packageId'],
+          packageTitle: extra['packageTitle'],
+        );
+      },
     ),
     // 로그인 관련 라우트
     GoRoute(
