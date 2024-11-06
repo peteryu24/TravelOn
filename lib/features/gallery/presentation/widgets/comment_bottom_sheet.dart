@@ -93,12 +93,14 @@ class _CommentBottomSheetState extends State<CommentBottomSheet> {
                     children: [
                       CircleAvatar(
                         radius: 16.r,
-                        backgroundImage: comment.userProfileUrl != null
-                            ? NetworkImage(comment.userProfileUrl!)
-                            : null,
-                        child: comment.userProfileUrl == null
-                            ? Icon(Icons.person, size: 20.r)
-                            : null,
+                        backgroundColor: Colors.grey[300],
+                        child: comment.userProfileUrl!.isNotEmpty
+                            ? Image.network(comment.userProfileUrl!)
+                            : Icon(
+                                Icons.person,
+                                size: 20.r,
+                                color: Colors.grey[600],
+                              ),
                       ),
                       SizedBox(width: 8.w),
                       Expanded(
