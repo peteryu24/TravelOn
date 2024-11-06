@@ -111,7 +111,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                   TextButton(
                     onPressed: () {
-                      context.push('/packages'); // 전체 패키지 목록 화면으로 이동
+                      // 하단 네비게이션 바의 여행 상품 탭으로 이동
+                      context.go('/search'); // context.push에서 context.go로 변경
                     },
                     child: Row(
                       children: [

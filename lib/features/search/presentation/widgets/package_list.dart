@@ -263,12 +263,8 @@ class _LikeablePackageCardState extends State<LikeablePackageCard> {
     }
 
     try {
-      final authProvider = context.read<AuthProvider>();
-      await authProvider.toggleLikePackage(widget.package.id);
-
-      if (context.mounted) {
-        await context.read<TravelProvider>().loadPackages();
-      }
+      final travelProvider = context.read<TravelProvider>();
+      await travelProvider.toggleLikePackage(widget.package.id, userId);
     } catch (e) {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(

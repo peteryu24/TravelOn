@@ -76,10 +76,10 @@ class TravelProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> toggleLike(String packageId, UserModel user) async {
+  Future<void> toggleLikePackage(String packageId, String userId) async {
     try {
       // 패키지와 유저 문서 참조
-      final userRef = _firestore.collection('users').doc(user.id);
+      final userRef = _firestore.collection('users').doc(userId);
       final packageRef = _firestore.collection('packages').doc(packageId);
 
       // 현재 상태 확인
@@ -102,13 +102,13 @@ class TravelProvider extends ChangeNotifier {
       if (isLiked) {
         // 좋아요 취소
         userLikedPackages.remove(packageId);
-        packageLikedBy.remove(user.id);
+        packageLikedBy.remove(userId);
         currentLikesCount = math.max(0, currentLikesCount - 1);
         _likedPackageIds.remove(packageId);
       } else {
         // 좋아요 추가
         userLikedPackages.add(packageId);
-        packageLikedBy.add(user.id);
+        packageLikedBy.add(userId);
         currentLikesCount++;
         _likedPackageIds.add(packageId);
       }
@@ -130,8 +130,8 @@ class TravelProvider extends ChangeNotifier {
         package.likedBy = packageLikedBy;
         package.likesCount = currentLikesCount;
 
-        // likesCount 기준으로 재정렬
-        _packages.sort((a, b) => b.likesCount.compareTo(a.likesCount));
+        // 패키지 리스트 재정렬
+        _sortPackagesByLikes();
       }
 
       notifyListeners();
@@ -139,6 +139,11 @@ class TravelProvider extends ChangeNotifier {
       print('Error toggling like: $e');
       rethrow;
     }
+  }
+
+  // 좋아요 수에 따른 정렬 메서드 추가
+  void _sortPackagesByLikes() {
+    _packages.sort((a, b) => b.likesCount.compareTo(a.likesCount));
   }
 
   // 패키지 목록 로드
@@ -154,6 +159,9 @@ class TravelProvider extends ChangeNotifier {
       if (currentUser != null) {
         await loadLikedPackages(currentUser.uid);
       }
+
+      // 패키지 리스트 정렬
+      _sortPackagesByLikes();
 
       _isLoading = false;
       notifyListeners();
@@ -233,7 +241,8 @@ class TravelProvider extends ChangeNotifier {
 
   Future<void> refreshPackage(String packageId) async {
     try {
-      final snapshot = await _firestore.collection('packages').doc(packageId).get();
+      final snapshot =
+          await _firestore.collection('packages').doc(packageId).get();
       if (snapshot.exists) {
         final index = _packages.indexWhere((p) => p.id == packageId);
         if (index != -1) {
@@ -292,17 +301,15 @@ class TravelProvider extends ChangeNotifier {
 
   // 인기 패키지 getter - 찜(좋아요) 수 기준 상위 5개
   List<TravelPackage> get popularPackages {
-    final filtered = _packages
-        .where((package) => package.likesCount > 0) // 좋아요가 1개 이상인 패키지만
-        .toList()
-      ..sort((a, b) => b.likesCount.compareTo(a.likesCount)); // 좋아요 수 내림차순 정렬
+    // 이미 정렬된 _packages에서 좋아요가 있는 패키지만 필터링
+    final filtered =
+        _packages.where((package) => package.likesCount > 0).take(5).toList();
 
     // 좋아요가 있는 패키지가 없다면 전체 패키지에서 최신순으로 5개 반환
     if (filtered.isEmpty) {
       return _packages.take(5).toList();
     }
 
-    // 좋아요 순으로 정렬된 패키지 중 상위 5개 반환
-    return filtered.take(5).toList();
+    return filtered;
   }
 }

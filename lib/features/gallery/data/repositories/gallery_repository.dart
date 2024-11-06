@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import '../../domain/entities/gallery_post_entity.dart';
+import '../../domain/entities/comment_entity.dart';
 
 class GalleryRepository {
   final FirebaseFirestore _firestore;
@@ -88,6 +89,55 @@ class GalleryRepository {
         'likedBy': likedBy,
         'likeCount': likedBy.length,
       });
+    });
+  }
+
+  // 댓글 추가
+  Future<void> addComment({
+    required String postId,
+    required String userId,
+    required String username,
+    String? userProfileUrl,
+    required String content,
+  }) async {
+    try {
+      final docRef = _firestore
+          .collection('gallery_posts')
+          .doc(postId)
+          .collection('comments')
+          .doc();
+
+      final comment = Comment(
+        id: docRef.id,
+        postId: postId,
+        userId: userId,
+        username: username,
+        userProfileUrl: userProfileUrl,
+        content: content,
+        createdAt: DateTime.now(),
+      );
+
+      await docRef.set(comment.toJson());
+
+      // 게시글의 댓글 수 업데이트
+      await _firestore.collection('gallery_posts').doc(postId).update({
+        'comments': FieldValue.arrayUnion([docRef.id]),
+      });
+    } catch (e) {
+      throw Exception('댓글 작성 실패: $e');
+    }
+  }
+
+  // 게시글의 댓글 목록 가져오기
+  Stream<List<Comment>> getComments(String postId) {
+    return _firestore
+        .collection('gallery_posts')
+        .doc(postId)
+        .collection('comments')
+        .orderBy('createdAt', descending: true)
+        .snapshots()
+        .map((snapshot) {
+      return snapshot.docs.map((doc) => Comment.fromJson(doc.data())).toList();
     });
   }
 }
