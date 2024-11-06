@@ -32,6 +32,7 @@ class _PackageDetailScreenState extends State<PackageDetailScreen> {
   bool _showReviews = false;
   late final int _minParticipants;
   late final int _maxParticipants;
+  String? _currentUserId;
 
 
   @override
@@ -40,6 +41,13 @@ class _PackageDetailScreenState extends State<PackageDetailScreen> {
     _minParticipants = widget.package.minParticipants;
     _maxParticipants = widget.package.maxParticipants;
     _loadTodayParticipants();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      setState(() {
+        _currentUserId = authProvider.currentUser?.id;
+      });
+    });
 
     // 리뷰 데이터 초기 로드
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -203,6 +211,7 @@ class _PackageDetailScreenState extends State<PackageDetailScreen> {
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
+                                  if (_currentUserId != widget.package.guideId)
                                   IconButton(
                                     onPressed: () async {
                                       final authProvider = Provider.of<AuthProvider>(context, listen: false);
