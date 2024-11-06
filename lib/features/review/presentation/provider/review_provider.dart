@@ -23,23 +23,11 @@ class ReviewProvider extends ChangeNotifier {
       notifyListeners();
 
       _reviews = await _repository.getPackageReviews(packageId);
-
-      // 평균 별점 계산
-      double totalRating = 0;
-      for (var review in _reviews) {
-        totalRating += review.rating;
-      }
-      final averageRating = _reviews.isNotEmpty ? totalRating / _reviews.length : 0.0;
-
-      // 패키지 문서 업데이트
-      await FirebaseFirestore.instance.collection('packages').doc(packageId).update({
-        'averageRating': double.parse(averageRating.toStringAsFixed(1)),
-        'reviewCount': _reviews.length,
-      });
-
       _error = null;
+
     } catch (e) {
       _error = e.toString();
+      print('Error in loadReviews: $e'); // 디버깅용
     } finally {
       _isLoading = false;
       notifyListeners();

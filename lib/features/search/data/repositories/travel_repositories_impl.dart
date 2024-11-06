@@ -30,7 +30,9 @@ class TravelRepositoryImpl implements TravelRepository {
           nights: (data['nights'] ?? 1).toInt(),
           departureDays: List<int>.from(data['departureDays'] ?? [1,2,3,4,5,6,7]),
           reviewCount: (data['reviewCount'] as num?)?.toInt() ?? 0,
-
+          averageRating: (data['averageRating'] as num?)?.toDouble() ?? 0.0,  // 이 부분 추가
+          likedBy: List<String>.from(data['likedBy'] ?? []),
+          likesCount: (data['likesCount'] as num?)?.toInt() ?? 0,
         );
       }).toList();
     } catch (e) {

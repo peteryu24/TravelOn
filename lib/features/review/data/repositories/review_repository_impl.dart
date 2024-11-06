@@ -8,27 +8,36 @@ class ReviewRepositoryImpl implements ReviewRepository {
   @override
   Future<List<Review>> getPackageReviews(String packageId) async {
     try {
+      print('Fetching reviews for package: $packageId'); // 디버깅용
+
       final snapshot = await _firestore
           .collection('reviews')
           .where('packageId', isEqualTo: packageId)
           .orderBy('createdAt', descending: true)
           .get();
 
-      final reviews = snapshot.docs.map((doc) => Review(
-        id: doc.id,
-        packageId: doc['packageId'],
-        userId: doc['userId'],
-        userName: doc['userName'],
-        rating: (doc['rating'] as num).toDouble(),  // 여기서 rating이 제대로 변환되는지 확인
-        content: doc['content'],
-        createdAt: (doc['createdAt'] as Timestamp).toDate(),
-        reservationId: doc['reservationId'],
-      )).toList();
+      print('Found ${snapshot.docs.length} reviews'); // 디버깅용
 
-      // 리뷰를 가져온 후 패키지 문서 업데이트
+      final reviews = snapshot.docs.map((doc) {
+        final rating = (doc['rating'] as num).toDouble();
+        print('Review rating: $rating'); // 디버깅용
+        return Review(
+          id: doc.id,
+          packageId: doc['packageId'],
+          userId: doc['userId'],
+          userName: doc['userName'],
+          rating: rating,
+          content: doc['content'],
+          createdAt: (doc['createdAt'] as Timestamp).toDate(),
+          reservationId: doc['reservationId'],
+        );
+      }).toList();
+
+      // 평균 별점 계산 및 업데이트
       if (reviews.isNotEmpty) {
         double totalRating = reviews.fold(0.0, (sum, review) => sum + review.rating);
         double averageRating = totalRating / reviews.length;
+        print('Average rating: $averageRating'); // 디버깅용
 
         await _firestore.collection('packages').doc(packageId).update({
           'averageRating': double.parse(averageRating.toStringAsFixed(1)),
