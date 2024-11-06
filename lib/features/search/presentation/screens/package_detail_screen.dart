@@ -11,6 +11,7 @@ import 'package:travel_on_final/features/review/presentation/screens/review_deta
 import 'package:travel_on_final/features/review/presentation/widgets/review_list.dart';
 import 'package:travel_on_final/features/search/presentation/providers/travel_provider.dart';
 import '../../domain/entities/travel_package.dart';
+import 'package:travel_on_final/features/chat/domain/usecases/create_chat_id.dart';
 
 class PackageDetailScreen extends StatefulWidget {
   final TravelPackage package;
@@ -172,9 +173,7 @@ class _PackageDetailScreenState extends State<PackageDetailScreen> {
                       ),
                     ],
                   ),
-
                   _buildReviewSection(), // 여기로 리뷰 섹션 이동
-
 
                   SizedBox(height: 16.h),
                   Container(
@@ -205,7 +204,15 @@ class _PackageDetailScreenState extends State<PackageDetailScreen> {
                                     ),
                                   ),
                                   IconButton(
-                                    onPressed: () {},
+                                    onPressed: () async {
+                                      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+                                      final userId = authProvider.currentUser?.id;
+                                      if (userId != null) {
+                                        final otherUserId = widget.package.guideId;
+                                        final chatId = CreateChatId().call(userId, otherUserId);
+                                        context.push('/chat/$chatId');
+                                      }
+                                    },
                                     icon: Icon(Icons.chat),
                                   )
                                 ],
@@ -243,7 +250,6 @@ class _PackageDetailScreenState extends State<PackageDetailScreen> {
                             ),
                           ],
                         ),
-
                       ],
                     ),
                   ),
@@ -289,7 +295,6 @@ class _PackageDetailScreenState extends State<PackageDetailScreen> {
                       height: 1.5.h,
                     ),
                   ),
-
                   SizedBox(height: 24.h),
                   // 설명 이미지들
                   if (widget.package.descriptionImages.isNotEmpty) ...[

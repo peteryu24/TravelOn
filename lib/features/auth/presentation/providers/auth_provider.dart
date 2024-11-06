@@ -69,8 +69,7 @@ class AuthProvider with ChangeNotifier {
       } else {
         _currentUser = UserModel(
           id: userCredential.user!.uid,
-          name:
-              userData['name'] ?? userCredential.user!.displayName ?? 'No Name',
+          name: userData['name'] ?? userCredential.user!.displayName ?? 'No Name',
           email: userData['email'] ?? userCredential.user!.email!,
           profileImageUrl: userData['profileImageUrl'] as String?,
           isGuide: userData['isGuide'] as bool? ?? false,
@@ -88,8 +87,7 @@ class AuthProvider with ChangeNotifier {
 
   Future<void> signup(String email, String password, String name) async {
     try {
-      UserCredential userCredential =
-          await _auth.createUserWithEmailAndPassword(
+      UserCredential userCredential = await _auth.createUserWithEmailAndPassword(
         email: email,
         password: password,
       );
@@ -156,8 +154,10 @@ class AuthProvider with ChangeNotifier {
     try {
       if (_currentUser == null) throw '로그인이 필요합니다';
 
-      final storageRef = _storage.ref().child('guide_certificates').child(
-          '${_currentUser!.id}_${DateTime.now().millisecondsSinceEpoch}.jpg');
+      final storageRef = _storage
+          .ref()
+          .child('guide_certificates')
+          .child('${_currentUser!.id}_${DateTime.now().millisecondsSinceEpoch}.jpg');
 
       await storageRef.putFile(certificateImage);
       final imageUrl = await storageRef.getDownloadURL();
@@ -187,8 +187,10 @@ class AuthProvider with ChangeNotifier {
     if (firebaseUser != null && firebaseUser.emailVerified) {
       isEmailVerified = true;
       try {
-        final userDoc =
-            await _firestore.collection('users').doc(firebaseUser.uid).get();
+        final userDoc = await _firestore
+            .collection('users')
+            .doc(firebaseUser.uid)
+            .get();
 
         final userData = userDoc.data() ?? {};
 
@@ -272,6 +274,8 @@ class AuthProvider with ChangeNotifier {
   //     print('Google 로그인 실패');
   //   }
   // }
+
+
 
   // // Facebook 로그인 메서드
   // Future<void> loginWithFacebook() async {

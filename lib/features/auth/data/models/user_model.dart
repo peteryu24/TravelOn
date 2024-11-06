@@ -14,8 +14,8 @@ class UserModel extends User {
     required this.email,
     this.profileImageUrl,
     this.isGuide = false,
-    List<String>? likedPackages,  // 생성자에 추가
-  }) : likedPackages = likedPackages ?? [],     // 기본값 빈 리스트
+    List<String>? likedPackages,
+  }) : likedPackages = likedPackages ?? [],
         super(id: id, name: name, email: email);
 
   // JSON 데이터를 UserModel 객체로 변환하는 fromJson 메서드
@@ -26,7 +26,7 @@ class UserModel extends User {
       email: json['email'] as String,
       profileImageUrl: json['profileImageUrl'] as String?,
       isGuide: json['isGuide'] as bool? ?? false,
-      likedPackages: List<String>.from(json['likedPackages'] ?? []),  // JSON에서 리스트 변환
+      likedPackages: List<String>.from(json['likedPackages'] ?? []),
     );
   }
 
@@ -38,7 +38,7 @@ class UserModel extends User {
       'email': email,
       'profileImageUrl': profileImageUrl,
       'isGuide': isGuide,
-      'likedPackages': likedPackages,  // JSON에 리스트 추가
+      'likedPackages': likedPackages,
     };
   }
 

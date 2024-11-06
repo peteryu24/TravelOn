@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:travel_on_final/features/chat/presentation/providers/chat_provider.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class BottomSheetWidget {
   final ImagePicker _picker = ImagePicker();
@@ -22,31 +23,59 @@ class BottomSheetWidget {
       builder: (BuildContext context) {
         return Wrap(
           children: [
-            ListTile(
-              leading: Icon(Icons.image),
-              title: Text('갤러리에서 사진 보내기'),
-              onTap: () async {
-                Navigator.pop(context);
-                final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
-                if (image != null) {
-                  _showConfirmationDialog(parentContext, image, chatId, userId, otherUserId, currentUserProfileImage, username);
-                }
-              },
-            ),
-            ListTile(
-              leading: Icon(Icons.camera_alt),
-              title: Text('카메라로 사진 찍고 보내기'),
-              onTap: () async {
-                Navigator.pop(context);
-                final XFile? image = await _picker.pickImage(source: ImageSource.camera);
-                if (image != null) {
-                  _showConfirmationDialog(parentContext, image, chatId, userId, otherUserId, currentUserProfileImage, username);
-                }
-              },
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                _buildIconButton(
+                  context,
+                  icon: Icons.image,
+                  label: '갤러리',
+                  onTap: () async {
+                    Navigator.pop(context);
+                    final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
+                    if (image != null) {
+                      _showConfirmationDialog(parentContext, image, chatId, userId, otherUserId, currentUserProfileImage, username);
+                    }
+                  },
+                ),
+                _buildIconButton(
+                  context,
+                  icon: Icons.camera_alt,
+                  label: '카메라',
+                  onTap: () async {
+                    Navigator.pop(context);
+                    final XFile? image = await _picker.pickImage(source: ImageSource.camera);
+                    if (image != null) {
+                      _showConfirmationDialog(parentContext, image, chatId, userId, otherUserId, currentUserProfileImage, username);
+                    }
+                  },
+                ),
+                // 추가 버튼을 여기에 배치 가능
+              ],
             ),
           ],
         );
       },
+    );
+  }
+
+  Widget _buildIconButton(BuildContext context, {required IconData icon, required String label, required VoidCallback onTap}) {
+    return Column(
+      children: [
+        InkWell(
+          onTap: onTap,
+          child: CircleAvatar(
+            backgroundColor: Colors.blue,
+            radius: 30.w,
+            child: Icon(icon, size: 30.w, color: Colors.white),
+          ),
+        ),
+        SizedBox(height: 4.h),
+        Text(
+          label,
+          style: TextStyle(fontSize: 14.sp),
+        ),
+      ],
     );
   }
 
@@ -76,7 +105,7 @@ class BottomSheetWidget {
                 final chatProvider = Provider.of<ChatProvider>(context, listen: false);
                 chatProvider.sendMessageToChat(
                   chatId: chatId,
-                  text: '[Image]', // 이미지 메시지의 기본 텍스트
+                  text: '[Image]',
                   otherUserId: otherUserId,
                   imageFile: image,
                   context: context,

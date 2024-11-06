@@ -36,7 +36,7 @@ class ChatProvider extends ChangeNotifier {
     DocumentSnapshot chatSnapshot = await chatRef.get();
 
     if (!chatSnapshot.exists && authProvider.currentUser != null) {
-      String otherUserName = await _getOtherUserNickname(otherUserId);
+      String otherUserName = await _getOtherUserName(otherUserId);
       String otherUserProfileImage = await _getOtherUserProfileImage(otherUserId);
 
       await chatRef.set({
@@ -96,15 +96,25 @@ class ChatProvider extends ChangeNotifier {
   }
 
 
-  // Firestore에서 사용자 닉네임 가져오기
-  Future<String> _getOtherUserNickname(String uid) async {
+  // Firestore에서 사용자 이름 가져오기
+  Future<String> _getOtherUserName(String uid) async {
     DocumentSnapshot userSnapshot = await _firestore.collection('users').doc(uid).get();
-    return userSnapshot.exists ? userSnapshot['nickname'] ?? 'Unknown User' : 'Unknown User';
+    return userSnapshot.exists ? userSnapshot['name'] ?? 'Unknown User' : 'Unknown User';
   }
 
   // Firestore에서 사용자 프로필 이미지 가져오기
   Future<String> _getOtherUserProfileImage(String uid) async {
     DocumentSnapshot userSnapshot = await _firestore.collection('users').doc(uid).get();
-    return userSnapshot.exists ? userSnapshot['userProfileImage'] ?? '' : '';
+    return userSnapshot.exists ? userSnapshot['profileImageUrl'] ?? '' : '';
+  }
+
+  // 상대방 유저 정보 갖고오기
+  Future<String> fetchOtherUserInfo(String otherUserId) async {
+    DocumentSnapshot userSnapshot = await _firestore.collection('users').doc(otherUserId).get();
+    if (userSnapshot.exists) {
+      final otherUserName = userSnapshot['name'] ?? 'Unknown User';
+      return otherUserName;
+    }
+    return 'Unknown User';
   }
 }

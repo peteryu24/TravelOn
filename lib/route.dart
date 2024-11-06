@@ -9,14 +9,9 @@ import 'package:travel_on_final/features/auth/presentation/screens/signup_screen
 import 'package:travel_on_final/core/presentation/widgets/scaffold_with_bottom_nav.dart';
 // chat
 import 'package:travel_on_final/features/chat/presentation/screens/chat_list_screen.dart';
-import 'package:travel_on_final/features/profile/presentation/screens/edit_packages_screen.dart';
-import 'package:travel_on_final/features/profile/presentation/screens/guide_certification_screen.dart';
-import 'package:travel_on_final/features/profile/presentation/screens/guide_reservation_screen.dart';
-import 'package:travel_on_final/features/profile/presentation/screens/liked_packages_screen.dart';
-import 'package:travel_on_final/features/profile/presentation/screens/my_packages_screen.dart';
-import 'package:travel_on_final/features/profile/presentation/screens/reservation_screen.dart';
+import 'package:travel_on_final/features/chat/presentation/screens/chat_screen.dart';
+// reservation
 import 'package:travel_on_final/features/reservation/presentation/screens/reservation_calendar_screen.dart';
-import 'package:travel_on_final/features/review/presentation/screens/add_review_screen.dart';
 // search
 import 'package:travel_on_final/features/search/domain/entities/travel_package.dart';
 import 'package:travel_on_final/features/search/presentation/screens/add_package_screen.dart';
@@ -26,6 +21,12 @@ import 'package:travel_on_final/features/search/presentation/screens/package_det
 import 'package:travel_on_final/features/home/presentation/screens/home_screen.dart';
 // profile
 import 'package:travel_on_final/features/profile/presentation/screens/profile_screen.dart';
+import 'package:travel_on_final/features/profile/presentation/screens/edit_packages_screen.dart';
+import 'package:travel_on_final/features/profile/presentation/screens/guide_certification_screen.dart';
+import 'package:travel_on_final/features/profile/presentation/screens/guide_reservation_screen.dart';
+import 'package:travel_on_final/features/profile/presentation/screens/liked_packages_screen.dart';
+import 'package:travel_on_final/features/profile/presentation/screens/my_packages_screen.dart';
+import 'package:travel_on_final/features/profile/presentation/screens/reservation_screen.dart';
 // gallery
 import 'package:travel_on_final/features/gallery/presentation/screens/travel_gallery_screen.dart';
 import 'package:travel_on_final/features/gallery/presentation/screens/add_gallery_post_screen.dart';
@@ -103,6 +104,13 @@ final goRouter = GoRouter(
     GoRoute(
       path: '/liked-packages',
       builder: (context, state) => const LikedPackagesScreen(),
+    ),
+    GoRoute(
+      path: '/chat/:chatId',
+      builder: (context, state) {
+        final chatId = state.pathParameters['chatId']!;
+        return ChatScreen(chatId: chatId);
+      },
     ),
     ////////////////////////////////////////////////////////////////////////////////////
     //                ↓↓↓ 바텀 내비게이션 바가 필요한 화면 라우팅 ↓↓↓                    //
