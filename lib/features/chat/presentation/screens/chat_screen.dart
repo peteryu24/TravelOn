@@ -19,6 +19,8 @@ class _ChatScreenState extends State<ChatScreen> {
   final BottomSheetWidget _bottomSheetWidget = BottomSheetWidget();
   String? otherUserId;
   String otherUserName = "Chat";
+  bool isMessageEntered = false;
+  Color intermediateColor = Color.lerp(Colors.lightBlue[50], Colors.lightBlue[100], 0.5)!;
 
   @override
   void initState() {
@@ -67,44 +69,89 @@ class _ChatScreenState extends State<ChatScreen> {
                 },
               ),
             ),
-            Row(
-              children: [
-                IconButton(
-                  icon: Icon(Icons.add),
-                  onPressed: () {
-                    _bottomSheetWidget.showBottomSheetMenu(
-                      parentContext: context,
-                      chatId: widget.chatId,
-                      userId: Provider.of<AuthProvider>(context, listen: false).currentUser!.id,
-                      otherUserId: otherUserId!,
-                      currentUserProfileImage: Provider.of<AuthProvider>(context, listen: false).currentUser!.profileImageUrl ?? '',
-                      username: Provider.of<AuthProvider>(context, listen: false).currentUser!.name,
-                    );
-                  },
-                ),
-                Expanded(
-                  child: TextField(
-                    controller: messageController,
-                    decoration: InputDecoration(
-                      hintText: '메시지를 입력하세요...',
-                    ),
+            Container(
+              decoration: BoxDecoration(
+                border: Border(
+                  top: BorderSide(
+                    width: 0.6,
+                    color: Colors.blue.withOpacity(0.5),
                   ),
                 ),
-                IconButton(
-                  icon: Icon(Icons.send),
-                  onPressed: () {
-                    if (messageController.text.isNotEmpty) {
-                      chatProvider.sendMessageToChat(
-                        chatId: widget.chatId,
-                        text: messageController.text,
-                        otherUserId: otherUserId!,
-                        context: context,
-                      );
-                      messageController.clear();
-                    }
-                  },
-                ),
-              ],
+              ),
+              padding: EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+              child: Row(
+                children: [
+                  Container(
+                    decoration: BoxDecoration(
+                      color: intermediateColor,
+                      shape: BoxShape.rectangle,
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: IconButton(
+                      icon: Icon(Icons.add, color: Colors.lightBlue[700]),
+                      onPressed: () {
+                        _bottomSheetWidget.showBottomSheetMenu(
+                          parentContext: context,
+                          chatId: widget.chatId,
+                          userId: Provider.of<AuthProvider>(context, listen: false).currentUser!.id,
+                          otherUserId: otherUserId!,
+                          currentUserProfileImage: Provider.of<AuthProvider>(context, listen: false).currentUser!.profileImageUrl ?? '',
+                          username: Provider.of<AuthProvider>(context, listen: false).currentUser!.name,
+                        );
+                      },
+                    ),
+                  ),
+                  SizedBox(width: 8,),
+                  Expanded(
+                    child: TextField(
+                      controller: messageController,
+                      onChanged: (value) {
+                        setState(() {
+                          isMessageEntered = value.isNotEmpty;
+                        });
+                      },
+                      decoration: InputDecoration(
+                        hintText: '메시지를 입력하세요...',
+                        filled: true,
+                        fillColor: Colors.lightBlue[100],
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(20),
+                          borderSide: BorderSide.none,
+                        ),
+                        contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                      ),
+                    ),
+                  ),
+                  SizedBox(width: 8,),
+                  Container(
+                    decoration: BoxDecoration(
+                      color: intermediateColor,
+                      shape: BoxShape.rectangle,
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: IconButton(
+                      icon: Icon(
+                        Icons.send,
+                        color: isMessageEntered ? Colors.blue : Colors.grey,
+                      ),
+                      onPressed: isMessageEntered
+                          ? () {
+                              chatProvider.sendMessageToChat(
+                                chatId: widget.chatId,
+                                text: messageController.text,
+                                otherUserId: otherUserId!,
+                                context: context,
+                              );
+                              messageController.clear();
+                              setState(() {
+                                isMessageEntered = false;
+                              });
+                            }
+                          : null,
+                    ),
+                  ),
+                ],
+              ),
             ),
           ],
         ),

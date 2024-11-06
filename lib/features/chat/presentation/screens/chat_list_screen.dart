@@ -17,6 +17,7 @@ class ChatListScreen extends StatelessWidget {
     }
 
     return Scaffold(
+      appBar: AppBar(title: Text("대화 목록")),
       body: StreamBuilder(
         stream: FirebaseFirestore.instance
             .collection('chats')
