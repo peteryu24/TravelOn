@@ -50,7 +50,6 @@ class BottomSheetWidget {
                     }
                   },
                 ),
-                // 추가 버튼을 여기에 배치 가능
               ],
             ),
           ],

@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:travel_on_final/features/auth/presentation/providers/auth_provider.dart';
 import 'package:travel_on_final/features/chat/presentation/providers/chat_provider.dart';
 import 'package:travel_on_final/features/chat/presentation/widgets/message_bubble_widget.dart';
+import 'package:travel_on_final/features/chat/presentation/widgets/bottom_sheet_widget.dart';
 
 class ChatScreen extends StatefulWidget {
   final String chatId;
@@ -15,6 +16,7 @@ class ChatScreen extends StatefulWidget {
 
 class _ChatScreenState extends State<ChatScreen> {
   final TextEditingController messageController = TextEditingController();
+  final BottomSheetWidget _bottomSheetWidget = BottomSheetWidget();
   String? otherUserId;
   String otherUserName = "Chat";
 
@@ -59,12 +61,26 @@ class _ChatScreenState extends State<ChatScreen> {
                 return MessageBubble(
                   message: message,
                   isMe: isMe,
+                  otherUserName: otherUserName,
                 );
               },
             ),
           ),
           Row(
             children: [
+              IconButton(
+                icon: Icon(Icons.add),
+                onPressed: () {
+                  _bottomSheetWidget.showBottomSheetMenu(
+                    parentContext: context,
+                    chatId: widget.chatId,
+                    userId: Provider.of<AuthProvider>(context, listen: false).currentUser!.id,
+                    otherUserId: otherUserId!,
+                    currentUserProfileImage: Provider.of<AuthProvider>(context, listen: false).currentUser!.profileImageUrl ?? '',
+                    username: Provider.of<AuthProvider>(context, listen: false).currentUser!.name,
+                  );
+                },
+              ),
               Expanded(
                 child: TextField(
                   controller: messageController,
