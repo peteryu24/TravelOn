@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 import '../../domain/entities/travel_package.dart';
 import 'package:provider/provider.dart';
 import 'package:travel_on_final/features/auth/presentation/providers/auth_provider.dart';
+import 'package:travel_on_final/features/chat/domain/usecases/create_chat_id.dart';
 
 class PackageDetailScreen extends StatefulWidget {
   final TravelPackage package;
@@ -193,9 +194,7 @@ class _PackageDetailScreenState extends State<PackageDetailScreen> {
                                       final userId = authProvider.currentUser?.id;
                                       if (userId != null) {
                                         final otherUserId = widget.package.guideId;
-                                        final sortedIds = [userId, otherUserId]..sort((a, b) => b.compareTo(a));
-                                        final chatId = '${sortedIds[0]}_${sortedIds[1]}';
-
+                                        final chatId = CreateChatId().call(userId, otherUserId);
                                         context.push('/chat/$chatId');
                                       }
                                     },
