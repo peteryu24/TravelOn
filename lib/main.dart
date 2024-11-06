@@ -9,6 +9,8 @@ import 'package:travel_on_final/features/home/presentation/providers/home_provid
 import 'package:travel_on_final/features/home/presentation/providers/weather_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:travel_on_final/features/reservation/presentation/providers/reservation_provider.dart';
+import 'package:travel_on_final/features/review/data/repositories/review_repository_impl.dart';
+import 'package:travel_on_final/features/review/presentation/provider/review_provider.dart';
 import 'package:travel_on_final/features/search/data/repositories/travel_repositories_impl.dart';
 import 'package:travel_on_final/route.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -90,6 +92,9 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => ChatProvider()),
         ChangeNotifierProvider(
           create: (_) => ReservationProvider(FirebaseFirestore.instance),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => ReviewProvider(ReviewRepositoryImpl()),
         ),
         ChangeNotifierProvider(
           create: (_) => HomeProvider(

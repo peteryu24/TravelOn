@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
+import '../../../gallery/presentation/providers/gallery_provider.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -168,9 +169,18 @@ class ProfileScreen extends StatelessWidget {
                     width: double.infinity,
                     child: ElevatedButton(
                       onPressed: () async {
-                        await authProvider.logout();
-                        if (context.mounted) {
-                          context.go('/login');
+                        try {
+                          context.read<GalleryProvider>().reset();
+                          await context.read<AuthProvider>().logout();
+                          if (context.mounted) {
+                            context.go('/login');
+                          }
+                        } catch (e) {
+                          if (context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text('로그아웃 중 오류가 발생했습니다: $e')),
+                            );
+                          }
                         }
                       },
                       style: ElevatedButton.styleFrom(

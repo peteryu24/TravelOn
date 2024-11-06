@@ -82,6 +82,16 @@ final goRouter = GoRouter(
       path: '/reservations/customer',
       builder: (context, state) => const CustomerReservationsScreen(),
     ),
+    GoRoute(
+      path: '/review/add',
+      builder: (context, state) {
+        final Map<String, dynamic> extra = state.extra as Map<String, dynamic>;
+        return AddReviewScreen(
+          packageId: extra['packageId'],
+          packageTitle: extra['packageTitle'],
+        );
+      },
+    ),
     // 로그인 관련 라우트
     GoRoute(
       path: '/login',

@@ -25,12 +25,12 @@ class TravelRepositoryImpl implements TravelRepository {
           descriptionImages: List<String>.from(data['descriptionImages'] ?? []),
           guideName: data['guideName'] ?? '',
           guideId: data['guideId'] ?? '',
-          minParticipants: data['minParticipants'] ?? 1,
-          maxParticipants: data['maxParticipants'] ?? 1,
-          nights: data['nights'] ?? 1,
-          departureDays: List<int>.from(data['departureDays'] ?? []),
-          likedBy: List<String>.from(data['likedBy'] ?? []),
-          likesCount: data['likesCount'] ?? 0,
+          minParticipants: (data['minParticipants'] as num?)?.toInt() ?? 4,
+          maxParticipants: (data['maxParticipants'] as num?)?.toInt() ?? 8,
+          nights: (data['nights'] ?? 1).toInt(),
+          departureDays: List<int>.from(data['departureDays'] ?? [1,2,3,4,5,6,7]),
+          reviewCount: (data['reviewCount'] as num?)?.toInt() ?? 0,
+
         );
       }).toList();
     } catch (e) {

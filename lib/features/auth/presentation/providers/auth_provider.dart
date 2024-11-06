@@ -10,6 +10,7 @@ import 'package:travel_on_final/features/search/presentation/providers/travel_pr
 import 'package:travel_on_final/features/auth/domain/usecases/google_login_usecase.dart';
 import 'package:travel_on_final/features/auth/domain/usecases/naver_login_usecase.dart';
 import 'package:travel_on_final/features/auth/domain/usecases/facebook_login_usecase.dart';
+import 'package:travel_on_final/features/gallery/presentation/providers/gallery_provider.dart';
 
 class AuthProvider with ChangeNotifier {
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -100,7 +101,10 @@ class AuthProvider with ChangeNotifier {
         'isGuide': false,
         'likedPackages': [],
       };
-      await _firestore.collection('users').doc(userCredential.user!.uid).set(userDoc);
+      await _firestore
+          .collection('users')
+          .doc(userCredential.user!.uid)
+          .set(userDoc);
       _currentUser = UserModel.fromJson(userDoc);
 
       await userCredential.user!.sendEmailVerification();
@@ -126,9 +130,24 @@ class AuthProvider with ChangeNotifier {
   }
 
   Future<void> logout() async {
-    await _auth.signOut();
-    _currentUser = null;
-    notifyListeners();
+    try {
+      await _auth.signOut();
+      _currentUser = null;
+
+      // Provider를 통해 직접 GalleryProvider에 접근하는 방식으로 변경
+      final context =
+          _auth.app.options.androidClientId as BuildContext?; // 임시방편
+      if (context != null) {
+        final galleryProvider =
+            Provider.of<GalleryProvider>(context, listen: false);
+        galleryProvider.reset();
+      }
+
+      notifyListeners();
+    } catch (e) {
+      print('로그아웃 에러: $e');
+      rethrow;
+    }
   }
 
   Future<void> certifyAsGuide(File certificateImage) async {
@@ -317,8 +336,10 @@ class AuthProvider with ChangeNotifier {
         throw '사용자 또는 패키지를 찾을 수 없습니다';
       }
 
-      List<String> userLikedPackages = List<String>.from(userDoc.data()!['likedPackages'] ?? []);
-      List<String> packageLikedBy = List<String>.from(packageDoc.data()!['likedBy'] ?? []);
+      List<String> userLikedPackages =
+          List<String>.from(userDoc.data()!['likedPackages'] ?? []);
+      List<String> packageLikedBy =
+          List<String>.from(packageDoc.data()!['likedBy'] ?? []);
 
       bool isLiked = userLikedPackages.contains(packageId);
       if (isLiked) {
@@ -329,14 +350,10 @@ class AuthProvider with ChangeNotifier {
         packageLikedBy.add(_currentUser!.id);
       }
 
-      await userRef.update({
-        'likedPackages': userLikedPackages
-      });
+      await userRef.update({'likedPackages': userLikedPackages});
 
-      await packageRef.update({
-        'likedBy': packageLikedBy,
-        'likesCount': packageLikedBy.length
-      });
+      await packageRef.update(
+          {'likedBy': packageLikedBy, 'likesCount': packageLikedBy.length});
 
       _currentUser = _currentUser!.copyWith(
         likedPackages: userLikedPackages,

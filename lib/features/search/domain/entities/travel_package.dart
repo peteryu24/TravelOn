@@ -14,6 +14,8 @@ class TravelPackage {
   final List<int> departureDays;
   List<String> likedBy;
   int likesCount;
+  final double averageRating;
+  final int reviewCount;
 
 
   TravelPackage({
@@ -32,6 +34,8 @@ class TravelPackage {
     required this.departureDays,
     List<String>? likedBy,
     this.likesCount = 0,
+    this.averageRating = 0.0,
+    this.reviewCount = 0,
   }) : likedBy = likedBy ?? []; // 새로운 리스트로 초기화
 
   factory TravelPackage.fromJson(Map<String, dynamic> json) {
@@ -51,6 +55,8 @@ class TravelPackage {
       departureDays: List<int>.from(json['departureDays'] ?? []),
       likedBy: List<String>.from(json['likedBy'] ?? []),  // 수정 가능한 리스트로 변환
       likesCount: (json['likesCount'] as num?)?.toInt() ?? 0,
+      averageRating: (json['averageRating'] as num?)?.toDouble() ?? 0.0,
+      reviewCount: (json['reviewCount'] as num?)?.toInt() ?? 0,
     );
   }
 
@@ -70,12 +76,16 @@ class TravelPackage {
     'departureDays': departureDays,
     'likedBy': likedBy,
     'likesCount': likesCount,
+    'averageRating': averageRating,
+    'reviewCount': reviewCount,
   };
 
   // 복사본 생성 메서드 추가
   TravelPackage copyWith({
     List<String>? likedBy,
     int? likesCount,
+    double? averageRating,     // 추가
+    int? reviewCount,          // 추가
   }) {
     return TravelPackage(
       id: id,
@@ -93,6 +103,8 @@ class TravelPackage {
       departureDays: departureDays,
       likedBy: likedBy ?? List<String>.from(this.likedBy),
       likesCount: likesCount ?? this.likesCount,
+      averageRating: averageRating ?? this.averageRating,   // 추가
+      reviewCount: reviewCount ?? this.reviewCount,         // 추가
     );
   }
 }
