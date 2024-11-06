@@ -224,6 +224,25 @@ class TravelProvider extends ChangeNotifier {
     }
   }
 
+  Future<void> refreshPackage(String packageId) async {
+    try {
+      final snapshot = await _firestore.collection('packages').doc(packageId).get();
+      if (snapshot.exists) {
+        final index = _packages.indexWhere((p) => p.id == packageId);
+        if (index != -1) {
+          final data = snapshot.data()!;
+          _packages[index] = TravelPackage.fromJson({
+            'id': snapshot.id,
+            ...data,
+          });
+          notifyListeners();
+        }
+      }
+    } catch (e) {
+      print('Error refreshing package: $e');
+    }
+  }
+
   List<TravelPackage> getLikedPackages() {
     return _packages.where((package) => _likedPackageIds.contains(package.id)).toList();
   }

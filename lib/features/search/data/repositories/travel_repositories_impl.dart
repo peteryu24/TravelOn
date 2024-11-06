@@ -30,6 +30,8 @@ class TravelRepositoryImpl implements TravelRepository {
           maxParticipants: (data['maxParticipants'] as num?)?.toInt() ?? 8,
           nights: (data['nights'] ?? 1).toInt(),
           departureDays: List<int>.from(data['departureDays'] ?? [1,2,3,4,5,6,7]),
+          reviewCount: (data['reviewCount'] as num?)?.toInt() ?? 0,
+
         );
         return package;
       }).toList();

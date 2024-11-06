@@ -97,13 +97,53 @@ class MyPackagesScreen extends StatelessWidget {
                                           child: const Text('취소'),
                                         ),
                                         TextButton(
-                                          onPressed: () async {
-                                            // TODO: 삭제 기능 구현
-                                            Navigator.pop(context);
+                                          onPressed: () {
+                                            // 삭제 확인 다이얼로그
+                                            showDialog(
+                                              context: context,
+                                              builder: (context) => AlertDialog(
+                                                title: const Text('패키지 삭제'),
+                                                content: const Text('이 패키지를 삭제하시겠습니까?'),
+                                                actions: [
+                                                  TextButton(
+                                                    onPressed: () => Navigator.pop(context),
+                                                    child: const Text('취소'),
+                                                  ),
+                                                  TextButton(
+                                                    onPressed: () async {
+                                                      try {
+                                                        // 삭제 실행
+                                                        await context.read<TravelProvider>().deletePackage(package.id);
+
+                                                        if (context.mounted) {
+                                                          ScaffoldMessenger.of(context).showSnackBar(
+                                                            const SnackBar(content: Text('패키지가 삭제되었습니다')),
+                                                          );
+                                                          Navigator.pop(context); // 다이얼로그 닫기
+                                                        }
+                                                      } catch (e) {
+                                                        if (context.mounted) {
+                                                          ScaffoldMessenger.of(context).showSnackBar(
+                                                            SnackBar(content: Text('삭제 중 오류가 발생했습니다: $e')),
+                                                          );
+                                                          Navigator.pop(context); // 다이얼로그 닫기
+                                                        }
+                                                      }
+                                                    },
+                                                    child: const Text(
+                                                      '삭제',
+                                                      style: TextStyle(color: Colors.red),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            );
                                           },
-                                          child: const Text(
-                                            '삭제',
-                                            style: TextStyle(color: Colors.red),
+                                          style: ElevatedButton.styleFrom(
+                                            backgroundColor: Colors.red,
+                                          ),
+                                          child: const Text('삭제',
+                                            style: TextStyle(color: Colors.white),
                                           ),
                                         ),
                                       ],
