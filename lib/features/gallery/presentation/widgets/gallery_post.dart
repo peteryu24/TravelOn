@@ -4,6 +4,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 import 'package:travel_on_final/features/auth/presentation/providers/auth_provider.dart';
 import '../providers/gallery_provider.dart';
+import 'comment_bottom_sheet.dart';
+import '../../domain/entities/comment_entity.dart';
 
 class GalleryPost extends StatefulWidget {
   final String imgUrl;
@@ -13,6 +15,7 @@ class GalleryPost extends StatefulWidget {
   final String postId;
   final List<String> likedBy;
   final int likeCount;
+  final List<Comment> comments;
 
   const GalleryPost({
     super.key,
@@ -23,6 +26,7 @@ class GalleryPost extends StatefulWidget {
     required this.postId,
     required this.likedBy,
     required this.likeCount,
+    required this.comments,
   });
 
   @override
@@ -84,6 +88,21 @@ class _GalleryPostState extends State<GalleryPost> {
     }
   }
 
+  void _showComments() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.white,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20.r)),
+      ),
+      builder: (context) => CommentBottomSheet(
+        postId: widget.postId,
+        comments: widget.comments,
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -138,7 +157,7 @@ class _GalleryPostState extends State<GalleryPost> {
               ),
             ),
             IconButton(
-              onPressed: () {},
+              onPressed: _showComments,
               icon: const Icon(CupertinoIcons.chat_bubble),
             ),
             const Spacer(),
@@ -158,7 +177,23 @@ class _GalleryPostState extends State<GalleryPost> {
           ),
         Padding(
           padding: EdgeInsets.all(10.r),
-          child: Text(widget.description),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(widget.description),
+              if (widget.comments.isNotEmpty)
+                TextButton(
+                  onPressed: _showComments,
+                  child: Text(
+                    '댓글 ${widget.comments.length}개 모두 보기',
+                    style: TextStyle(
+                      color: Colors.grey[600],
+                      fontSize: 14.sp,
+                    ),
+                  ),
+                ),
+            ],
+          ),
         ),
         Divider(height: 20.h),
       ],

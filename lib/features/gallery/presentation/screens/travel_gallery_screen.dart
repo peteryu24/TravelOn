@@ -5,6 +5,7 @@ import '../widgets/gallery_post.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../providers/gallery_provider.dart';
+import '../../domain/entities/comment_entity.dart';
 
 class TravelGalleryScreen extends StatelessWidget {
   const TravelGalleryScreen({super.key});
@@ -14,7 +15,7 @@ class TravelGalleryScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          '여행 갤러리',
+          '여행갤러리',
           style: TextStyle(
             fontSize: 20.sp,
             fontWeight: FontWeight.bold,
@@ -42,6 +43,9 @@ class TravelGalleryScreen extends StatelessWidget {
             itemCount: posts.length,
             itemBuilder: (context, index) {
               final post = posts[index];
+              provider.subscribeToComments(post.id);
+              final comments = provider.getCommentsForPost(post.id);
+
               return GalleryPost(
                 postId: post.id,
                 imgUrl: post.imageUrl,
@@ -50,6 +54,7 @@ class TravelGalleryScreen extends StatelessWidget {
                 description: post.description,
                 likedBy: post.likedBy,
                 likeCount: post.likeCount,
+                comments: comments,
               );
             },
           );
