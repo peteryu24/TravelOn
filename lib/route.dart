@@ -30,6 +30,8 @@ import 'package:travel_on_final/features/profile/presentation/screens/reservatio
 // gallery
 import 'package:travel_on_final/features/gallery/presentation/screens/travel_gallery_screen.dart';
 import 'package:travel_on_final/features/gallery/presentation/screens/add_gallery_post_screen.dart';
+// review
+import 'package:travel_on_final/features/review/presentation/screens/add_review_screen.dart';
 
 final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>();
 
