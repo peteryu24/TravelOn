@@ -68,13 +68,23 @@ class GalleryProvider extends ChangeNotifier {
     String? userProfileUrl,
     required String content,
   }) async {
-    await _repository.addComment(
-      postId: postId,
-      userId: userId,
-      username: username,
-      userProfileUrl: userProfileUrl,
-      content: content,
-    );
+    try {
+      // 낙관적 업데이트를 위해 현재 상태 유지
+      final currentComments = List<Comment>.from(_postComments[postId] ?? []);
+
+      await _repository.addComment(
+        postId: postId,
+        userId: userId,
+        username: username,
+        userProfileUrl: userProfileUrl,
+        content: content,
+      );
+    } catch (e) {
+      // 에러 발생 시 원래 상태로 복구
+      _postComments[postId] = List<Comment>.from(_postComments[postId] ?? []);
+      notifyListeners();
+      rethrow;
+    }
   }
 
   // 특정 게시글의 댓글 목록 가져오기

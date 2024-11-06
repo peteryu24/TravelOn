@@ -29,10 +29,26 @@ class _CommentBottomSheetState extends State<CommentBottomSheet> {
   }
 
   Future<void> _addComment() async {
-    if (_commentController.text.trim().isEmpty) return;
+    final content = _commentController.text.trim();
+    if (content.isEmpty) return;
 
     final user = context.read<AuthProvider>().currentUser;
     if (user == null) return;
+
+    final optimisticComment = Comment(
+      id: DateTime.now().toString(),
+      postId: widget.postId,
+      userId: user.id,
+      username: user.name,
+      userProfileUrl: user.profileImageUrl,
+      content: content,
+      createdAt: DateTime.now(),
+    );
+
+    setState(() {
+      widget.comments.insert(0, optimisticComment);
+    });
+    _commentController.clear();
 
     try {
       await context.read<GalleryProvider>().addComment(
@@ -40,11 +56,14 @@ class _CommentBottomSheetState extends State<CommentBottomSheet> {
             userId: user.id,
             username: user.name,
             userProfileUrl: user.profileImageUrl,
-            content: _commentController.text.trim(),
+            content: content,
           );
-      _commentController.clear();
     } catch (e) {
       if (mounted) {
+        setState(() {
+          widget.comments
+              .removeWhere((comment) => comment.id == optimisticComment.id);
+        });
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('댓글 작성 중 오류가 발생했습니다: $e')),
         );
