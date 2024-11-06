@@ -26,6 +26,9 @@ import 'package:travel_on_final/features/search/presentation/screens/package_det
 import 'package:travel_on_final/features/home/presentation/screens/home_screen.dart';
 // profile
 import 'package:travel_on_final/features/profile/presentation/screens/profile_screen.dart';
+// gallery
+import 'package:travel_on_final/features/gallery/presentation/screens/travel_gallery_screen.dart';
+import 'package:travel_on_final/features/gallery/presentation/screens/add_gallery_post_screen.dart';
 
 final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>();
 
@@ -126,6 +129,14 @@ final goRouter = GoRouter(
           builder: (context, state) => const ProfileScreen(),
         ),
       ],
+    ),
+    GoRoute(
+      path: '/travel-gallery',
+      builder: (context, state) => const TravelGalleryScreen(),
+    ),
+    GoRoute(
+      path: '/add-gallery-post',
+      builder: (context, state) => const AddGalleryPostScreen(),
     ),
   ],
 );

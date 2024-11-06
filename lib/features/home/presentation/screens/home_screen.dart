@@ -74,7 +74,7 @@ class _HomeScreenState extends State<HomeScreen> {
               const NextTripCard(),
               SizedBox(height: 20.h),
 
-              // 날씨 정보
+              // 날씨 정���
               const WeatherSlider(),
               SizedBox(height: 30.h),
 
@@ -87,13 +87,13 @@ class _HomeScreenState extends State<HomeScreen> {
                 crossAxisSpacing: 20.w,
                 children: [
                   _buildMenuItem(Icons.star, '여행꿀팁'),
-                  _buildMenuItem(Icons.map_outlined, '코스가이드'),
-                  _buildMenuItem(Icons.calendar_today, '일정만들기'),
-                  _buildMenuItem(Icons.photo_camera, '여행갤러리'),
-                  _buildMenuItem(Icons.wb_sunny, '생생날씨'),
                   _buildMenuItem(Icons.favorite_border, '추천여행지'),
-                  _buildMenuItem(Icons.restaurant, '추천맛집'),
+                  _buildMenuItem(Icons.restaurant, '트슐랭가이드'),
+                  _buildMenuItem(Icons.photo_camera, '여행갤러리'),
+                  _buildMenuItem(Icons.people, '가이드랭킹'),
                   _buildMenuItem(Icons.location_on, '전국지도'),
+                  // _buildMenuItem(Icons.calendar_today, '일정만들기'),
+                  // _buildMenuItem(Icons.wb_sunny, '생생날씨'),
                 ],
               ),
               SizedBox(height: 30.h),
@@ -110,7 +110,9 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ),
                   TextButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      context.push('/packages'); // 전체 패키지 목록 화면으로 이동
+                    },
                     child: Row(
                       children: [
                         const Text(
@@ -125,18 +127,18 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               SizedBox(height: 10.h),
 
-              // 가로 스크롤 되는 추천 이미지 카드 
+              // 가로 스크롤 되는 추천 이미지 카드
               Consumer<TravelProvider>(
                 builder: (context, provider, child) {
-                  final recentPackages = provider.recentPackages;
+                  final popularPackages = provider.popularPackages;
 
                   return SizedBox(
                     height: 200.h,
                     child: ListView.builder(
                       scrollDirection: Axis.horizontal,
-                      itemCount: recentPackages.length,
+                      itemCount: popularPackages.length,
                       itemBuilder: (context, index) {
-                        final package = recentPackages[index];
+                        final package = popularPackages[index];
                         return Padding(
                           padding: EdgeInsets.only(
                             right: 16.w,
@@ -173,13 +175,20 @@ class _HomeScreenState extends State<HomeScreen> {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Container(
-          padding: EdgeInsets.all(12.r),
-          decoration: BoxDecoration(
-            color: Colors.grey.shade100,
-            borderRadius: BorderRadius.circular(12.r),
+        GestureDetector(
+          onTap: () {
+            if (label == '여행갤러리') {
+              context.push('/travel-gallery');
+            }
+          },
+          child: Container(
+            padding: EdgeInsets.all(12.r),
+            decoration: BoxDecoration(
+              color: Colors.grey.shade100,
+              borderRadius: BorderRadius.circular(12.r),
+            ),
+            child: Icon(icon, color: Colors.blue),
           ),
-          child: Icon(icon, color: Colors.blue),
         ),
         SizedBox(height: 3.h),
         Text(

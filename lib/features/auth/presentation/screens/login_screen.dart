@@ -147,54 +147,93 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
               ),
             ),
-            SizedBox(height: 25.h),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                SocialLoginButton(
-                  assetPath: "assets/images/logo/kakaotalk.png",
-                  onPressed: () async {
-                    final authProvider = Provider.of<AuthProvider>(context, listen: false);
-                    await authProvider.loginWithKakao();
+            SizedBox(height: 30.h),
+            // Row(
+            //   mainAxisAlignment: MainAxisAlignment.center,
+            //   children: [
+            //     SocialLoginButton(
+            //       assetPath: "assets/images/logo/kakaotalk.png",
+            //       onPressed: () async {
+            //         final authProvider = Provider.of<AuthProvider>(context, listen: false);
+            //         await authProvider.loginWithKakao();
 
-                    if (authProvider.isAuthenticated) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('${authProvider.currentUser!.name}님 환영합니다.')),
-                      );
-                      context.go('/');
-                    } else {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('카카오톡 로그인 실패')),
-                      );
-                    }
-                  },
-                ),
-                SizedBox(width: 10.w),
-                SocialLoginButton(
-                  assetPath: "assets/images/logo/google.png",
-                  onPressed: () {
-                    final authProvider = Provider.of<AuthProvider>(context, listen: false);
-                    authProvider.loginWithGoogle();
-                  },
-                ),
-                SizedBox(width: 10.w),
-                SocialLoginButton(
-                  assetPath: "assets/images/logo/naver.png",
-                  onPressed: () {
-                    final authProvider = Provider.of<AuthProvider>(context, listen: false);
-                    authProvider.loginWithNaver();
-                  },
-                ),
-                SizedBox(width: 10.w),
-                SocialLoginButton(
-                  assetPath: "assets/images/logo/facebook.png",
-                  onPressed: () {
-                    final authProvider = Provider.of<AuthProvider>(context, listen: false);
-                    authProvider.loginWithFacebook();
-                  },
-                ),
-              ],
-            ),
+            //         if (authProvider.isAuthenticated) {
+            //           ScaffoldMessenger.of(context).showSnackBar(
+            //             SnackBar(content: Text('${authProvider.currentUser!.name}님 환영합니다.')),
+            //           );
+            //           context.go('/');
+            //         } else {
+            //           ScaffoldMessenger.of(context).showSnackBar(
+            //             SnackBar(content: Text('카카오톡 로그인 실패')),
+            //           );
+            //         }
+            //       },
+            //     ),
+            //     SizedBox(width: 10.w),
+            //     SocialLoginButton(
+            //       assetPath: "assets/images/logo/google.png",
+            //       onPressed: () async {
+            //         final authProvider = Provider.of<AuthProvider>(context, listen: false);
+            //         await authProvider.loginWithGoogle();
+
+            //         if (authProvider.isAuthenticated) {
+            //           ScaffoldMessenger.of(context).showSnackBar(
+            //             SnackBar(content: Text('${authProvider.currentUser!.name}님 환영합니다.')),
+            //           );
+            //           context.go('/');
+            //         } else {
+            //           ScaffoldMessenger.of(context).showSnackBar(
+            //             SnackBar(content: Text('Google 로그인 실패')),
+            //           );
+            //         }
+            //       },
+            //     ),
+            //     SizedBox(width: 10.w),
+            //     SocialLoginButton(
+            //       assetPath: "assets/images/logo/naver.png",
+            //       onPressed: () async {
+            //         final authProvider = Provider.of<AuthProvider>(context, listen: false);
+            //         await authProvider.loginWithNaver();
+
+            //         if (authProvider.isAuthenticated) {
+            //           ScaffoldMessenger.of(context).showSnackBar(
+            //             SnackBar(content: Text('${authProvider.currentUser!.name}님 환영합니다.')),
+            //           );
+            //           context.go('/');
+            //         } else {
+            //           ScaffoldMessenger.of(context).showSnackBar(
+            //             SnackBar(content: Text('Naver 로그인 실패')),
+            //           );
+            //         }
+            //       },
+            //     ),
+            //     SizedBox(width: 10.w),
+            //     SocialLoginButton(
+            //       assetPath: "assets/images/logo/facebook.png",
+            //       onPressed: () async {
+            //         final authProvider = Provider.of<AuthProvider>(context, listen: false);
+            //         await authProvider.loginWithFacebook();
+
+            //         if (authProvider.isAuthenticated) {
+            //           ScaffoldMessenger.of(context).showSnackBar(
+            //             SnackBar(content: Text('${authProvider.currentUser!.name}님 환영합니다.')),
+            //           );
+            //           context.go('/');
+            //         } else {
+            //           ScaffoldMessenger.of(context).showSnackBar(
+            //             SnackBar(content: Text('Facebook 로그인 실패')),
+            //           );
+            //         }
+            //       },
+            //     ),
+            //     SizedBox(width: 10.w),
+            //     SocialLoginButton(
+            //       assetPath: "assets/images/logo/apple.png",
+            //       onPressed: () async {
+            //       },
+            //     ),
+            //   ],
+            // ),
           ],
         ),
       ),

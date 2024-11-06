@@ -9,9 +9,9 @@ import 'dart:math' as math;
 class TravelProvider extends ChangeNotifier {
   final TravelRepository _repository;
   final FirebaseAuth _auth;
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;  // 추가
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance; // 추가
   List<TravelPackage> _packages = [];
-  Set<String> _likedPackageIds = {};  // 찜한 패키지 ID 목록
+  Set<String> _likedPackageIds = {}; // 찜한 패키지 ID 목록
   String _selectedRegion = 'all';
   String _searchQuery = '';
   bool _isLoading = false;
@@ -91,8 +91,10 @@ class TravelProvider extends ChangeNotifier {
       }
 
       // 현재 상태 가져오기
-      List<String> userLikedPackages = List<String>.from(userDoc.data()!['likedPackages'] ?? []);
-      List<String> packageLikedBy = List<String>.from(packageDoc.data()!['likedBy'] ?? []);
+      List<String> userLikedPackages =
+          List<String>.from(userDoc.data()!['likedPackages'] ?? []);
+      List<String> packageLikedBy =
+          List<String>.from(packageDoc.data()!['likedBy'] ?? []);
       int currentLikesCount = packageDoc.data()!['likesCount'] ?? 0;
 
       // 좋아요 토글
@@ -127,6 +129,9 @@ class TravelProvider extends ChangeNotifier {
         final package = _packages[packageIndex];
         package.likedBy = packageLikedBy;
         package.likesCount = currentLikesCount;
+
+        // likesCount 기준으로 재정렬
+        _packages.sort((a, b) => b.likesCount.compareTo(a.likesCount));
       }
 
       notifyListeners();
@@ -135,6 +140,7 @@ class TravelProvider extends ChangeNotifier {
       rethrow;
     }
   }
+
   // 패키지 목록 로드
   Future<void> loadPackages() async {
     try {
@@ -207,7 +213,8 @@ class TravelProvider extends ChangeNotifier {
       final userDoc = await _firestore.collection('users').doc(userId).get();
       if (!userDoc.exists) return;
 
-      final likedPackages = List<String>.from(userDoc.data()!['likedPackages'] ?? []);
+      final likedPackages =
+          List<String>.from(userDoc.data()!['likedPackages'] ?? []);
       _likedPackageIds = Set.from(likedPackages);
 
       // 로컬 패키지 상태 업데이트
@@ -244,7 +251,9 @@ class TravelProvider extends ChangeNotifier {
   }
 
   List<TravelPackage> getLikedPackages() {
-    return _packages.where((package) => _likedPackageIds.contains(package.id)).toList();
+    return _packages
+        .where((package) => _likedPackageIds.contains(package.id))
+        .toList();
   }
 
   // 특정 패키지 검색
@@ -279,5 +288,21 @@ class TravelProvider extends ChangeNotifier {
   // 최신 패키지 5개 조회
   List<TravelPackage> get recentPackages {
     return _packages.take(5).toList();
+  }
+
+  // 인기 패키지 getter - 찜(좋아요) 수 기준 상위 5개
+  List<TravelPackage> get popularPackages {
+    final filtered = _packages
+        .where((package) => package.likesCount > 0) // 좋아요가 1개 이상인 패키지만
+        .toList()
+      ..sort((a, b) => b.likesCount.compareTo(a.likesCount)); // 좋아요 수 내림차순 정렬
+
+    // 좋아요가 있는 패키지가 없다면 전체 패키지에서 최신순으로 5개 반환
+    if (filtered.isEmpty) {
+      return _packages.take(5).toList();
+    }
+
+    // 좋아요 순으로 정렬된 패키지 중 상위 5개 반환
+    return filtered.take(5).toList();
   }
 }

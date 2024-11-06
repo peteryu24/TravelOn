@@ -11,12 +11,11 @@ class TravelRepositoryImpl implements TravelRepository {
   @override
   Future<List<TravelPackage>> getPackages() async {
     try {
-      print('Fetching packages from Firestore...');
       final snapshot = await _firestore.collection('packages').get();
 
       return snapshot.docs.map((doc) {
         final data = doc.data();
-        final package = TravelPackage(
+        return TravelPackage(
           id: doc.id,
           title: data['title'] ?? '',
           description: data['description'] ?? '',
@@ -33,10 +32,9 @@ class TravelRepositoryImpl implements TravelRepository {
           reviewCount: (data['reviewCount'] as num?)?.toInt() ?? 0,
 
         );
-        return package;
       }).toList();
     } catch (e) {
-      print('Error fetching packages: $e');
+      print('Error getting packages: $e');
       rethrow;
     }
   }
@@ -52,7 +50,8 @@ class TravelRepositoryImpl implements TravelRepository {
       if (package.mainImage != null) {
         print('Uploading main image...');
         final mainImageFile = File(package.mainImage!);
-        final mainImageRef = _storage.ref('package_images/${DateTime.now().millisecondsSinceEpoch}_main.jpg');
+        final mainImageRef = _storage.ref(
+            'package_images/${DateTime.now().millisecondsSinceEpoch}_main.jpg');
         await mainImageRef.putFile(mainImageFile);
         mainImageUrl = await mainImageRef.getDownloadURL();
         print('Main image uploaded: $mainImageUrl');
@@ -61,7 +60,8 @@ class TravelRepositoryImpl implements TravelRepository {
       for (String imagePath in package.descriptionImages) {
         print('Uploading description image...');
         final file = File(imagePath);
-        final imageRef = _storage.ref('package_images/${DateTime.now().millisecondsSinceEpoch}_${descriptionImageUrls.length}.jpg');
+        final imageRef = _storage.ref(
+            'package_images/${DateTime.now().millisecondsSinceEpoch}_${descriptionImageUrls.length}.jpg');
         await imageRef.putFile(file);
         final imageUrl = await imageRef.getDownloadURL();
         descriptionImageUrls.add(imageUrl);
@@ -82,8 +82,8 @@ class TravelRepositoryImpl implements TravelRepository {
         'maxParticipants': package.maxParticipants,
         'nights': package.nights,
         'departureDays': package.departureDays,
-        'likedBy': [],  // 초기 빈 배열로 설정
-        'likesCount': 0,  // 초기값 0으로 설정
+        'likedBy': [], // 초기 빈 배열로 설정
+        'likesCount': 0, // 초기값 0으로 설정
       };
 
       if (package.minParticipants <= 0) {
@@ -101,7 +101,6 @@ class TravelRepositoryImpl implements TravelRepository {
       print('Saved package data:');
       print('minParticipants: ${savedData?['minParticipants']}');
       print('maxParticipants: ${savedData?['maxParticipants']}');
-
     } catch (e) {
       print('Error adding package: $e');
       rethrow;
@@ -120,7 +119,8 @@ class TravelRepositoryImpl implements TravelRepository {
       if (package.mainImage != null && package.mainImage!.startsWith('/')) {
         print('Uploading new main image...');
         final mainImageFile = File(package.mainImage!);
-        final mainImageRef = _storage.ref('package_images/${DateTime.now().millisecondsSinceEpoch}_main.jpg');
+        final mainImageRef = _storage.ref(
+            'package_images/${DateTime.now().millisecondsSinceEpoch}_main.jpg');
         await mainImageRef.putFile(mainImageFile);
         mainImageUrl = await mainImageRef.getDownloadURL();
       }
@@ -131,7 +131,8 @@ class TravelRepositoryImpl implements TravelRepository {
           // 새로운 이미지는 업로드
           print('Uploading new description image...');
           final file = File(imagePath);
-          final imageRef = _storage.ref('package_images/${DateTime.now().millisecondsSinceEpoch}_${descriptionImageUrls.length}.jpg');
+          final imageRef = _storage.ref(
+              'package_images/${DateTime.now().millisecondsSinceEpoch}_${descriptionImageUrls.length}.jpg');
           await imageRef.putFile(file);
           final imageUrl = await imageRef.getDownloadURL();
           descriptionImageUrls.add(imageUrl);
@@ -164,9 +165,11 @@ class TravelRepositoryImpl implements TravelRepository {
         throw '최대 인원은 최소 인원보다 작을 수 없습니다';
       }
 
-      await _firestore.collection('packages').doc(package.id).update(packageData);
+      await _firestore
+          .collection('packages')
+          .doc(package.id)
+          .update(packageData);
       print('Package updated successfully');
-
     } catch (e) {
       print('Error updating package: $e');
       rethrow;
@@ -179,13 +182,15 @@ class TravelRepositoryImpl implements TravelRepository {
       print('Starting to delete package...');
 
       // 패키지 문서 가져오기
-      final packageDoc = await _firestore.collection('packages').doc(packageId).get();
+      final packageDoc =
+          await _firestore.collection('packages').doc(packageId).get();
       final data = packageDoc.data();
 
       if (data != null) {
         // 연결된 이미지 삭제
         final mainImage = data['mainImage'] as String?;
-        final descriptionImages = List<String>.from(data['descriptionImages'] ?? []);
+        final descriptionImages =
+            List<String>.from(data['descriptionImages'] ?? []);
 
         // 메인 이미지 삭제
         if (mainImage != null && mainImage.isNotEmpty) {
@@ -211,7 +216,6 @@ class TravelRepositoryImpl implements TravelRepository {
       // Firestore 문서 삭제
       await _firestore.collection('packages').doc(packageId).delete();
       print('Package deleted successfully');
-
     } catch (e) {
       print('Error deleting package: $e');
       rethrow;
@@ -234,8 +238,10 @@ class TravelRepositoryImpl implements TravelRepository {
         }
 
         // 현재 데이터
-        final List<String> likedBy = List<String>.from(packageDoc.data()!['likedBy'] ?? []);
-        final List<String> userLikedPackages = List<String>.from(userDoc.data()!['likedPackages'] ?? []);
+        final List<String> likedBy =
+            List<String>.from(packageDoc.data()!['likedBy'] ?? []);
+        final List<String> userLikedPackages =
+            List<String>.from(userDoc.data()!['likedPackages'] ?? []);
 
         if (likedBy.contains(userId)) {
           // 좋아요 취소
@@ -280,4 +286,3 @@ class TravelRepositoryImpl implements TravelRepository {
     }
   }
 }
-
