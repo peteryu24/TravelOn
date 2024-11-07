@@ -12,6 +12,7 @@ class GalleryProvider extends ChangeNotifier {
   Stream<List<GalleryPost>>? _postsStream;
   StreamSubscription<List<GalleryPost>>? _subscription;
   final Map<String, List<Comment>> _postComments = {};
+  List<GalleryPost> _scrappedPosts = [];
 
   GalleryProvider(this._repository) {
     _initStream();
@@ -27,6 +28,7 @@ class GalleryProvider extends ChangeNotifier {
 
   List<GalleryPost> get posts => _posts;
   bool get isLoading => _isLoading;
+  List<GalleryPost> get scrappedPosts => _scrappedPosts;
 
   // 포스트 업로드
   Future<void> uploadPost({
@@ -68,13 +70,23 @@ class GalleryProvider extends ChangeNotifier {
     String? userProfileUrl,
     required String content,
   }) async {
-    await _repository.addComment(
-      postId: postId,
-      userId: userId,
-      username: username,
-      userProfileUrl: userProfileUrl,
-      content: content,
-    );
+    // 낙관적 업데이트를 위해 현재 상태 유지
+    final currentComments = List<Comment>.from(_postComments[postId] ?? []);
+
+    try {
+      await _repository.addComment(
+        postId: postId,
+        userId: userId,
+        username: username,
+        userProfileUrl: userProfileUrl,
+        content: content,
+      );
+    } catch (e) {
+      // 에러 발생 시 원래 상태로 복구
+      _postComments[postId] = currentComments;
+      notifyListeners();
+      rethrow;
+    }
   }
 
   // 특정 게시글의 댓글 목록 가져오기
@@ -88,6 +100,92 @@ class GalleryProvider extends ChangeNotifier {
       _postComments[postId] = comments;
       notifyListeners();
     });
+  }
+
+  // 스크랩 토글
+  Future<void> toggleScrap(String postId, String userId) async {
+    try {
+      await _repository.toggleScrap(postId, userId);
+      // 스크랩 토글 후 즉시 스크랩된 게시글 목록 새로고침
+      await loadScrappedPosts(userId);
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  // 스크랩된 게시글 로드
+  Future<void> loadScrappedPosts(String userId) async {
+    try {
+      _scrappedPosts = await _repository.getScrappedPosts(userId);
+      notifyListeners();
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  // 포스트 수정
+  Future<void> updatePost({
+    required String postId,
+    required String location,
+    required String description,
+    File? newImage,
+  }) async {
+    _isLoading = true;
+    notifyListeners();
+
+    try {
+      await _repository.updatePost(
+        postId: postId,
+        location: location,
+        description: description,
+        newImage: newImage,
+      );
+
+      // 로컬 상태 업데이트
+      final index = _posts.indexWhere((post) => post.id == postId);
+      if (index != -1) {
+        _posts[index] = _posts[index].copyWith(
+          location: location,
+          description: description,
+        );
+        notifyListeners();
+      }
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  // 포스트 삭제
+  Future<void> deletePost(String postId) async {
+    _isLoading = true;
+    notifyListeners();
+
+    try {
+      await _repository.deletePost(postId);
+      _posts.removeWhere((post) => post.id == postId);
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<void> deleteComment(String postId, String commentId) async {
+    // 낙관적 업데이트를 위해 현재 상태 유지
+    final currentComments = List<Comment>.from(_postComments[postId] ?? []);
+
+    try {
+      // 댓글 삭제 시도
+      _postComments[postId]?.removeWhere((comment) => comment.id == commentId);
+      notifyListeners();
+
+      await _repository.deleteComment(postId, commentId);
+    } catch (e) {
+      // 에러 발생 시 원래 상태로 복구
+      _postComments[postId] = currentComments;
+      notifyListeners();
+      rethrow;
+    }
   }
 
   @override

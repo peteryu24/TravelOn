@@ -28,9 +28,12 @@ import 'package:travel_on_final/features/profile/presentation/screens/guide_rese
 import 'package:travel_on_final/features/profile/presentation/screens/liked_packages_screen.dart';
 import 'package:travel_on_final/features/profile/presentation/screens/my_packages_screen.dart';
 import 'package:travel_on_final/features/profile/presentation/screens/reservation_screen.dart';
+import 'package:travel_on_final/features/profile/presentation/screens/profile_edit_screen.dart';
 // gallery
 import 'package:travel_on_final/features/gallery/presentation/screens/travel_gallery_screen.dart';
 import 'package:travel_on_final/features/gallery/presentation/screens/add_gallery_post_screen.dart';
+import 'package:travel_on_final/features/gallery/presentation/screens/scrapped_posts_screen.dart';
+import 'package:travel_on_final/features/gallery/presentation/screens/edit_gallery_post_screen.dart';
 // review
 import 'package:travel_on_final/features/review/presentation/screens/add_review_screen.dart';
 
@@ -115,6 +118,10 @@ final goRouter = GoRouter(
         return ChatScreen(chatId: chatId);
       },
     ),
+    GoRoute(
+      path: '/profile/edit',
+      builder: (context, state) => ProfileEditScreen(),
+    ),
     ////////////////////////////////////////////////////////////////////////////////////
     //                ↓↓↓ 바텀 내비게이션 바가 필요한 화면 라우팅 ↓↓↓                    //
     ////////////////////////////////////////////////////////////////////////////////////
@@ -133,7 +140,7 @@ final goRouter = GoRouter(
         ),
         GoRoute(
           path: '/chat_list',
-          builder: (context, state) => ChatListScreen(),
+          builder: (context, state) => const ChatListScreen(),
         ),
         GoRoute(
           path: '/profile',
@@ -148,6 +155,22 @@ final goRouter = GoRouter(
     GoRoute(
       path: '/add-gallery-post',
       builder: (context, state) => const AddGalleryPostScreen(),
+    ),
+    GoRoute(
+      path: '/edit-gallery-post',
+      builder: (context, state) {
+        final Map<String, dynamic> extra = state.extra as Map<String, dynamic>;
+        return EditGalleryPostScreen(
+          postId: extra['postId'] as String,
+          location: extra['location'] as String,
+          description: extra['description'] as String,
+          imageUrl: extra['imageUrl'] as String,
+        );
+      },
+    ),
+    GoRoute(
+      path: '/scrapped-posts',
+      builder: (context, state) => const ScrappedPostsScreen(),
     ),
   ],
 );

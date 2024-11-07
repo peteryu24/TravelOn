@@ -1,7 +1,5 @@
-// lib/features/home/presentation/widgets/bottom_navigation_bar.dart
-
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 
 class CustomBottomNavigationBar extends StatelessWidget {
   final int selectedIndex;
@@ -17,21 +15,28 @@ class CustomBottomNavigationBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return BottomNavigationBar(
       type: BottomNavigationBarType.fixed,
+      selectedLabelStyle: const TextStyle(
+        fontSize: 12,
+        fontWeight: FontWeight.w400,
+      ),
+      unselectedLabelStyle: const TextStyle(
+        fontSize: 12,
+      ),
       items: const <BottomNavigationBarItem>[
         BottomNavigationBarItem(
-          icon: Icon(Icons.home),
+          icon: Icon(CupertinoIcons.house_alt_fill),
           label: '홈',
         ),
         BottomNavigationBarItem(
-          icon: Icon(Icons.travel_explore),
-          label: '여행 상품',
+          icon: Icon(CupertinoIcons.compass_fill),
+          label: '여행상품',
         ),
         BottomNavigationBarItem(
-          icon: Icon(Icons.chat),
+          icon: Icon(CupertinoIcons.chat_bubble_2_fill),
           label: '채팅',
         ),
         BottomNavigationBarItem(
-          icon: Icon(Icons.person),
+          icon: Icon(CupertinoIcons.person_crop_circle_fill),
           label: '마이페이지',
         ),
       ],

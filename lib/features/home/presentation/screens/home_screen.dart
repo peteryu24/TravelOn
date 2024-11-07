@@ -11,6 +11,8 @@ import 'package:travel_on_final/features/home/presentation/widgets/weather_slide
 import 'package:travel_on_final/features/search/presentation/providers/travel_provider.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/providers/navigation_provider.dart';
+
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
@@ -111,8 +113,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                   TextButton(
                     onPressed: () {
-                      // 하단 네비게이션 바의 여행 상품 탭으로 이동
-                      context.go('/search'); // context.push에서 context.go로 변경
+                      // 하단 네비게이션 바의 여행 상품 탭(인덱스 1)으로 이동
+                      context.read<NavigationProvider>().setIndex(1);
                     },
                     child: Row(
                       children: [

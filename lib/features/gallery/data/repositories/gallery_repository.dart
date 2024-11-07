@@ -140,4 +140,129 @@ class GalleryRepository {
       return snapshot.docs.map((doc) => Comment.fromJson(doc.data())).toList();
     });
   }
+
+  Future<void> toggleScrap(String postId, String userId) async {
+    try {
+      final userRef = _firestore.collection('users').doc(userId);
+      final postRef = _firestore.collection('gallery_posts').doc(postId);
+
+      await _firestore.runTransaction((transaction) async {
+        final userDoc = await transaction.get(userRef);
+        final postDoc = await transaction.get(postRef);
+
+        List<String> scrappedPosts =
+            List<String>.from(userDoc.data()?['scrappedPosts'] ?? []);
+        List<String> scrappedBy =
+            List<String>.from(postDoc.data()?['scrappedBy'] ?? []);
+
+        if (scrappedPosts.contains(postId)) {
+          scrappedPosts.remove(postId);
+          scrappedBy.remove(userId);
+        } else {
+          scrappedPosts.add(postId);
+          scrappedBy.add(userId);
+        }
+
+        transaction.update(userRef, {'scrappedPosts': scrappedPosts});
+        transaction.update(postRef, {'scrappedBy': scrappedBy});
+      });
+    } catch (e) {
+      throw Exception('스크랩 처리 실패: $e');
+    }
+  }
+
+  Future<List<GalleryPost>> getScrappedPosts(String userId) async {
+    try {
+      final userDoc = await _firestore.collection('users').doc(userId).get();
+      final List<String> scrappedPostIds =
+          List<String>.from(userDoc.data()?['scrappedPosts'] ?? []);
+
+      if (scrappedPostIds.isEmpty) return [];
+
+      final postsSnapshot = await _firestore
+          .collection('gallery_posts')
+          .where(FieldPath.documentId, whereIn: scrappedPostIds)
+          .get();
+
+      return postsSnapshot.docs
+          .map((doc) => GalleryPost.fromJson(doc.data()))
+          .toList();
+    } catch (e) {
+      throw Exception('스크랩된 게시글 로드 실패: $e');
+    }
+  }
+
+  // 포스트 수정
+  Future<void> updatePost({
+    required String postId,
+    required String location,
+    required String description,
+    File? newImage,
+  }) async {
+    try {
+      final postRef = _firestore.collection('gallery_posts').doc(postId);
+
+      Map<String, dynamic> updates = {
+        'location': location,
+        'description': description,
+        'updatedAt': DateTime.now(),
+      };
+
+      // 새 이미지가 있는 경우에만 이미지 업로드 및 URL 업데이트
+      if (newImage != null) {
+        // 기존 이미지 URL 가져오기
+        final postDoc = await postRef.get();
+        final oldImageUrl = postDoc.data()?['imageUrl'] as String?;
+
+        // 새 이미지 업로드
+        final String fileName =
+            'gallery_images/${DateTime.now().millisecondsSinceEpoch}_$postId.jpg';
+        final Reference storageRef = _storage.ref().child(fileName);
+        await storageRef.putFile(newImage);
+        final String newImageUrl = await storageRef.getDownloadURL();
+
+        // 업데이트할 데이터에 새 이미지 URL 추가
+        updates['imageUrl'] = newImageUrl;
+
+        // 기존 이미지 삭제 (있는 경우)
+        if (oldImageUrl != null) {
+          try {
+            final oldImageRef = _storage.refFromURL(oldImageUrl);
+            await oldImageRef.delete();
+          } catch (e) {
+            print('기존 이미지 삭제 실패: $e');
+          }
+        }
+      }
+
+      // Firestore 문서 업데이트
+      await postRef.update(updates);
+    } catch (e) {
+      throw Exception('포스트 수정 실패: $e');
+    }
+  }
+
+  Future<void> deletePost(String postId) async {
+    // Delete post document from Firestore
+    await _firestore.collection('gallery_posts').doc(postId).delete();
+  }
+
+  Future<void> deleteComment(String postId, String commentId) async {
+    try {
+      // 댓글 문��� 삭제
+      await _firestore
+          .collection('gallery_posts')
+          .doc(postId)
+          .collection('comments')
+          .doc(commentId)
+          .delete();
+
+      // 게시글의 comments 배열에서 해당 댓글 ID 제거
+      await _firestore.collection('gallery_posts').doc(postId).update({
+        'comments': FieldValue.arrayRemove([commentId]),
+      });
+    } catch (e) {
+      throw Exception('댓글 삭제 실패: $e');
+    }
+  }
 }

@@ -6,17 +6,34 @@ import 'package:travel_on_final/features/auth/presentation/providers/auth_provid
 import 'package:travel_on_final/features/chat/presentation/providers/chat_provider.dart';
 
 class ChatListScreen extends StatelessWidget {
+  const ChatListScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     final authProvider = Provider.of<AuthProvider>(context);
+    final chatProvider = Provider.of<ChatProvider>(context, listen: false);
 
     if (authProvider.currentUser == null) {
       return Scaffold(
-        body: Center(child: Text('로그인이 필요합니다')),
+        appBar: AppBar(
+          backgroundColor: Colors.white,
+          scrolledUnderElevation: 0,
+          elevation: 0,
+          centerTitle: true,
+          title: const Text('채팅 목록'),
+        ),
+        body: const Center(child: Text('로그인이 필요합니다')),
       );
     }
 
     return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        scrolledUnderElevation: 0,
+        elevation: 0,
+        centerTitle: true,
+        title: const Text('채팅 목록'),
+      ),
       body: StreamBuilder(
         stream: FirebaseFirestore.instance
             .collection('chats')
@@ -24,7 +41,7 @@ class ChatListScreen extends StatelessWidget {
             .snapshots(),
         builder: (ctx, AsyncSnapshot<QuerySnapshot> chatSnapshot) {
           if (chatSnapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
+            return const Center(child: CircularProgressIndicator());
           }
 
           final chatDocs = chatSnapshot.data!.docs.where((doc) {
@@ -36,48 +53,41 @@ class ChatListScreen extends StatelessWidget {
             itemCount: chatDocs.length,
             itemBuilder: (ctx, index) {
               final chatData = chatDocs[index].data() as Map<String, dynamic>;
+              final chatId = chatDocs[index].id;
+              final otherUserId =
+                  authProvider.currentUser!.id == chatData['participants'][0]
+                      ? chatData['participants'][1]
+                      : chatData['participants'][0];
+
+              chatProvider.updateOtherUserInfo(chatId, otherUserId);
 
               return ListTile(
                 leading: CircleAvatar(
                   backgroundImage: chatData['userProfileImages'] != null &&
-                          chatData['userProfileImages'][authProvider.currentUser!.id == chatData['participants'][0]
-                              ? chatData['participants'][1]
-                              : chatData['participants'][0]] != null &&
-                          chatData['userProfileImages'][authProvider.currentUser!.id == chatData['participants'][0]
-                              ? chatData['participants'][1]
-                              : chatData['participants'][0]].isNotEmpty
-                      ? NetworkImage(chatData['userProfileImages'][authProvider.currentUser!.id == chatData['participants'][0]
-                          ? chatData['participants'][1]
-                          : chatData['participants'][0]])
-                      : AssetImage('assets/images/default_profile.png') as ImageProvider,
+                          chatData['userProfileImages'][otherUserId] != null &&
+                          chatData['userProfileImages'][otherUserId].isNotEmpty
+                      ? NetworkImage(chatData['userProfileImages'][otherUserId])
+                      : const AssetImage('assets/images/default_profile.png')
+                          as ImageProvider,
                 ),
                 title: Text(
-                  chatData['usernames'][authProvider.currentUser!.id == chatData['participants'][0]
-                          ? chatData['participants'][1]
-                          : chatData['participants'][0]]
-                      ?.substring(
+                  chatData['usernames'][otherUserId]?.substring(
                           0,
-                          chatData['usernames'][authProvider.currentUser!.id == chatData['participants'][0]
-                                      ? chatData['participants'][1]
-                                      : chatData['participants'][0]]
-                                  .length >
-                              15
-                          ? 15
-                          : chatData['usernames'][authProvider.currentUser!.id == chatData['participants'][0]
-                                  ? chatData['participants'][1]
-                                  : chatData['participants'][0]]
-                              .length) ??
+                          chatData['usernames'][otherUserId].length > 15
+                              ? 15
+                              : chatData['usernames'][otherUserId].length) ??
                       'Unknown User',
-                  style: TextStyle(fontWeight: FontWeight.bold),
+                  style: const TextStyle(fontWeight: FontWeight.bold),
                 ),
                 subtitle: Text(
-                  (chatData['lastMessage'] != null && chatData['lastMessage'].length > 65)
+                  (chatData['lastMessage'] != null &&
+                          chatData['lastMessage'].length > 65)
                       ? '${chatData['lastMessage'].substring(0, 65)}...'
                       : chatData['lastMessage'] ?? '',
                 ),
                 onTap: () {
-                  Provider.of<ChatProvider>(context, listen: false).startListeningToMessages(chatDocs[index].id);
-                  GoRouter.of(context).push('/chat/${chatDocs[index].id}');
+                  chatProvider.startListeningToMessages(chatId);
+                  GoRouter.of(context).push('/chat/$chatId');
                 },
               );
             },

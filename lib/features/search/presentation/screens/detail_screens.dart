@@ -7,7 +7,7 @@ import '../widgets/region_filter.dart';
 import '../providers/travel_provider.dart';
 
 class DetailScreen extends StatefulWidget {
-  const DetailScreen({Key? key}) : super(key: key);
+  const DetailScreen({super.key});
 
   @override
   State<DetailScreen> createState() => _DetailScreenState();
@@ -102,16 +102,13 @@ class _DetailScreenState extends State<DetailScreen> {
 
   // AppBar 타이틀 위젯
   Widget _buildTitle() {
-    return _isSearching
-        ? _buildSearchField()
-        : const Text('여행 패키지');
+    return _isSearching ? _buildSearchField() : const Text('여행 패키지');
   }
 
   // AppBar 액션 버튼들
   List<Widget> _buildActions() {
     if (_isSearching) {
-      return [
-      ];
+      return [];
     }
 
     return [
@@ -189,15 +186,18 @@ class _DetailScreenState extends State<DetailScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Colors.white,
+        scrolledUnderElevation: 0,
+        elevation: 0,
+        centerTitle: true,
         leading: _isSearching
             ? IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: _stopSearch,
-        )
+                icon: const Icon(Icons.arrow_back),
+                onPressed: _stopSearch,
+              )
             : null,
         title: _buildTitle(),
         actions: _buildActions(),
-        elevation: 1,
       ),
       body: Column(
         children: [
