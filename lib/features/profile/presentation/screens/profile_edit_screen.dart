@@ -199,7 +199,7 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
                 ],
               ),
             ),
-            SizedBox(height: 24), // Spacer 대신 여백 추가
+            SizedBox(height: 24),
             ElevatedButton(
               onPressed: _saveProfile,
               child: Text('저장'),
