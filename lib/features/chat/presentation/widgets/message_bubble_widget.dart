@@ -5,12 +5,12 @@ import 'package:travel_on_final/features/chat/domain/entities/message_entity.dar
 class MessageBubble extends StatelessWidget {
   final MessageEntity message;
   final bool isMe;
-  final String otherUserName; // 상대방 이름 추가
+  final String otherUserName;
 
   const MessageBubble({
     required this.message,
     required this.isMe,
-    required this.otherUserName, // 상대방 이름 추가
+    required this.otherUserName,
   });
 
   @override
