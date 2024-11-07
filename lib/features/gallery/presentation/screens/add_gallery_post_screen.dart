@@ -74,12 +74,15 @@ class _AddGalleryPostScreenState extends State<AddGalleryPostScreen> {
           TextButton(
             onPressed: _isLoading ? null : _uploadPost,
             child: _isLoading
-                ? const SizedBox(
-                    width: 20,
-                    height: 20,
-                    child: CircularProgressIndicator(strokeWidth: 2),
+                ? SizedBox(
+                    width: 20.w,
+                    height: 20.h,
+                    child: const CircularProgressIndicator(strokeWidth: 2),
                   )
-                : const Text('공유'),
+                : const Text(
+                    '공유',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
           ),
         ],
       ),
@@ -93,12 +96,25 @@ class _AddGalleryPostScreenState extends State<AddGalleryPostScreen> {
               child: Container(
                 height: 200.h,
                 decoration: BoxDecoration(
-                  color: Colors.grey[200],
+                  border: Border.all(color: const Color(0XFF2196F3)),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: _image != null
-                    ? Image.file(_image!, fit: BoxFit.cover)
-                    : const Icon(Icons.add_photo_alternate, size: 50),
+                    ? ClipRRect(
+                        borderRadius: BorderRadius.circular(8),
+                        child: Image.file(
+                          _image!,
+                          fit: BoxFit.cover,
+                          width: double.infinity,
+                        ),
+                      )
+                    : const Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.add_photo_alternate, size: 50),
+                          Text('이미지 추가'),
+                        ],
+                      ),
               ),
             ),
             SizedBox(height: 16.h),
@@ -106,6 +122,13 @@ class _AddGalleryPostScreenState extends State<AddGalleryPostScreen> {
               controller: _locationController,
               decoration: const InputDecoration(
                 labelText: '위치',
+                hintText: '예: 서울 남산타워',
+                border: OutlineInputBorder(),
+                enabledBorder: OutlineInputBorder(
+                  borderSide: BorderSide(
+                    color: Color(0XFF2196F3),
+                  ),
+                ),
                 prefixIcon: Icon(Icons.location_on),
               ),
               validator: (value) =>
@@ -116,9 +139,16 @@ class _AddGalleryPostScreenState extends State<AddGalleryPostScreen> {
               controller: _descriptionController,
               decoration: const InputDecoration(
                 labelText: '설명',
+                hintText: '여행 경험을 공유해주세요',
+                border: OutlineInputBorder(),
+                enabledBorder: OutlineInputBorder(
+                  borderSide: BorderSide(
+                    color: Color(0XFF2196F3),
+                  ),
+                ),
                 prefixIcon: Icon(Icons.description),
               ),
-              maxLines: 3,
+              maxLines: 5,
               validator: (value) =>
                   value?.isEmpty ?? true ? '설명을 입력해주세요' : null,
             ),
