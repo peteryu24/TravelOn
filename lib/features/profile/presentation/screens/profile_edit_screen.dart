@@ -87,7 +87,7 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
                 radius: 40,
                 backgroundImage: _selectedImageFile != null
                     ? FileImage(_selectedImageFile!)
-                    : _profileImageUrl != null
+                    : (_profileImageUrl != null && _profileImageUrl!.isNotEmpty)
                         ? NetworkImage(_profileImageUrl!)
                         : AssetImage('assets/images/default_profile.png') as ImageProvider,
               ),

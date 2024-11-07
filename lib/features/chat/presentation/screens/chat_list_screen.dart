@@ -9,6 +9,7 @@ class ChatListScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final authProvider = Provider.of<AuthProvider>(context);
+    final chatProvider = Provider.of<ChatProvider>(context, listen: false);
 
     if (authProvider.currentUser == null) {
       return Scaffold(
@@ -37,37 +38,27 @@ class ChatListScreen extends StatelessWidget {
             itemCount: chatDocs.length,
             itemBuilder: (ctx, index) {
               final chatData = chatDocs[index].data() as Map<String, dynamic>;
+              final chatId = chatDocs[index].id;
+              final otherUserId = authProvider.currentUser!.id == chatData['participants'][0]
+                  ? chatData['participants'][1]
+                  : chatData['participants'][0];
+
+              chatProvider.updateOtherUserInfo(chatId, otherUserId);
 
               return ListTile(
                 leading: CircleAvatar(
                   backgroundImage: chatData['userProfileImages'] != null &&
-                          chatData['userProfileImages'][authProvider.currentUser!.id == chatData['participants'][0]
-                              ? chatData['participants'][1]
-                              : chatData['participants'][0]] != null &&
-                          chatData['userProfileImages'][authProvider.currentUser!.id == chatData['participants'][0]
-                              ? chatData['participants'][1]
-                              : chatData['participants'][0]].isNotEmpty
-                      ? NetworkImage(chatData['userProfileImages'][authProvider.currentUser!.id == chatData['participants'][0]
-                          ? chatData['participants'][1]
-                          : chatData['participants'][0]])
+                          chatData['userProfileImages'][otherUserId] != null &&
+                          chatData['userProfileImages'][otherUserId].isNotEmpty
+                      ? NetworkImage(chatData['userProfileImages'][otherUserId])
                       : AssetImage('assets/images/default_profile.png') as ImageProvider,
                 ),
                 title: Text(
-                  chatData['usernames'][authProvider.currentUser!.id == chatData['participants'][0]
-                          ? chatData['participants'][1]
-                          : chatData['participants'][0]]
-                      ?.substring(
+                  chatData['usernames'][otherUserId]?.substring(
                           0,
-                          chatData['usernames'][authProvider.currentUser!.id == chatData['participants'][0]
-                                      ? chatData['participants'][1]
-                                      : chatData['participants'][0]]
-                                  .length >
-                              15
-                          ? 15
-                          : chatData['usernames'][authProvider.currentUser!.id == chatData['participants'][0]
-                                  ? chatData['participants'][1]
-                                  : chatData['participants'][0]]
-                              .length) ??
+                          chatData['usernames'][otherUserId].length > 15
+                              ? 15
+                              : chatData['usernames'][otherUserId].length) ??
                       'Unknown User',
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
@@ -77,8 +68,8 @@ class ChatListScreen extends StatelessWidget {
                       : chatData['lastMessage'] ?? '',
                 ),
                 onTap: () {
-                  Provider.of<ChatProvider>(context, listen: false).startListeningToMessages(chatDocs[index].id);
-                  GoRouter.of(context).push('/chat/${chatDocs[index].id}');
+                  chatProvider.startListeningToMessages(chatId);
+                  GoRouter.of(context).push('/chat/$chatId');
                 },
               );
             },
