@@ -70,10 +70,10 @@ class GalleryProvider extends ChangeNotifier {
     String? userProfileUrl,
     required String content,
   }) async {
-    try {
-      // 낙관적 업데이트를 위해 현재 상태 유지
-      final currentComments = List<Comment>.from(_postComments[postId] ?? []);
+    // 낙관적 업데이트를 위해 현재 상태 유지
+    final currentComments = List<Comment>.from(_postComments[postId] ?? []);
 
+    try {
       await _repository.addComment(
         postId: postId,
         userId: userId,
@@ -83,7 +83,7 @@ class GalleryProvider extends ChangeNotifier {
       );
     } catch (e) {
       // 에러 발생 시 원래 상태로 복구
-      _postComments[postId] = List<Comment>.from(_postComments[postId] ?? []);
+      _postComments[postId] = currentComments;
       notifyListeners();
       rethrow;
     }
@@ -167,6 +167,24 @@ class GalleryProvider extends ChangeNotifier {
     } finally {
       _isLoading = false;
       notifyListeners();
+    }
+  }
+
+  Future<void> deleteComment(String postId, String commentId) async {
+    // 낙관적 업데이트를 위해 현재 상태 유지
+    final currentComments = List<Comment>.from(_postComments[postId] ?? []);
+
+    try {
+      // 댓글 삭제 시도
+      _postComments[postId]?.removeWhere((comment) => comment.id == commentId);
+      notifyListeners();
+
+      await _repository.deleteComment(postId, commentId);
+    } catch (e) {
+      // 에러 발생 시 원래 상태로 복구
+      _postComments[postId] = currentComments;
+      notifyListeners();
+      rethrow;
     }
   }
 

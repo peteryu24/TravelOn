@@ -246,4 +246,23 @@ class GalleryRepository {
     // Delete post document from Firestore
     await _firestore.collection('gallery_posts').doc(postId).delete();
   }
+
+  Future<void> deleteComment(String postId, String commentId) async {
+    try {
+      // 댓글 문��� 삭제
+      await _firestore
+          .collection('gallery_posts')
+          .doc(postId)
+          .collection('comments')
+          .doc(commentId)
+          .delete();
+
+      // 게시글의 comments 배열에서 해당 댓글 ID 제거
+      await _firestore.collection('gallery_posts').doc(postId).update({
+        'comments': FieldValue.arrayRemove([commentId]),
+      });
+    } catch (e) {
+      throw Exception('댓글 삭제 실패: $e');
+    }
+  }
 }
