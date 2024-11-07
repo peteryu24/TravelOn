@@ -1,51 +1,42 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:travel_on_final/features/review/domain/entities/review.dart';
 import 'package:travel_on_final/features/review/domain/repositories/review_repository.dart';
+import 'package:travel_on_final/features/search/presentation/providers/travel_provider.dart';
 
 class ReviewRepositoryImpl implements ReviewRepository {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final TravelProvider _travelProvider;  // 추가
+
+  ReviewRepositoryImpl(this._travelProvider);  // 생성자 추가
 
   @override
-  Future<List<Review>> getPackageReviews(String packageId) async {
+  Future<List<Review>> getPackageReviews(String packageId, {int? limit, DocumentSnapshot? lastDocument}) async {
     try {
-      print('Fetching reviews for package: $packageId'); // 디버깅용
-
-      final snapshot = await _firestore
+      Query query = _firestore
           .collection('reviews')
           .where('packageId', isEqualTo: packageId)
-          .orderBy('createdAt', descending: true)
-          .get();
+          .orderBy('createdAt', descending: true);
 
-      print('Found ${snapshot.docs.length} reviews'); // 디버깅용
-
-      final reviews = snapshot.docs.map((doc) {
-        final rating = (doc['rating'] as num).toDouble();
-        print('Review rating: $rating'); // 디버깅용
-        return Review(
-          id: doc.id,
-          packageId: doc['packageId'],
-          userId: doc['userId'],
-          userName: doc['userName'],
-          rating: rating,
-          content: doc['content'],
-          createdAt: (doc['createdAt'] as Timestamp).toDate(),
-          reservationId: doc['reservationId'],
-        );
-      }).toList();
-
-      // 평균 별점 계산 및 업데이트
-      if (reviews.isNotEmpty) {
-        double totalRating = reviews.fold(0.0, (sum, review) => sum + review.rating);
-        double averageRating = totalRating / reviews.length;
-        print('Average rating: $averageRating'); // 디버깅용
-
-        await _firestore.collection('packages').doc(packageId).update({
-          'averageRating': double.parse(averageRating.toStringAsFixed(1)),
-          'reviewCount': reviews.length,
-        });
+      if (limit != null) {
+        query = query.limit(limit);
       }
 
-      return reviews;
+      if (lastDocument != null) {
+        query = query.startAfterDocument(lastDocument);
+      }
+
+      final snapshot = await query.get();
+
+      return snapshot.docs.map((doc) => Review(
+        id: doc.id,
+        packageId: doc['packageId'],
+        userId: doc['userId'],
+        userName: doc['userName'],
+        rating: (doc['rating'] as num).toDouble(),
+        content: doc['content'],
+        createdAt: (doc['createdAt'] as Timestamp).toDate(),
+        reservationId: doc['reservationId'],
+      )).toList();
     } catch (e) {
       print('Error getting package reviews: $e');
       rethrow;
@@ -115,8 +106,10 @@ class ReviewRepositoryImpl implements ReviewRepository {
       // 패키지 문서 업데이트
       await packageRef.update({
         'reviewCount': reviewCount,
-        'averageRating': double.parse(averageRating.toStringAsFixed(1)), // 소수점 첫째자리까지만
+        'averageRating': double.parse(averageRating.toStringAsFixed(1)),
       });
+
+      _travelProvider.refreshPackage(review.packageId);
 
     } catch (e) {
       print('Error adding review: $e');

@@ -94,7 +94,11 @@ class MyApp extends StatelessWidget {
           create: (_) => ReservationProvider(FirebaseFirestore.instance),
         ),
         ChangeNotifierProvider(
-          create: (_) => ReviewProvider(ReviewRepositoryImpl()),
+          create: (context) => ReviewProvider(
+            ReviewRepositoryImpl(
+              context.read<TravelProvider>(),  // TravelProvider 주입
+            ),
+          ),
         ),
         ChangeNotifierProvider(
           create: (_) => HomeProvider(

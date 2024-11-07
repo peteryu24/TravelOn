@@ -28,20 +28,31 @@ class _ReviewDetailScreenState extends State<ReviewDetailScreen> {
         title: Text(widget.package.title),
       ),
       body: Consumer<ReviewProvider>(
-        builder: (context, reviewProvider, _) {
-          final reviews = reviewProvider.reviews;
-          final reviewCount = reviews.length;
-
-          double averageRating = 0.0;
-          if (reviewCount > 0) {
-            double totalRating = reviews.fold(
-                0.0, (sum, review) => sum + review.rating);
-            averageRating = totalRating / reviewCount;
+        builder: (context, provider, _) {
+          if (provider.isLoading && provider.reviews.isEmpty) {
+            return const Center(child: CircularProgressIndicator());
           }
+
+          if (provider.error != null) {
+            return Center(child: Text('Error: ${provider.error}'));
+          }
+
+          if (provider.reviews.isEmpty) {
+            return const Center(child: Text('아직 작성된 리뷰가 없습니다'));
+          }
+
+          // totalReviewCount 사용 (수정된 부분)
+          final totalReviewCount = provider.totalReviewCount;
+
+          // 평균 별점 계산
+          double totalRating = 0;
+          for (var review in provider.reviews) {
+            totalRating += review.rating;
+          }
+          final averageRating = provider.reviews.isEmpty ? 0.0 : totalRating / provider.reviews.length;
 
           return Column(
             children: [
-              // 상단 통계 부분 (고정)
               Container(
                 padding: EdgeInsets.all(16.w),
                 color: Colors.grey[100],
@@ -59,7 +70,7 @@ class _ReviewDetailScreenState extends State<ReviewDetailScreen> {
                             ),
                             SizedBox(width: 4.w),
                             Text(
-                              averageRating.toStringAsFixed(1),
+                              provider.totalAverageRating.toStringAsFixed(1),  // 여기를 수정
                               style: TextStyle(
                                 fontSize: 24.sp,
                                 fontWeight: FontWeight.bold,
@@ -69,7 +80,7 @@ class _ReviewDetailScreenState extends State<ReviewDetailScreen> {
                         ),
                         SizedBox(height: 4.h),
                         Text(
-                          '리뷰 $reviewCount개',
+                          '리뷰 ${provider.totalReviewCount}개',
                           style: TextStyle(
                             color: Colors.grey[600],
                             fontSize: 14.sp,
@@ -81,15 +92,14 @@ class _ReviewDetailScreenState extends State<ReviewDetailScreen> {
                 ),
               ),
 
-              // 리뷰 작성 버튼 (고정)
+              // ReviewDetailScreen.dart
               Consumer<AuthProvider>(
                 builder: (context, authProvider, _) {
                   final user = authProvider.currentUser;
                   if (user == null) return const SizedBox.shrink();
 
                   return FutureBuilder<bool>(
-                    future: reviewProvider.canUserAddReview(
-                        user.id, widget.package.id),
+                    future: provider.canUserAddReview(user.id, widget.package.id),
                     builder: (context, snapshot) {
                       if (!snapshot.hasData || !snapshot.data!) {
                         return const SizedBox.shrink();
@@ -98,25 +108,31 @@ class _ReviewDetailScreenState extends State<ReviewDetailScreen> {
                       return Padding(
                         padding: EdgeInsets.all(16.w),
                         child: ElevatedButton(
-                          onPressed: () {
-                            Navigator.push(
+                          onPressed: () async {  // async 추가
+                            final reviewProvider = context.read<ReviewProvider>();  // 미리 provider 가져오기
+
+                            await Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (_) =>
-                                    AddReviewScreen(
-                                      packageId: widget.package.id,
-                                      packageTitle: widget.package.title,
-                                    ),
+                                builder: (_) => AddReviewScreen(
+                                  packageId: widget.package.id,
+                                  packageTitle: widget.package.title,
+                                ),
                               ),
-                            ).then((_) {
-                              reviewProvider.loadReviews(widget.package.id);
-                            });
+                            );
+
+                            // mounted 체크 후 데이터 새로고침
+                            if (mounted) {
+                              await reviewProvider.getTotalReviewStats(widget.package.id);
+                              if (mounted) {
+                                await reviewProvider.loadInitialReviews(widget.package.id);
+                              }
+                            }
                           },
                           style: ElevatedButton.styleFrom(
                             minimumSize: Size(double.infinity, 48.h),
                           ),
-                          child: Text(
-                              '리뷰 작성하기', style: TextStyle(fontSize: 16.sp)),
+                          child: Text('리뷰 작성하기', style: TextStyle(fontSize: 16.sp)),
                         ),
                       );
                     },
@@ -124,15 +140,21 @@ class _ReviewDetailScreenState extends State<ReviewDetailScreen> {
                 },
               ),
 
-              // 리뷰 목록 (스크롤 가능)
               Expanded(
-                child: reviews.isEmpty
-                    ? Center(child: Text('아직 작성된 리뷰가 없습니다'))
-                    : SingleChildScrollView(
-                  child: Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 16.w),
-                    child: ReviewList(packageId: widget.package.id),
-                  ),
+                child: ListView(
+                  children: [
+                    ...provider.reviews.map((review) => ReviewCard(review: review)),
+                    if (provider.hasMore)
+                      Padding(
+                        padding: EdgeInsets.all(16.w),
+                        child: ElevatedButton(
+                          onPressed: provider.isLoading
+                              ? null
+                              : () => provider.loadMoreReviews(widget.package.id),
+                          child: Text('더보기'),
+                        ),
+                      ),
+                  ],
                 ),
               ),
             ],
@@ -145,10 +167,13 @@ class _ReviewDetailScreenState extends State<ReviewDetailScreen> {
   @override
   void initState() {
     super.initState();
-    // initState에서 직접 호출하는 대신 마이크로태스크로 예약
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
-        context.read<ReviewProvider>().loadReviews(widget.package.id);
+        final reviewProvider = context.read<ReviewProvider>();
+        // 전체 통계와 초기 리뷰를 함께 로드
+        reviewProvider.getTotalReviewStats(widget.package.id).then((_) {
+          reviewProvider.loadInitialReviews(widget.package.id);
+        });
       }
     });
   }
