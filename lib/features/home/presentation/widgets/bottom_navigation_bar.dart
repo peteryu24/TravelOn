@@ -15,6 +15,13 @@ class CustomBottomNavigationBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return BottomNavigationBar(
       type: BottomNavigationBarType.fixed,
+      selectedLabelStyle: const TextStyle(
+        fontSize: 12,
+        fontWeight: FontWeight.w400,
+      ),
+      unselectedLabelStyle: const TextStyle(
+        fontSize: 12,
+      ),
       items: const <BottomNavigationBarItem>[
         BottomNavigationBarItem(
           icon: Icon(CupertinoIcons.house_alt_fill),
@@ -22,7 +29,7 @@ class CustomBottomNavigationBar extends StatelessWidget {
         ),
         BottomNavigationBarItem(
           icon: Icon(CupertinoIcons.compass_fill),
-          label: '여행 상품',
+          label: '여행상품',
         ),
         BottomNavigationBarItem(
           icon: Icon(CupertinoIcons.chat_bubble_2_fill),
