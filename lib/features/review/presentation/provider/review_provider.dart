@@ -41,11 +41,14 @@ class ReviewProvider extends ChangeNotifier {
           totalRating += (doc.data()['rating'] as num).toDouble();
         }
         _totalAverageRating = totalRating / _totalReviewCount;
+      } else {
+        _totalAverageRating = 0.0;
       }
 
       notifyListeners();
     } catch (e) {
       print('Error getting total review stats: $e');
+      rethrow;
     }
   }
 
@@ -169,10 +172,10 @@ class ReviewProvider extends ChangeNotifier {
   Future<void> loadPreviewReviews(String packageId) async {
     try {
       _isLoading = true;
+      resetReviewState();
       notifyListeners();
 
-      // 전체 리뷰 개수 먼저 가져오기
-      await getTotalReviewCount(packageId);
+      await getTotalReviewStats(packageId);
 
       final snapshot = await _firestore
           .collection('reviews')
@@ -191,11 +194,18 @@ class ReviewProvider extends ChangeNotifier {
         createdAt: (doc['createdAt'] as Timestamp).toDate(),
         reservationId: doc['reservationId'],
       )).toList();
-    } catch (e) {
-      _error = e.toString();
+
     } finally {
       _isLoading = false;
       notifyListeners();
     }
+  }
+
+  void resetReviewState() {
+    _reviews = [];
+    _totalReviewCount = 0;
+    _totalAverageRating = 0.0;
+    _error = null;
+    notifyListeners();
   }
 }

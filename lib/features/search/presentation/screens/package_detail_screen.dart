@@ -30,14 +30,15 @@ class _PackageDetailScreenState extends State<PackageDetailScreen> {
   Future<int>? _todayParticipants;
   bool _isAvailable = true;
   bool _showReviews = false;
-  late final int _minParticipants;
-  late final int _maxParticipants;
+  int _minParticipants = 0;  // 기본값 설정
+  int _maxParticipants = 0;  // 기본값 설정
   String? _currentUserId;
 
 
   @override
   void initState() {
     super.initState();
+    // initState에서 값 설정
     _minParticipants = widget.package.minParticipants;
     _maxParticipants = widget.package.maxParticipants;
     _loadTodayParticipants();
@@ -228,7 +229,9 @@ class _PackageDetailScreenState extends State<PackageDetailScreen> {
                             SizedBox(width: 8.w),
                             const Icon(Icons.group, color: Colors.black),
                             Text(
-                              '예약 가능 인원: $_minParticipants명 ~ $_maxParticipants명',
+                              widget.package.minParticipants != null && widget.package.maxParticipants != null
+                                  ? '예약 가능 인원: ${widget.package.minParticipants}명 ~ ${widget.package.maxParticipants}명'
+                                  : '예약 가능 인원: 정보 없음',
                               style: TextStyle(
                                 fontSize: 16.sp,
                                 color: _isAvailable ? Colors.black : Colors.red,

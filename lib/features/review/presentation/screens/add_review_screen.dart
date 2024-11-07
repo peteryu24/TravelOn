@@ -102,9 +102,13 @@ class _AddReviewScreenState extends State<AddReviewScreen> {
                       userName: user.name,
                       rating: _rating,
                       content: _contentController.text.trim(),
-                    );  // context 파라미터 제거
+                    );
 
                     if (mounted) {
+                      // 리뷰 작성 완료 후 즉시 통계 업데이트
+                      final reviewProvider = context.read<ReviewProvider>();
+                      await reviewProvider.getTotalReviewStats(widget.packageId);
+
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(content: Text('리뷰가 등록되었습니다')),
                       );

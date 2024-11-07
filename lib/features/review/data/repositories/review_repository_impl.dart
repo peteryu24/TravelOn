@@ -1,9 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:travel_on_final/features/review/domain/entities/review.dart';
 import 'package:travel_on_final/features/review/domain/repositories/review_repository.dart';
+import 'package:travel_on_final/features/search/presentation/providers/travel_provider.dart';
 
 class ReviewRepositoryImpl implements ReviewRepository {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final TravelProvider _travelProvider;  // 추가
+
+  ReviewRepositoryImpl(this._travelProvider);  // 생성자 추가
 
   @override
   Future<List<Review>> getPackageReviews(String packageId, {int? limit, DocumentSnapshot? lastDocument}) async {
@@ -102,8 +106,10 @@ class ReviewRepositoryImpl implements ReviewRepository {
       // 패키지 문서 업데이트
       await packageRef.update({
         'reviewCount': reviewCount,
-        'averageRating': double.parse(averageRating.toStringAsFixed(1)), // 소수점 첫째자리까지만
+        'averageRating': double.parse(averageRating.toStringAsFixed(1)),
       });
+
+      _travelProvider.refreshPackage(review.packageId);
 
     } catch (e) {
       print('Error adding review: $e');

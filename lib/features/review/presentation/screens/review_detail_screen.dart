@@ -92,6 +92,7 @@ class _ReviewDetailScreenState extends State<ReviewDetailScreen> {
                 ),
               ),
 
+              // ReviewDetailScreen.dart
               Consumer<AuthProvider>(
                 builder: (context, authProvider, _) {
                   final user = authProvider.currentUser;
@@ -107,8 +108,10 @@ class _ReviewDetailScreenState extends State<ReviewDetailScreen> {
                       return Padding(
                         padding: EdgeInsets.all(16.w),
                         child: ElevatedButton(
-                          onPressed: () {
-                            Navigator.push(
+                          onPressed: () async {  // async 추가
+                            final reviewProvider = context.read<ReviewProvider>();  // 미리 provider 가져오기
+
+                            await Navigator.push(
                               context,
                               MaterialPageRoute(
                                 builder: (_) => AddReviewScreen(
@@ -116,9 +119,15 @@ class _ReviewDetailScreenState extends State<ReviewDetailScreen> {
                                   packageTitle: widget.package.title,
                                 ),
                               ),
-                            ).then((_) {
-                              provider.loadInitialReviews(widget.package.id);
-                            });
+                            );
+
+                            // mounted 체크 후 데이터 새로고침
+                            if (mounted) {
+                              await reviewProvider.getTotalReviewStats(widget.package.id);
+                              if (mounted) {
+                                await reviewProvider.loadInitialReviews(widget.package.id);
+                              }
+                            }
                           },
                           style: ElevatedButton.styleFrom(
                             minimumSize: Size(double.infinity, 48.h),
