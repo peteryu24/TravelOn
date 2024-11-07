@@ -117,4 +117,15 @@ class ChatProvider extends ChangeNotifier {
     }
     return 'Unknown User';
   }
+
+  // 상대방 정보 업데이트 메서드
+  Future<void> updateOtherUserInfo(String chatId, String otherUserId) async {
+    final otherUserName = await _getOtherUserName(otherUserId);
+    final otherUserProfileImage = await _getOtherUserProfileImage(otherUserId);
+
+    await _firestore.collection('chats').doc(chatId).update({
+      'usernames.$otherUserId': otherUserName,
+      'userProfileImages.$otherUserId': otherUserProfileImage,
+    });
+  }
 }
