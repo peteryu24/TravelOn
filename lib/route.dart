@@ -31,6 +31,7 @@ import 'package:travel_on_final/features/profile/presentation/screens/reservatio
 // gallery
 import 'package:travel_on_final/features/gallery/presentation/screens/travel_gallery_screen.dart';
 import 'package:travel_on_final/features/gallery/presentation/screens/add_gallery_post_screen.dart';
+import 'package:travel_on_final/features/gallery/presentation/screens/scrapped_posts_screen.dart';
 // review
 import 'package:travel_on_final/features/review/presentation/screens/add_review_screen.dart';
 
@@ -148,6 +149,10 @@ final goRouter = GoRouter(
     GoRoute(
       path: '/add-gallery-post',
       builder: (context, state) => const AddGalleryPostScreen(),
+    ),
+    GoRoute(
+      path: '/scrapped-posts',
+      builder: (context, state) => const ScrappedPostsScreen(),
     ),
   ],
 );

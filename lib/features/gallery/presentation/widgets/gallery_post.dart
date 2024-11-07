@@ -6,6 +6,7 @@ import 'package:travel_on_final/features/auth/presentation/providers/auth_provid
 import '../providers/gallery_provider.dart';
 import 'comment_bottom_sheet.dart';
 import '../../domain/entities/comment_entity.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class GalleryPost extends StatefulWidget {
   final String imgUrl;
@@ -36,17 +37,18 @@ class GalleryPost extends StatefulWidget {
 class _GalleryPostState extends State<GalleryPost> {
   late bool isLiked;
   late int likeCount;
+  bool isScrapped = false;
 
   @override
   void initState() {
     super.initState();
     _updateLikeStatus();
+    _updateScrapStatus();
   }
 
   @override
   void didUpdateWidget(GalleryPost oldWidget) {
     super.didUpdateWidget(oldWidget);
-    // 위젯이 업데이트될 때마다 좋아요 상태 갱신
     if (oldWidget.likedBy != widget.likedBy ||
         oldWidget.likeCount != widget.likeCount) {
       _updateLikeStatus();
@@ -59,10 +61,25 @@ class _GalleryPostState extends State<GalleryPost> {
     likeCount = widget.likeCount;
   }
 
+  void _updateScrapStatus() async {
+    final user = context.read<AuthProvider>().currentUser;
+    if (user != null) {
+      final userDoc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.id)
+          .get();
+      final List<String> scrappedPosts =
+          List<String>.from(userDoc.data()?['scrappedPosts'] ?? []);
+
+      setState(() {
+        isScrapped = scrappedPosts.contains(widget.postId);
+      });
+    }
+  }
+
   Future<void> _handleLikePress() async {
     final user = context.read<AuthProvider>().currentUser;
     if (user != null) {
-      // 즉각적인 UI 업데이트를 위해 상태 먼저 변경
       setState(() {
         isLiked = !isLiked;
         likeCount = isLiked ? likeCount + 1 : likeCount - 1;
@@ -74,7 +91,6 @@ class _GalleryPostState extends State<GalleryPost> {
               user.id,
             );
       } catch (e) {
-        // 에러 발생 시 상태 롤백
         setState(() {
           isLiked = !isLiked;
           likeCount = isLiked ? likeCount + 1 : likeCount - 1;
@@ -101,6 +117,40 @@ class _GalleryPostState extends State<GalleryPost> {
         comments: widget.comments,
       ),
     );
+  }
+
+  Future<void> _toggleScrap() async {
+    final user = context.read<AuthProvider>().currentUser;
+    if (user == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('로그인이 필요합니다')),
+      );
+      return;
+    }
+
+    setState(() {
+      isScrapped = !isScrapped;
+    });
+
+    try {
+      await context.read<GalleryProvider>().toggleScrap(widget.postId, user.id);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(isScrapped ? '스크랩이 완료되었습니다' : '스크랩이 해제되었습니다'),
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          isScrapped = !isScrapped;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('스크랩 처리 중 오류가 발생했습니다')),
+        );
+      }
+    }
   }
 
   @override
@@ -162,8 +212,12 @@ class _GalleryPostState extends State<GalleryPost> {
             ),
             const Spacer(),
             IconButton(
-              onPressed: () {},
-              icon: const Icon(CupertinoIcons.bookmark),
+              onPressed: _toggleScrap,
+              icon: Icon(
+                isScrapped
+                    ? CupertinoIcons.bookmark_fill
+                    : CupertinoIcons.bookmark,
+              ),
             ),
           ],
         ),

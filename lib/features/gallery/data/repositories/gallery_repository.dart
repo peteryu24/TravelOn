@@ -140,4 +140,55 @@ class GalleryRepository {
       return snapshot.docs.map((doc) => Comment.fromJson(doc.data())).toList();
     });
   }
+
+  Future<void> toggleScrap(String postId, String userId) async {
+    try {
+      final userRef = _firestore.collection('users').doc(userId);
+      final postRef = _firestore.collection('gallery_posts').doc(postId);
+
+      await _firestore.runTransaction((transaction) async {
+        final userDoc = await transaction.get(userRef);
+        final postDoc = await transaction.get(postRef);
+
+        List<String> scrappedPosts =
+            List<String>.from(userDoc.data()?['scrappedPosts'] ?? []);
+        List<String> scrappedBy =
+            List<String>.from(postDoc.data()?['scrappedBy'] ?? []);
+
+        if (scrappedPosts.contains(postId)) {
+          scrappedPosts.remove(postId);
+          scrappedBy.remove(userId);
+        } else {
+          scrappedPosts.add(postId);
+          scrappedBy.add(userId);
+        }
+
+        transaction.update(userRef, {'scrappedPosts': scrappedPosts});
+        transaction.update(postRef, {'scrappedBy': scrappedBy});
+      });
+    } catch (e) {
+      throw Exception('스크랩 처리 실패: $e');
+    }
+  }
+
+  Future<List<GalleryPost>> getScrappedPosts(String userId) async {
+    try {
+      final userDoc = await _firestore.collection('users').doc(userId).get();
+      final List<String> scrappedPostIds =
+          List<String>.from(userDoc.data()?['scrappedPosts'] ?? []);
+
+      if (scrappedPostIds.isEmpty) return [];
+
+      final postsSnapshot = await _firestore
+          .collection('gallery_posts')
+          .where(FieldPath.documentId, whereIn: scrappedPostIds)
+          .get();
+
+      return postsSnapshot.docs
+          .map((doc) => GalleryPost.fromJson(doc.data()))
+          .toList();
+    } catch (e) {
+      throw Exception('스크랩된 게시글 로드 실패: $e');
+    }
+  }
 }

@@ -12,6 +12,7 @@ class GalleryProvider extends ChangeNotifier {
   Stream<List<GalleryPost>>? _postsStream;
   StreamSubscription<List<GalleryPost>>? _subscription;
   final Map<String, List<Comment>> _postComments = {};
+  List<GalleryPost> _scrappedPosts = [];
 
   GalleryProvider(this._repository) {
     _initStream();
@@ -27,6 +28,7 @@ class GalleryProvider extends ChangeNotifier {
 
   List<GalleryPost> get posts => _posts;
   bool get isLoading => _isLoading;
+  List<GalleryPost> get scrappedPosts => _scrappedPosts;
 
   // 포스트 업로드
   Future<void> uploadPost({
@@ -98,6 +100,27 @@ class GalleryProvider extends ChangeNotifier {
       _postComments[postId] = comments;
       notifyListeners();
     });
+  }
+
+  // 스크랩 토글
+  Future<void> toggleScrap(String postId, String userId) async {
+    try {
+      await _repository.toggleScrap(postId, userId);
+      // 스크랩 토글 후 즉시 스크랩된 게시글 목록 새로고침
+      await loadScrappedPosts(userId);
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  // 스크랩된 게시글 로드
+  Future<void> loadScrappedPosts(String userId) async {
+    try {
+      _scrappedPosts = await _repository.getScrappedPosts(userId);
+      notifyListeners();
+    } catch (e) {
+      rethrow;
+    }
   }
 
   @override

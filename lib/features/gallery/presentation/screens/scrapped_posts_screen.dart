@@ -1,40 +1,48 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import '../widgets/gallery_post.dart';
-import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../providers/gallery_provider.dart';
-import '../../domain/entities/comment_entity.dart';
+import '../../../auth/presentation/providers/auth_provider.dart';
+import '../widgets/gallery_post.dart';
 
-class TravelGalleryScreen extends StatelessWidget {
-  const TravelGalleryScreen({super.key});
+class ScrappedPostsScreen extends StatefulWidget {
+  const ScrappedPostsScreen({super.key});
+
+  @override
+  State<ScrappedPostsScreen> createState() => _ScrappedPostsScreenState();
+}
+
+class _ScrappedPostsScreenState extends State<ScrappedPostsScreen> {
+  @override
+  void initState() {
+    super.initState();
+    _loadScrappedPosts();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _loadScrappedPosts();
+  }
+
+  Future<void> _loadScrappedPosts() async {
+    final userId = context.read<AuthProvider>().currentUser?.id;
+    if (userId != null) {
+      await context.read<GalleryProvider>().loadScrappedPosts(userId);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.white,
-        scrolledUnderElevation: 0,
-        elevation: 0,
-        centerTitle: true,
         title: Text(
-          '여행갤러리',
+          '스크랩한 게시글',
           style: TextStyle(
             fontSize: 20.sp,
             fontWeight: FontWeight.bold,
           ),
         ),
-        actions: [
-          IconButton(
-            onPressed: () => context.push('/scrapped-posts'),
-            icon: const Icon(Icons.bookmark),
-          ),
-          IconButton(
-            onPressed: () => context.push('/add-gallery-post'),
-            icon: const Icon(CupertinoIcons.plus_circle),
-          ),
-        ],
       ),
       body: Consumer<GalleryProvider>(
         builder: (context, provider, child) {
@@ -42,15 +50,18 @@ class TravelGalleryScreen extends StatelessWidget {
             return const Center(child: CircularProgressIndicator());
           }
 
-          final posts = provider.posts;
-          if (posts.isEmpty) {
-            return const Center(child: Text('아직 게시물이 없습니다'));
+          final scrappedPosts = provider.scrappedPosts;
+
+          if (scrappedPosts.isEmpty) {
+            return const Center(
+              child: Text('스크랩한 게시글이 없습니다'),
+            );
           }
 
           return ListView.builder(
-            itemCount: posts.length,
+            itemCount: scrappedPosts.length,
             itemBuilder: (context, index) {
-              final post = posts[index];
+              final post = scrappedPosts[index];
               provider.subscribeToComments(post.id);
               final comments = provider.getCommentsForPost(post.id);
 
