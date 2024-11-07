@@ -75,8 +75,9 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
     final user = context.watch<AuthProvider>().currentUser;
 
     return Scaffold(
+      resizeToAvoidBottomInset: true,
       appBar: AppBar(title: Text('회원 정보 수정')),
-      body: Padding(
+      body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
@@ -198,7 +199,7 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
                 ],
               ),
             ),
-            Spacer(),
+            SizedBox(height: 24), // Spacer 대신 여백 추가
             ElevatedButton(
               onPressed: _saveProfile,
               child: Text('저장'),
