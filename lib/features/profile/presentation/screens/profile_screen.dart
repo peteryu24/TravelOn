@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
 import '../../../gallery/presentation/providers/gallery_provider.dart';
+import '../widgets/profile_dialogs.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -29,45 +30,47 @@ class ProfileScreen extends StatelessWidget {
               children: [
                 // 사용자 정보 카드
                 Card(
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Row(
-                      children: [
-                        CircleAvatar(
-                          radius: 30,
-                          backgroundColor: Colors.grey[200],
-                          child: Icon(
-                            Icons.person,
-                            size: 30,
-                            color: Colors.grey[600],
+                  child: InkWell(
+                    onTap: () => showPasswordDialog(context),
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Row(
+                        children: [
+                          CircleAvatar(
+                            radius: 30,
+                            backgroundColor: Colors.grey[200],
+                            backgroundImage: user?.profileImageUrl != null && user!.profileImageUrl!.isNotEmpty
+                                ? NetworkImage(user.profileImageUrl!)
+                                : AssetImage('assets/images/default_profile.png') as ImageProvider,
                           ),
-                        ),
-                        const SizedBox(width: 16),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                user?.name ?? '사용자',
-                                style: const TextStyle(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold,
+                          const SizedBox(width: 16),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  user?.name ?? '사용자',
+                                  style: const TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
-                              ),
-                              Text(
-                                user?.email ?? '',
-                                style: TextStyle(
-                                  color: Colors.grey[600],
+                                Text(
+                                  user?.email ?? '',
+                                  style: TextStyle(
+                                    color: Colors.grey[600],
+                                  ),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                 ),
                 const SizedBox(height: 24),
+
 
                 // 가이드 기능 섹션 (가이드인 경우에만 표시)
                 if (user?.isGuide == true) ...[

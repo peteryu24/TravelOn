@@ -21,60 +21,69 @@ class BottomSheetWidget {
     showModalBottomSheet(
       context: parentContext,
       builder: (BuildContext context) {
-        return Wrap(
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                _buildIconButton(
-                  context,
-                  icon: Icons.image,
-                  label: '갤러리',
-                  onTap: () async {
-                    Navigator.pop(context);
-                    final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
-                    if (image != null) {
-                      _showConfirmationDialog(parentContext, image, chatId, userId, otherUserId, currentUserProfileImage, username);
-                    }
-                  },
-                ),
-                _buildIconButton(
-                  context,
-                  icon: Icons.camera_alt,
-                  label: '카메라',
-                  onTap: () async {
-                    Navigator.pop(context);
-                    final XFile? image = await _picker.pickImage(source: ImageSource.camera);
-                    if (image != null) {
-                      _showConfirmationDialog(parentContext, image, chatId, userId, otherUserId, currentUserProfileImage, username);
-                    }
-                  },
-                ),
-              ],
-            ),
-          ],
+        return Padding(
+          padding: EdgeInsets.symmetric(vertical: 16.h),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              buildIconButton(
+                context,
+                icon: Icons.image,
+                label: '갤러리',
+                backgroundColor: Colors.lightBlue,
+                onTap: () async {
+                  Navigator.pop(context);
+                  final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
+                  if (image != null) {
+                    _showConfirmationDialog(parentContext, image, chatId, userId, otherUserId, currentUserProfileImage, username);
+                  }
+                },
+              ),
+              buildIconButton(
+                context,
+                icon: Icons.camera_alt,
+                label: '카메라',
+                backgroundColor: Colors.blueAccent,
+                onTap: () async {
+                  Navigator.pop(context);
+                  final XFile? image = await _picker.pickImage(source: ImageSource.camera);
+                  if (image != null) {
+                    _showConfirmationDialog(parentContext, image, chatId, userId, otherUserId, currentUserProfileImage, username);
+                  }
+                },
+              ),
+            ],
+          ),
         );
       },
     );
   }
 
-  Widget _buildIconButton(BuildContext context, {required IconData icon, required String label, required VoidCallback onTap}) {
-    return Column(
-      children: [
-        InkWell(
-          onTap: onTap,
-          child: CircleAvatar(
-            backgroundColor: Colors.blue,
-            radius: 30.w,
-            child: Icon(icon, size: 30.w, color: Colors.white),
+  Widget buildIconButton(BuildContext context, {
+    required IconData icon,
+    required String label,
+    required VoidCallback onTap,
+    required Color backgroundColor,
+  }) {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 12.w),
+      child: Column(
+        children: [
+          InkWell(
+            onTap: onTap,
+            child: CircleAvatar(
+              backgroundColor: backgroundColor,
+              radius: 30.w,
+              child: Icon(icon, size: 30.w, color: Colors.white),
+            ),
           ),
-        ),
-        SizedBox(height: 4.h),
-        Text(
-          label,
-          style: TextStyle(fontSize: 14.sp),
-        ),
-      ],
+          SizedBox(height: 4.h),
+          Text(
+            label,
+            style: TextStyle(fontSize: 14.sp),
+          ),
+        ],
+      ),
     );
   }
 

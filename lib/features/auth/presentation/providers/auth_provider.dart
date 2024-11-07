@@ -231,6 +231,61 @@ class AuthProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  // 비밀번호 확인
+  Future<bool> checkPassword(String password) async {
+    try {
+      final user = _auth.currentUser;
+      if (user == null || user.email == null) return false;
+
+      final credential = EmailAuthProvider.credential(email: user.email!, password: password);
+      await user.reauthenticateWithCredential(credential);
+      return true;
+    } catch (e) {
+      print('비밀번호 확인 실패: $e');
+      return false;
+    }
+  }
+
+  // 프로필 업데이트
+  Future<void> updateUserProfile({
+    required String name,
+    String? gender,
+    DateTime? birthDate,
+    String? profileImageUrl,
+  }) async {
+    if (_currentUser == null) throw '로그인이 필요합니다';
+
+    try {
+      final userRef = _firestore.collection('users').doc(_currentUser!.id);
+
+      String? imageUrl = profileImageUrl;
+      if (profileImageUrl != null && !profileImageUrl.startsWith('http')) {
+        final ref = _storage.ref().child('user_profiles/${_currentUser!.id}.jpg');
+        await ref.putFile(File(profileImageUrl));
+        imageUrl = await ref.getDownloadURL();
+      }
+
+      await userRef.update({
+        'name': name,
+        'gender': gender,
+        'birthDate': birthDate != null ? Timestamp.fromDate(birthDate) : null,
+        'profileImageUrl': imageUrl,
+      });
+
+      _currentUser = _currentUser!.copyWith(
+        name: name,
+        gender: gender,
+        birthDate: birthDate,
+        profileImageUrl: imageUrl,
+      );
+
+      notifyListeners();
+    } catch (e) {
+      print('프로필 업데이트 실패: $e');
+      throw '프로필 업데이트에 실패했습니다';
+    }
+  }
+
   /////////////////////////////////////////////////////////////////////
   /// 소셜 로그인
   // Future<void> loginWithKakao() async {

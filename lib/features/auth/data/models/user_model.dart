@@ -6,7 +6,9 @@ class UserModel extends User {
   final String email;
   final String? profileImageUrl;
   final bool isGuide;
-  List<String> likedPackages;  // 찜한 패키지 ID 목록 추가
+  final String? gender;
+  final DateTime? birthDate;
+  List<String> likedPackages;
 
   UserModel({
     required this.id,
@@ -14,6 +16,8 @@ class UserModel extends User {
     required this.email,
     this.profileImageUrl,
     this.isGuide = false,
+    this.gender,
+    this.birthDate,
     List<String>? likedPackages,
   }) : likedPackages = likedPackages ?? [],
         super(id: id, name: name, email: email);
@@ -26,6 +30,8 @@ class UserModel extends User {
       email: json['email'] as String,
       profileImageUrl: json['profileImageUrl'] as String?,
       isGuide: json['isGuide'] as bool? ?? false,
+      gender: json['gender'] as String?,
+      birthDate: json['birthDate'] != null ? DateTime.parse(json['birthDate']) : null,
       likedPackages: List<String>.from(json['likedPackages'] ?? []),
     );
   }
@@ -38,6 +44,8 @@ class UserModel extends User {
       'email': email,
       'profileImageUrl': profileImageUrl,
       'isGuide': isGuide,
+      'gender': gender,
+      'birthDate': birthDate?.toIso8601String(),
       'likedPackages': likedPackages,
     };
   }
@@ -49,6 +57,8 @@ class UserModel extends User {
     String? email,
     String? profileImageUrl,
     bool? isGuide,
+    String? gender,
+    DateTime? birthDate,
     List<String>? likedPackages,
   }) {
     return UserModel(
@@ -57,6 +67,8 @@ class UserModel extends User {
       email: email ?? this.email,
       profileImageUrl: profileImageUrl ?? this.profileImageUrl,
       isGuide: isGuide ?? this.isGuide,
+      gender: gender ?? this.gender,
+      birthDate: birthDate ?? this.birthDate,
       likedPackages: likedPackages ?? List<String>.from(this.likedPackages),
     );
   }
