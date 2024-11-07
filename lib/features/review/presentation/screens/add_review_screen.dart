@@ -102,8 +102,7 @@ class _AddReviewScreenState extends State<AddReviewScreen> {
                       userName: user.name,
                       rating: _rating,
                       content: _contentController.text.trim(),
-                      context: context,  // context 전달
-                    );
+                    );  // context 파라미터 제거
 
                     if (mounted) {
                       ScaffoldMessenger.of(context).showSnackBar(

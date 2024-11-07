@@ -43,19 +43,12 @@ class _PackageDetailScreenState extends State<PackageDetailScreen> {
     _loadTodayParticipants();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final authProvider = Provider.of<AuthProvider>(context, listen: false);
-      setState(() {
-        _currentUserId = authProvider.currentUser?.id;
-      });
-    });
-
-    // 리뷰 데이터 초기 로드
-    WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
-        context.read<ReviewProvider>().loadReviews(widget.package.id);
+        context.read<ReviewProvider>().loadPreviewReviews(widget.package.id);
       }
     });
   }
+
 
   Future<void> _loadTodayParticipants() async {
     setState(() {
@@ -429,16 +422,8 @@ class _PackageDetailScreenState extends State<PackageDetailScreen> {
   Widget _buildReviewSection() {
     return Consumer<ReviewProvider>(
       builder: (context, reviewProvider, _) {
-        // 실시간으로 리뷰 데이터 가져오기
-        final reviews = reviewProvider.reviews;
-        final reviewCount = reviews.length;
-
-        // 평균 별점 계산
-        double averageRating = 0.0;
-        if (reviewCount > 0) {
-          double totalRating = reviews.fold(0.0, (sum, review) => sum + review.rating);
-          averageRating = totalRating / reviewCount;
-        }
+        final totalReviewCount = reviewProvider.totalReviewCount;
+        final totalAverageRating = reviewProvider.totalAverageRating;  // 전체 평균 별점 사용
 
         return TextButton(
           onPressed: () {
@@ -448,15 +433,14 @@ class _PackageDetailScreenState extends State<PackageDetailScreen> {
                 builder: (_) => ReviewDetailScreen(package: widget.package),
               ),
             ).then((_) {
-              // 리뷰 화면에서 돌아올 때 리뷰 데이터 새로고침
-              reviewProvider.loadReviews(widget.package.id);
+              reviewProvider.loadPreviewReviews(widget.package.id);
             });
           },
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                '리뷰($reviewCount)',
+                '리뷰($totalReviewCount)',
                 style: TextStyle(
                   fontSize: 18.sp,
                   fontWeight: FontWeight.bold,
@@ -471,7 +455,7 @@ class _PackageDetailScreenState extends State<PackageDetailScreen> {
               ),
               SizedBox(width: 4.w),
               Text(
-                averageRating.toStringAsFixed(1),
+                totalAverageRating.toStringAsFixed(1),  // 전체 평균 별점 표시
                 style: TextStyle(
                   fontSize: 16.sp,
                   fontWeight: FontWeight.bold,
