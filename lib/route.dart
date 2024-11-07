@@ -32,6 +32,7 @@ import 'package:travel_on_final/features/profile/presentation/screens/reservatio
 import 'package:travel_on_final/features/gallery/presentation/screens/travel_gallery_screen.dart';
 import 'package:travel_on_final/features/gallery/presentation/screens/add_gallery_post_screen.dart';
 import 'package:travel_on_final/features/gallery/presentation/screens/scrapped_posts_screen.dart';
+import 'package:travel_on_final/features/gallery/presentation/screens/edit_gallery_post_screen.dart';
 // review
 import 'package:travel_on_final/features/review/presentation/screens/add_review_screen.dart';
 
@@ -134,7 +135,7 @@ final goRouter = GoRouter(
         ),
         GoRoute(
           path: '/chat_list',
-          builder: (context, state) => ChatListScreen(),
+          builder: (context, state) => const ChatListScreen(),
         ),
         GoRoute(
           path: '/profile',
@@ -149,6 +150,18 @@ final goRouter = GoRouter(
     GoRoute(
       path: '/add-gallery-post',
       builder: (context, state) => const AddGalleryPostScreen(),
+    ),
+    GoRoute(
+      path: '/edit-gallery-post',
+      builder: (context, state) {
+        final Map<String, dynamic> extra = state.extra as Map<String, dynamic>;
+        return EditGalleryPostScreen(
+          postId: extra['postId'] as String,
+          location: extra['location'] as String,
+          description: extra['description'] as String,
+          imageUrl: extra['imageUrl'] as String,
+        );
+      },
     ),
     GoRoute(
       path: '/scrapped-posts',

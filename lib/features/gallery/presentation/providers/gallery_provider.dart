@@ -123,6 +123,53 @@ class GalleryProvider extends ChangeNotifier {
     }
   }
 
+  // 포스트 수정
+  Future<void> updatePost({
+    required String postId,
+    required String location,
+    required String description,
+    File? newImage,
+  }) async {
+    _isLoading = true;
+    notifyListeners();
+
+    try {
+      await _repository.updatePost(
+        postId: postId,
+        location: location,
+        description: description,
+        newImage: newImage,
+      );
+
+      // 로컬 상태 업데이트
+      final index = _posts.indexWhere((post) => post.id == postId);
+      if (index != -1) {
+        _posts[index] = _posts[index].copyWith(
+          location: location,
+          description: description,
+        );
+        notifyListeners();
+      }
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  // 포스트 삭제
+  Future<void> deletePost(String postId) async {
+    _isLoading = true;
+    notifyListeners();
+
+    try {
+      await _repository.deletePost(postId);
+      _posts.removeWhere((post) => post.id == postId);
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
   @override
   void dispose() {
     _subscription?.cancel();

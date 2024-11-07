@@ -55,6 +55,7 @@ class TravelGalleryScreen extends StatelessWidget {
               final comments = provider.getCommentsForPost(post.id);
 
               return GalleryPost(
+                userId: post.userId,
                 postId: post.id,
                 imgUrl: post.imageUrl,
                 username: post.username,

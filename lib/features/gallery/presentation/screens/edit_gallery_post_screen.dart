@@ -5,21 +5,38 @@ import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import '../providers/gallery_provider.dart';
-import 'package:travel_on_final/features/auth/presentation/providers/auth_provider.dart';
 
-class AddGalleryPostScreen extends StatefulWidget {
-  const AddGalleryPostScreen({super.key});
+class EditGalleryPostScreen extends StatefulWidget {
+  final String postId;
+  final String location;
+  final String description;
+  final String imageUrl;
+
+  const EditGalleryPostScreen({
+    super.key,
+    required this.postId,
+    required this.location,
+    required this.description,
+    required this.imageUrl,
+  });
 
   @override
-  State<AddGalleryPostScreen> createState() => _AddGalleryPostScreenState();
+  State<EditGalleryPostScreen> createState() => _EditGalleryPostScreenState();
 }
 
-class _AddGalleryPostScreenState extends State<AddGalleryPostScreen> {
-  File? _image;
+class _EditGalleryPostScreenState extends State<EditGalleryPostScreen> {
+  File? _newImage;
   final _locationController = TextEditingController();
   final _descriptionController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
   bool _isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _locationController.text = widget.location;
+    _descriptionController.text = widget.description;
+  }
 
   Future<void> _pickImage() async {
     final ImagePicker picker = ImagePicker();
@@ -27,37 +44,34 @@ class _AddGalleryPostScreenState extends State<AddGalleryPostScreen> {
 
     if (image != null) {
       setState(() {
-        _image = File(image.path);
+        _newImage = File(image.path);
       });
     }
   }
 
-  Future<void> _uploadPost() async {
-    if (!_formKey.currentState!.validate() || _image == null) return;
+  Future<void> _updatePost() async {
+    if (!_formKey.currentState!.validate()) return;
 
     setState(() => _isLoading = true);
 
     try {
-      final user = context.read<AuthProvider>().currentUser!;
-      await context.read<GalleryProvider>().uploadPost(
-            userId: user.id,
-            username: user.name,
-            userProfileUrl: user.profileImageUrl,
-            imageFile: _image!,
+      await context.read<GalleryProvider>().updatePost(
+            postId: widget.postId,
             location: _locationController.text,
             description: _descriptionController.text,
+            newImage: _newImage,
           );
 
       if (mounted) {
         context.pop();
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('게시물이 업로드되었습니다')),
+          const SnackBar(content: Text('게시물이 수정되었습니다')),
         );
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('업로드 실패: $e')),
+          SnackBar(content: Text('수정 실패: $e')),
         );
       }
     } finally {
@@ -69,17 +83,20 @@ class _AddGalleryPostScreenState extends State<AddGalleryPostScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('새 게시물'),
+        title: const Text('게시물 수정'),
         actions: [
           TextButton(
-            onPressed: _isLoading ? null : _uploadPost,
+            onPressed: _isLoading ? null : _updatePost,
             child: _isLoading
-                ? const SizedBox(
-                    width: 20,
-                    height: 20,
-                    child: CircularProgressIndicator(strokeWidth: 2),
+                ? SizedBox(
+                    width: 20.w,
+                    height: 20.h,
+                    child: const CircularProgressIndicator(strokeWidth: 2),
                   )
-                : const Text('공유'),
+                : const Text(
+                    '완료',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
           ),
         ],
       ),
@@ -96,21 +113,22 @@ class _AddGalleryPostScreenState extends State<AddGalleryPostScreen> {
                   border: Border.all(color: const Color(0XFF2196F3)),
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: _image != null
+                child: _newImage != null
                     ? ClipRRect(
                         borderRadius: BorderRadius.circular(8),
                         child: Image.file(
-                          _image!,
+                          _newImage!,
                           fit: BoxFit.cover,
                           width: double.infinity,
                         ),
                       )
-                    : const Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(Icons.add_photo_alternate, size: 50),
-                          Text('이미지 추가'),
-                        ],
+                    : ClipRRect(
+                        borderRadius: BorderRadius.circular(8),
+                        child: Image.network(
+                          widget.imageUrl,
+                          fit: BoxFit.cover,
+                          width: double.infinity,
+                        ),
                       ),
               ),
             ),

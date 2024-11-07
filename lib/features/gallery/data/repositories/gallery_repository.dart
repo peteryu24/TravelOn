@@ -191,4 +191,59 @@ class GalleryRepository {
       throw Exception('스크랩된 게시글 로드 실패: $e');
     }
   }
+
+  // 포스트 수정
+  Future<void> updatePost({
+    required String postId,
+    required String location,
+    required String description,
+    File? newImage,
+  }) async {
+    try {
+      final postRef = _firestore.collection('gallery_posts').doc(postId);
+
+      Map<String, dynamic> updates = {
+        'location': location,
+        'description': description,
+        'updatedAt': DateTime.now(),
+      };
+
+      // 새 이미지가 있는 경우에만 이미지 업로드 및 URL 업데이트
+      if (newImage != null) {
+        // 기존 이미지 URL 가져오기
+        final postDoc = await postRef.get();
+        final oldImageUrl = postDoc.data()?['imageUrl'] as String?;
+
+        // 새 이미지 업로드
+        final String fileName =
+            'gallery_images/${DateTime.now().millisecondsSinceEpoch}_$postId.jpg';
+        final Reference storageRef = _storage.ref().child(fileName);
+        await storageRef.putFile(newImage);
+        final String newImageUrl = await storageRef.getDownloadURL();
+
+        // 업데이트할 데이터에 새 이미지 URL 추가
+        updates['imageUrl'] = newImageUrl;
+
+        // 기존 이미지 삭제 (있는 경우)
+        if (oldImageUrl != null) {
+          try {
+            final oldImageRef = _storage.refFromURL(oldImageUrl);
+            await oldImageRef.delete();
+          } catch (e) {
+            print('기존 이미지 삭제 실패: $e');
+          }
+        }
+      }
+
+      // Firestore 문서 업데이트
+      await postRef.update(updates);
+    } catch (e) {
+      throw Exception('포스트 수정 실패: $e');
+    }
+  }
+
+  Future<void> deletePost(String postId) async {
+    // Delete post document from Firestore
+    await _firestore.collection('gallery_posts').doc(postId).delete();
+  }
 }

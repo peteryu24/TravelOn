@@ -7,6 +7,7 @@ import '../providers/gallery_provider.dart';
 import 'comment_bottom_sheet.dart';
 import '../../domain/entities/comment_entity.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:go_router/go_router.dart';
 
 class GalleryPost extends StatefulWidget {
   final String imgUrl;
@@ -17,6 +18,7 @@ class GalleryPost extends StatefulWidget {
   final List<String> likedBy;
   final int likeCount;
   final List<Comment> comments;
+  final String userId;
 
   const GalleryPost({
     super.key,
@@ -28,6 +30,7 @@ class GalleryPost extends StatefulWidget {
     required this.likedBy,
     required this.likeCount,
     required this.comments,
+    required this.userId,
   });
 
   @override
@@ -155,6 +158,9 @@ class _GalleryPostState extends State<GalleryPost> {
 
   @override
   Widget build(BuildContext context) {
+    final currentUser = context.read<AuthProvider>().currentUser;
+    final isOwner = currentUser?.id == widget.userId;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -169,25 +175,103 @@ class _GalleryPostState extends State<GalleryPost> {
                 backgroundColor: Colors.grey[200],
               ),
               SizedBox(width: 10.w),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    widget.username,
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 14.sp,
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      widget.username,
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14.sp,
+                      ),
                     ),
-                  ),
-                  Text(
-                    widget.location,
-                    style: TextStyle(
-                      fontSize: 12.sp,
-                      color: Colors.grey[600],
+                    Text(
+                      widget.location,
+                      style: TextStyle(
+                        fontSize: 12.sp,
+                        color: Colors.grey[600],
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
+              if (isOwner)
+                PopupMenuButton<String>(
+                  icon: const Icon(Icons.more_vert),
+                  onSelected: (value) async {
+                    if (value == 'edit') {
+                      context.push('/edit-gallery-post', extra: {
+                        'postId': widget.postId,
+                        'location': widget.location,
+                        'description': widget.description,
+                        'imageUrl': widget.imgUrl,
+                      });
+                    } else if (value == 'delete') {
+                      final confirmed = await showDialog<bool>(
+                        context: context,
+                        builder: (context) => AlertDialog(
+                          title: const Text('게시물 삭제'),
+                          content: const Text('이 게시물을 삭제하시겠습니까?'),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.pop(context, false),
+                              child: const Text('취소'),
+                            ),
+                            TextButton(
+                              onPressed: () => Navigator.pop(context, true),
+                              child: const Text(
+                                '삭제',
+                                style: TextStyle(color: Colors.red),
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+
+                      if (confirmed == true && context.mounted) {
+                        try {
+                          await context
+                              .read<GalleryProvider>()
+                              .deletePost(widget.postId);
+                          if (context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('게시물이 삭제되었습니다')),
+                            );
+                          }
+                        } catch (e) {
+                          if (context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text('삭제 실패: $e')),
+                            );
+                          }
+                        }
+                      }
+                    }
+                  },
+                  itemBuilder: (context) => [
+                    const PopupMenuItem(
+                      value: 'edit',
+                      child: Row(
+                        children: [
+                          Icon(Icons.edit),
+                          SizedBox(width: 8),
+                          Text('수정'),
+                        ],
+                      ),
+                    ),
+                    const PopupMenuItem(
+                      value: 'delete',
+                      child: Row(
+                        children: [
+                          Icon(Icons.delete, color: Colors.red),
+                          SizedBox(width: 8),
+                          Text('삭제', style: TextStyle(color: Colors.red)),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
             ],
           ),
         ),
