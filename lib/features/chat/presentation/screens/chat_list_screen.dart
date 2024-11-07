@@ -6,6 +6,8 @@ import 'package:travel_on_final/features/auth/presentation/providers/auth_provid
 import 'package:travel_on_final/features/chat/presentation/providers/chat_provider.dart';
 
 class ChatListScreen extends StatelessWidget {
+  const ChatListScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     final authProvider = Provider.of<AuthProvider>(context);
@@ -13,12 +15,25 @@ class ChatListScreen extends StatelessWidget {
 
     if (authProvider.currentUser == null) {
       return Scaffold(
-        body: Center(child: Text('로그인이 필요합니다')),
+        appBar: AppBar(
+          backgroundColor: Colors.white,
+          scrolledUnderElevation: 0,
+          elevation: 0,
+          centerTitle: true,
+          title: const Text('채팅 목록'),
+        ),
+        body: const Center(child: Text('로그인이 필요합니다')),
       );
     }
 
     return Scaffold(
-      appBar: AppBar(title: Text("대화 목록")),
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        scrolledUnderElevation: 0,
+        elevation: 0,
+        centerTitle: true,
+        title: const Text('채팅 목록'),
+      ),
       body: StreamBuilder(
         stream: FirebaseFirestore.instance
             .collection('chats')
@@ -26,7 +41,7 @@ class ChatListScreen extends StatelessWidget {
             .snapshots(),
         builder: (ctx, AsyncSnapshot<QuerySnapshot> chatSnapshot) {
           if (chatSnapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
+            return const Center(child: CircularProgressIndicator());
           }
 
           final chatDocs = chatSnapshot.data!.docs.where((doc) {
@@ -39,9 +54,10 @@ class ChatListScreen extends StatelessWidget {
             itemBuilder: (ctx, index) {
               final chatData = chatDocs[index].data() as Map<String, dynamic>;
               final chatId = chatDocs[index].id;
-              final otherUserId = authProvider.currentUser!.id == chatData['participants'][0]
-                  ? chatData['participants'][1]
-                  : chatData['participants'][0];
+              final otherUserId =
+                  authProvider.currentUser!.id == chatData['participants'][0]
+                      ? chatData['participants'][1]
+                      : chatData['participants'][0];
 
               chatProvider.updateOtherUserInfo(chatId, otherUserId);
 
@@ -51,7 +67,8 @@ class ChatListScreen extends StatelessWidget {
                           chatData['userProfileImages'][otherUserId] != null &&
                           chatData['userProfileImages'][otherUserId].isNotEmpty
                       ? NetworkImage(chatData['userProfileImages'][otherUserId])
-                      : AssetImage('assets/images/default_profile.png') as ImageProvider,
+                      : const AssetImage('assets/images/default_profile.png')
+                          as ImageProvider,
                 ),
                 title: Text(
                   chatData['usernames'][otherUserId]?.substring(
@@ -60,10 +77,11 @@ class ChatListScreen extends StatelessWidget {
                               ? 15
                               : chatData['usernames'][otherUserId].length) ??
                       'Unknown User',
-                  style: TextStyle(fontWeight: FontWeight.bold),
+                  style: const TextStyle(fontWeight: FontWeight.bold),
                 ),
                 subtitle: Text(
-                  (chatData['lastMessage'] != null && chatData['lastMessage'].length > 65)
+                  (chatData['lastMessage'] != null &&
+                          chatData['lastMessage'].length > 65)
                       ? '${chatData['lastMessage'].substring(0, 65)}...'
                       : chatData['lastMessage'] ?? '',
                 ),

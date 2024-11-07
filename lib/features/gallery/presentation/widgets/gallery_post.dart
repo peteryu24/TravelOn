@@ -6,6 +6,8 @@ import 'package:travel_on_final/features/auth/presentation/providers/auth_provid
 import '../providers/gallery_provider.dart';
 import 'comment_bottom_sheet.dart';
 import '../../domain/entities/comment_entity.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:go_router/go_router.dart';
 
 class GalleryPost extends StatefulWidget {
   final String imgUrl;
@@ -16,6 +18,7 @@ class GalleryPost extends StatefulWidget {
   final List<String> likedBy;
   final int likeCount;
   final List<Comment> comments;
+  final String userId;
 
   const GalleryPost({
     super.key,
@@ -27,6 +30,7 @@ class GalleryPost extends StatefulWidget {
     required this.likedBy,
     required this.likeCount,
     required this.comments,
+    required this.userId,
   });
 
   @override
@@ -36,17 +40,18 @@ class GalleryPost extends StatefulWidget {
 class _GalleryPostState extends State<GalleryPost> {
   late bool isLiked;
   late int likeCount;
+  bool isScrapped = false;
 
   @override
   void initState() {
     super.initState();
     _updateLikeStatus();
+    _updateScrapStatus();
   }
 
   @override
   void didUpdateWidget(GalleryPost oldWidget) {
     super.didUpdateWidget(oldWidget);
-    // 위젯이 업데이트될 때마다 좋아요 상태 갱신
     if (oldWidget.likedBy != widget.likedBy ||
         oldWidget.likeCount != widget.likeCount) {
       _updateLikeStatus();
@@ -59,10 +64,25 @@ class _GalleryPostState extends State<GalleryPost> {
     likeCount = widget.likeCount;
   }
 
+  void _updateScrapStatus() async {
+    final user = context.read<AuthProvider>().currentUser;
+    if (user != null) {
+      final userDoc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.id)
+          .get();
+      final List<String> scrappedPosts =
+          List<String>.from(userDoc.data()?['scrappedPosts'] ?? []);
+
+      setState(() {
+        isScrapped = scrappedPosts.contains(widget.postId);
+      });
+    }
+  }
+
   Future<void> _handleLikePress() async {
     final user = context.read<AuthProvider>().currentUser;
     if (user != null) {
-      // 즉각적인 UI 업데이트를 위해 상태 먼저 변경
       setState(() {
         isLiked = !isLiked;
         likeCount = isLiked ? likeCount + 1 : likeCount - 1;
@@ -74,7 +94,6 @@ class _GalleryPostState extends State<GalleryPost> {
               user.id,
             );
       } catch (e) {
-        // 에러 발생 시 상태 롤백
         setState(() {
           isLiked = !isLiked;
           likeCount = isLiked ? likeCount + 1 : likeCount - 1;
@@ -103,8 +122,45 @@ class _GalleryPostState extends State<GalleryPost> {
     );
   }
 
+  Future<void> _toggleScrap() async {
+    final user = context.read<AuthProvider>().currentUser;
+    if (user == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('로그인이 필요합니다')),
+      );
+      return;
+    }
+
+    setState(() {
+      isScrapped = !isScrapped;
+    });
+
+    try {
+      await context.read<GalleryProvider>().toggleScrap(widget.postId, user.id);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(isScrapped ? '스크랩이 완료되었습니다' : '스크랩이 해제되었습니다'),
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          isScrapped = !isScrapped;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('스크랩 처리 중 오류가 발생했습니다')),
+        );
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    final currentUser = context.read<AuthProvider>().currentUser;
+    final isOwner = currentUser?.id == widget.userId;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -119,25 +175,103 @@ class _GalleryPostState extends State<GalleryPost> {
                 backgroundColor: Colors.grey[200],
               ),
               SizedBox(width: 10.w),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    widget.username,
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 14.sp,
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      widget.username,
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14.sp,
+                      ),
                     ),
-                  ),
-                  Text(
-                    widget.location,
-                    style: TextStyle(
-                      fontSize: 12.sp,
-                      color: Colors.grey[600],
+                    Text(
+                      widget.location,
+                      style: TextStyle(
+                        fontSize: 12.sp,
+                        color: Colors.grey[600],
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
+              if (isOwner)
+                PopupMenuButton<String>(
+                  icon: const Icon(Icons.more_vert),
+                  onSelected: (value) async {
+                    if (value == 'edit') {
+                      context.push('/edit-gallery-post', extra: {
+                        'postId': widget.postId,
+                        'location': widget.location,
+                        'description': widget.description,
+                        'imageUrl': widget.imgUrl,
+                      });
+                    } else if (value == 'delete') {
+                      final confirmed = await showDialog<bool>(
+                        context: context,
+                        builder: (context) => AlertDialog(
+                          title: const Text('게시물 삭제'),
+                          content: const Text('이 게시물을 삭제하시겠습니까?'),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.pop(context, false),
+                              child: const Text('취소'),
+                            ),
+                            TextButton(
+                              onPressed: () => Navigator.pop(context, true),
+                              child: const Text(
+                                '삭제',
+                                style: TextStyle(color: Colors.red),
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+
+                      if (confirmed == true && context.mounted) {
+                        try {
+                          await context
+                              .read<GalleryProvider>()
+                              .deletePost(widget.postId);
+                          if (context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('게시물이 삭제되었습니다')),
+                            );
+                          }
+                        } catch (e) {
+                          if (context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text('삭제 실패: $e')),
+                            );
+                          }
+                        }
+                      }
+                    }
+                  },
+                  itemBuilder: (context) => [
+                    const PopupMenuItem(
+                      value: 'edit',
+                      child: Row(
+                        children: [
+                          Icon(Icons.edit),
+                          SizedBox(width: 8),
+                          Text('수정'),
+                        ],
+                      ),
+                    ),
+                    const PopupMenuItem(
+                      value: 'delete',
+                      child: Row(
+                        children: [
+                          Icon(Icons.delete, color: Colors.red),
+                          SizedBox(width: 8),
+                          Text('삭제', style: TextStyle(color: Colors.red)),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
             ],
           ),
         ),
@@ -162,8 +296,12 @@ class _GalleryPostState extends State<GalleryPost> {
             ),
             const Spacer(),
             IconButton(
-              onPressed: () {},
-              icon: const Icon(CupertinoIcons.bookmark),
+              onPressed: _toggleScrap,
+              icon: Icon(
+                isScrapped
+                    ? CupertinoIcons.bookmark_fill
+                    : CupertinoIcons.bookmark,
+              ),
             ),
           ],
         ),

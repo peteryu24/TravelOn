@@ -58,4 +58,32 @@ class GalleryPost {
       'comments': comments,
     };
   }
+
+  GalleryPost copyWith({
+    String? id,
+    String? userId,
+    String? username,
+    String? userProfileUrl,
+    String? imageUrl,
+    String? location,
+    String? description,
+    DateTime? createdAt,
+    List<String>? likedBy,
+    int? likeCount,
+    List<String>? comments,
+  }) {
+    return GalleryPost(
+      id: id ?? this.id,
+      userId: userId ?? this.userId,
+      username: username ?? this.username,
+      userProfileUrl: userProfileUrl ?? this.userProfileUrl,
+      imageUrl: imageUrl ?? this.imageUrl,
+      location: location ?? this.location,
+      description: description ?? this.description,
+      createdAt: createdAt ?? this.createdAt,
+      likedBy: likedBy ?? this.likedBy,
+      likeCount: likeCount ?? this.likeCount,
+      comments: comments ?? this.comments,
+    );
+  }
 }

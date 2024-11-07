@@ -14,7 +14,13 @@ class ProfileScreen extends StatelessWidget {
     final user = authProvider.currentUser;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('마이페이지')),
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        scrolledUnderElevation: 0,
+        elevation: 0,
+        centerTitle: true,
+        title: const Text('마이페이지'),
+      ),
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(
