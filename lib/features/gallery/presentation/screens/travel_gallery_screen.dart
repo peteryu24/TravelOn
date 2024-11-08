@@ -65,6 +65,7 @@ class TravelGalleryScreen extends StatelessWidget {
                 userId: post.userId,
                 packageId: post.packageId,
                 packageTitle: post.packageTitle,
+                userProfileUrl: post.userProfileUrl,
               );
             },
           );

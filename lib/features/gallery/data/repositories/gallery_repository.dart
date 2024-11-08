@@ -213,6 +213,8 @@ class GalleryRepository {
   }) async {
     try {
       final postRef = _firestore.collection('gallery_posts').doc(postId);
+      final postDoc = await postRef.get();
+      final currentData = postDoc.data();
 
       Map<String, dynamic> updates = {
         'location': location,
@@ -220,6 +222,7 @@ class GalleryRepository {
         'updatedAt': DateTime.now(),
         'packageId': packageId,
         'packageTitle': packageTitle,
+        'userProfileUrl': currentData?['userProfileUrl'],
       };
 
       // 새 이미지가 있는 경우에만 이미지 업로드 및 URL 업데이트

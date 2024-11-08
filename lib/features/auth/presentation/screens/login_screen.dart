@@ -8,6 +8,8 @@ import 'package:travel_on_final/features/auth/presentation/widgets/password_fiel
 import 'package:go_router/go_router.dart';
 
 class LoginScreen extends StatefulWidget {
+  const LoginScreen({super.key});
+
   @override
   _LoginScreenState createState() => _LoginScreenState();
 }
@@ -61,7 +63,7 @@ class _LoginScreenState extends State<LoginScreen> {
       context.go('/');
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('로그인에 실패했습니다. 다시 시도해주세요.')),
+        const SnackBar(content: Text('로그인에 실패했습니다. 다시 시도해주세요.')),
       );
     }
   }
@@ -113,7 +115,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     ],
                   ),
                 ),
-                Spacer(),
+                const Spacer(),
                 Padding(
                   padding: EdgeInsets.only(right: 8.0.w),
                   child: TextButton(
