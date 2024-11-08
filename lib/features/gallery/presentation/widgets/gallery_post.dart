@@ -22,6 +22,7 @@ class GalleryPost extends StatefulWidget {
   final String userId;
   final String? packageId;
   final String? packageTitle;
+  final String? userProfileUrl;
 
   const GalleryPost({
     super.key,
@@ -36,6 +37,7 @@ class GalleryPost extends StatefulWidget {
     required this.userId,
     this.packageId,
     this.packageTitle,
+    this.userProfileUrl,
   });
 
   @override
@@ -175,9 +177,23 @@ class _GalleryPostState extends State<GalleryPost> {
             children: [
               CircleAvatar(
                 radius: 20.r,
-                backgroundImage:
-                    const AssetImage('assets/images/default_profile.png'),
                 backgroundColor: Colors.grey[200],
+                child: ClipOval(
+                  child: widget.userProfileUrl != null &&
+                          widget.userProfileUrl!.isNotEmpty
+                      ? Image.network(
+                          widget.userProfileUrl!,
+                          width: 40.r,
+                          height: 40.r,
+                          fit: BoxFit.cover,
+                        )
+                      : Image.asset(
+                          'assets/images/default_profile.png',
+                          width: 40.r,
+                          height: 40.r,
+                          fit: BoxFit.cover,
+                        ),
+                ),
               ),
               SizedBox(width: 10.w),
               Expanded(

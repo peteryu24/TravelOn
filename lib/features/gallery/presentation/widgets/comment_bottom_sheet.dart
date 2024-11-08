@@ -109,7 +109,14 @@ class _CommentBottomSheetState extends State<CommentBottomSheet> {
               radius: 16.r,
               backgroundColor: Colors.grey[300],
               child: comment.userProfileUrl?.isNotEmpty == true
-                  ? Image.network(comment.userProfileUrl!)
+                  ? ClipOval(
+                      child: Image.network(
+                        comment.userProfileUrl!,
+                        width: 32.r,
+                        height: 32.r,
+                        fit: BoxFit.cover,
+                      ),
+                    )
                   : Icon(
                       Icons.person,
                       size: 20.r,
