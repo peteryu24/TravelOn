@@ -29,7 +29,7 @@ class _ReviewDetailScreenState extends State<ReviewDetailScreen> {
       ),
       body: Consumer<ReviewProvider>(
         builder: (context, provider, _) {
-          if (provider.isLoading && provider.reviews.isEmpty) {
+          if (provider.isLoading) {
             return const Center(child: CircularProgressIndicator());
           }
 
@@ -37,22 +37,9 @@ class _ReviewDetailScreenState extends State<ReviewDetailScreen> {
             return Center(child: Text('Error: ${provider.error}'));
           }
 
-          if (provider.reviews.isEmpty) {
-            return const Center(child: Text('아직 작성된 리뷰가 없습니다'));
-          }
-
-          // totalReviewCount 사용 (수정된 부분)
-          final totalReviewCount = provider.totalReviewCount;
-
-          // 평균 별점 계산
-          double totalRating = 0;
-          for (var review in provider.reviews) {
-            totalRating += review.rating;
-          }
-          final averageRating = provider.reviews.isEmpty ? 0.0 : totalRating / provider.reviews.length;
-
           return Column(
             children: [
+              // 별점과 리뷰 개수 표시
               Container(
                 padding: EdgeInsets.all(16.w),
                 color: Colors.grey[100],
@@ -70,7 +57,7 @@ class _ReviewDetailScreenState extends State<ReviewDetailScreen> {
                             ),
                             SizedBox(width: 4.w),
                             Text(
-                              provider.totalAverageRating.toStringAsFixed(1),  // 여기를 수정
+                              provider.totalAverageRating.toStringAsFixed(1),
                               style: TextStyle(
                                 fontSize: 24.sp,
                                 fontWeight: FontWeight.bold,
@@ -98,41 +85,61 @@ class _ReviewDetailScreenState extends State<ReviewDetailScreen> {
                   final user = authProvider.currentUser;
                   if (user == null) return const SizedBox.shrink();
 
-                  return FutureBuilder<bool>(
-                    future: provider.canUserAddReview(user.id, widget.package.id),
+                  return FutureBuilder<String?>(
+                    future: provider.checkReviewStatus(user.id, widget.package.id),
                     builder: (context, snapshot) {
-                      if (!snapshot.hasData || !snapshot.data!) {
-                        return const SizedBox.shrink();
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const Center(child: CircularProgressIndicator());
                       }
+
+                      final errorMessage = snapshot.data;
+                      final canReview = errorMessage == null;
 
                       return Padding(
                         padding: EdgeInsets.all(16.w),
-                        child: ElevatedButton(
-                          onPressed: () async {  // async 추가
-                            final reviewProvider = context.read<ReviewProvider>();  // 미리 provider 가져오기
-
-                            await Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) => AddReviewScreen(
-                                  packageId: widget.package.id,
-                                  packageTitle: widget.package.title,
+                        child: Column(
+                          children: [
+                            if (!canReview)
+                              Padding(
+                                padding: EdgeInsets.only(bottom: 8.h),
+                                child: Text(
+                                  errorMessage ?? '',
+                                  style: TextStyle(
+                                    color: Colors.red,
+                                    fontSize: 14.sp,
+                                  ),
                                 ),
                               ),
-                            );
+                            ElevatedButton(
+                              onPressed: canReview ? () async {
+                                final reviewProvider = context.read<ReviewProvider>();
 
-                            // mounted 체크 후 데이터 새로고침
-                            if (mounted) {
-                              await reviewProvider.getTotalReviewStats(widget.package.id);
-                              if (mounted) {
-                                await reviewProvider.loadInitialReviews(widget.package.id);
-                              }
-                            }
-                          },
-                          style: ElevatedButton.styleFrom(
-                            minimumSize: Size(double.infinity, 48.h),
-                          ),
-                          child: Text('리뷰 작성하기', style: TextStyle(fontSize: 16.sp)),
+                                await Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => AddReviewScreen(
+                                      packageId: widget.package.id,
+                                      packageTitle: widget.package.title,
+                                    ),
+                                  ),
+                                );
+
+                                if (mounted) {
+                                  await reviewProvider.getTotalReviewStats(widget.package.id);
+                                  if (mounted) {
+                                    await reviewProvider.loadInitialReviews(widget.package.id);
+                                  }
+                                }
+                              } : null,
+                              style: ElevatedButton.styleFrom(
+                                minimumSize: Size(double.infinity, 48.h),
+                              ),
+                              child: Text(
+                                  canReview ? '리뷰 작성하기' : '리뷰 작성 불가',
+                                  style: TextStyle(fontSize: 16.sp)
+                              ),
+                            ),
+                          ],
                         ),
                       );
                     },
@@ -141,7 +148,9 @@ class _ReviewDetailScreenState extends State<ReviewDetailScreen> {
               ),
 
               Expanded(
-                child: ListView(
+                child: provider.reviews.isEmpty
+                    ? const Center(child: Text('아직 작성된 리뷰가 없습니다'))
+                    : ListView(
                   children: [
                     ...provider.reviews.map((review) => ReviewCard(review: review)),
                     if (provider.hasMore)

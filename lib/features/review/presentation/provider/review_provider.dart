@@ -123,8 +123,8 @@ class ReviewProvider extends ChangeNotifier {
         _hasMore = _reviews.length < totalCount;
       }
 
-      print('Loaded reviews: ${_reviews.length}'); // 디버깅용
-      print('Has more: $_hasMore'); // 디버깅용
+      // print('Loaded reviews: ${_reviews.length}'); // 디버깅용
+      // print('Has more: $_hasMore'); // 디버깅용
 
     } catch (e) {
       _error = e.toString();
@@ -165,8 +165,16 @@ class ReviewProvider extends ChangeNotifier {
       rethrow;
     }
   }
-  Future<bool> canUserAddReview(String userId, String packageId) {
-    return _repository.canUserReview(userId, packageId);  // ReviewRepository의 메서드 호출
+  Future<bool> canUserAddReview(String userId, String packageId) async {
+    print('canUserAddReview called with userId: $userId, packageId: $packageId');  // 로그 추가
+    try {
+      final result = await _repository.canUserReview(userId, packageId);
+      print('canUserAddReview result: $result');  // 로그 추가
+      return result;
+    } catch (e) {
+      print('Error in canUserAddReview: $e');
+      return false;
+    }
   }
 
   Future<void> loadPreviewReviews(String packageId) async {
@@ -207,5 +215,73 @@ class ReviewProvider extends ChangeNotifier {
     _totalAverageRating = 0.0;
     _error = null;
     notifyListeners();
+  }
+
+  Future<String?> checkReviewStatus(String userId, String packageId) async {
+    try {
+      // 예약 확인
+      final hasApprovedReservation = await _repository.canUserReview(userId, packageId);
+      if (!hasApprovedReservation) {
+        return '예약 승인된 사용자만 리뷰를 작성할 수 있습니다.';
+      }
+
+      // 이미 리뷰를 작성했는지 확인
+      final existingReviews = await FirebaseFirestore.instance
+          .collection('reviews')
+          .where('userId', isEqualTo: userId)
+          .where('packageId', isEqualTo: packageId)
+          .get();
+
+      if (existingReviews.docs.isNotEmpty) {
+        return '이미 리뷰를 작성하셨습니다.';
+      }
+
+      return null; // null이면 리뷰 작성 가능
+    } catch (e) {
+      return '리뷰 상태 확인 중 오류가 발생했습니다.';
+    }
+  }
+
+  Future<void> deleteReview(String reviewId, String packageId) async {
+    try {
+      await _repository.deleteReview(reviewId);
+      await loadInitialReviews(packageId);
+      await getTotalReviewStats(packageId);
+      notifyListeners();
+    } catch (e) {
+      _error = e.toString();
+      notifyListeners();
+      rethrow;
+    }
+  }
+
+  Future<void> updateReview({
+    required String reviewId,
+    required String packageId,
+    required String userId,    // userId 추가
+    required String userName,  // userName 추가
+    required double rating,
+    required String content,
+  }) async {
+    try {
+      final updatedReview = Review(
+        id: reviewId,
+        packageId: packageId,
+        userId: userId,       // 파라미터로 받은 userId 사용
+        userName: userName,   // 파라미터로 받은 userName 사용
+        rating: rating,
+        content: content,
+        createdAt: DateTime.now(),
+      );
+
+      await _repository.updateReview(updatedReview);
+      await loadInitialReviews(packageId);
+      await getTotalReviewStats(packageId);
+      notifyListeners();
+    } catch (e) {
+      _error = e.toString();
+      notifyListeners();
+      rethrow;
+    }
   }
 }
