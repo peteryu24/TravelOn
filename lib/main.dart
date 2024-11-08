@@ -41,7 +41,11 @@ Future<void> main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  await FirebaseAppCheck.instance.activate();
+  await FirebaseAppCheck.instance.activate(
+    webProvider: ReCaptchaV3Provider('recaptcha-v3-site-key'),
+    androidProvider: AndroidProvider.debug,
+    appleProvider: AppleProvider.appAttest,  // iOS용
+  );
 
   await SharedPreferences.getInstance();
 
@@ -55,17 +59,11 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
+        // Firebase 서비스 프로바이더
         Provider<FirebaseAuth>.value(value: FirebaseAuth.instance),
         Provider<FirebaseFirestore>.value(value: FirebaseFirestore.instance),
 
         // Auth 관련 Providers
-        ChangeNotifierProvider(
-          create: (context) => app.AuthProvider(
-            context.read<FirebaseAuth>(),          
-            context.read<ResetPasswordUseCase>(),
-            context.read<TravelProvider>(),
-          ),
-        ),
         Provider<AuthRepository>(create: (_) => AuthRepositoryImpl()),
         ProxyProvider<FirebaseAuth, ResetPasswordUseCase>(
           update: (_, auth, __) => ResetPasswordUseCase(auth),
@@ -79,18 +77,26 @@ class MyApp extends StatelessWidget {
           ),
         ),
 
+        ChangeNotifierProvider(
+          create: (context) => app.AuthProvider(
+            context.read<FirebaseAuth>(),
+            context.read<ResetPasswordUseCase>(),
+            context.read<TravelProvider>(),
+          ),
+        ),
+
         // 네비게이션 관련 Provider
         ChangeNotifierProvider(create: (_) => NavigationProvider()),
 
-        // 채팅 관련 Provider
+        // 채팅 Provider
         ChangeNotifierProvider(create: (_) => ChatProvider()),
 
-        // 예약 관련 Provider
+        // 예약 Provider
         ChangeNotifierProvider(
           create: (_) => ReservationProvider(FirebaseFirestore.instance),
         ),
 
-        // 리뷰 관련 Provider
+        // 리뷰 Provider
         ChangeNotifierProvider(
           create: (context) => ReviewProvider(
             ReviewRepositoryImpl(
@@ -99,7 +105,7 @@ class MyApp extends StatelessWidget {
           ),
         ),
 
-        // 홈 화면 관련 Provider
+        // 홈 Provider
         ChangeNotifierProvider(
           create: (_) => HomeProvider(
             GetNextTrip(
@@ -108,10 +114,10 @@ class MyApp extends StatelessWidget {
           ),
         ),
 
-        // 날씨 관련 Provider
+        // 날씨 Provider
         ChangeNotifierProvider(create: (_) => WeatherProvider()),
 
-        // 갤러리 관련 Provider
+        // 갤러리 Provider
         ChangeNotifierProvider(
           create: (context) => GalleryProvider(
             GalleryRepository(),
