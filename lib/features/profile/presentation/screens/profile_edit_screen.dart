@@ -20,12 +20,23 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
   @override
   void initState() {
     super.initState();
-    final user = context.read<AuthProvider>().currentUser;
-    _nameController.text = user?.name ?? '';
-    _gender = user?.gender;
-    _birthDate = user?.birthDate;
-    _profileImageUrl = user?.profileImageUrl;
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final user = context.read<AuthProvider>().currentUser;
+      if (user != null) {
+        setState(() {
+          _nameController.text = user.name;
+          _gender = user.gender;
+          _birthDate = user.birthDate;
+          _profileImageUrl = user.profileImageUrl;
+        });
+      }
+      print("User Gender: ${user?.name}");
+      print("User Gender: ${user?.gender}");
+      print("User BirthDate: ${user?.birthDate}");
+    });
   }
+
 
   Future<void> _selectBirthDate() async {
     final pickedDate = await showDatePicker(
@@ -52,7 +63,7 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
     }
   }
 
-  void _saveProfile() {
+  void _saveProfile() async {
     if (_nameController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('이름은 비어 있을 수 없습니다')),
@@ -60,19 +71,31 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
       return;
     }
 
-    context.read<AuthProvider>().updateUserProfile(
-      name: _nameController.text,
-      gender: _gender,
-      birthDate: _birthDate,
-      profileImageUrl: _selectedImageFile?.path ?? _profileImageUrl,
-    );
-
-    Navigator.pop(context);
+    try {
+      await context.read<AuthProvider>().updateUserProfile(
+        name: _nameController.text,
+        gender: _gender,
+        birthDate: _birthDate,
+        profileImageUrl: _selectedImageFile?.path,
+      );
+      Navigator.pop(context);
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('프로필 업데이트에 실패했습니다')),
+      );
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     final user = context.watch<AuthProvider>().currentUser;
+
+    if (user == null) {
+      return Scaffold(
+        appBar: AppBar(title: Text('회원 정보 수정')),
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
 
     return Scaffold(
       resizeToAvoidBottomInset: true,
@@ -144,7 +167,7 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
                       OutlinedButton(
                         onPressed: () {
                           setState(() {
-                            _gender = _gender == '남성' ? null : '남성';
+                            _gender = '남성';
                           });
                         },
                         style: OutlinedButton.styleFrom(
@@ -158,7 +181,7 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
                       OutlinedButton(
                         onPressed: () {
                           setState(() {
-                            _gender = _gender == '여성' ? null : '여성';
+                            _gender = '여성';
                           });
                         },
                         style: OutlinedButton.styleFrom(
