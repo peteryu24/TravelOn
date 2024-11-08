@@ -91,60 +91,56 @@ class TravelProvider extends ChangeNotifier {
 
   Future<void> toggleLikePackage(String packageId, String userId) async {
     try {
-      // 패키지와 유저 문서 참조
       final userRef = _firestore.collection('users').doc(userId);
       final packageRef = _firestore.collection('packages').doc(packageId);
 
-      // 현재 상태 확인
-      final userDoc = await userRef.get();
-      final packageDoc = await packageRef.get();
+      await _firestore.runTransaction((transaction) async {
+        final userDoc = await transaction.get(userRef);
+        final packageDoc = await transaction.get(packageRef);
 
-      if (!userDoc.exists || !packageDoc.exists) {
-        throw '사용자 또는 패키지를 찾을 수 없습니다';
-      }
+        if (!userDoc.exists || !packageDoc.exists) {
+          throw '사용자 또는 패키지를 찾을 수 없습니다';
+        }
 
-      // 현재 상태 가져오기
-      List<String> userLikedPackages =
-          List<String>.from(userDoc.data()!['likedPackages'] ?? []);
-      List<String> packageLikedBy =
-          List<String>.from(packageDoc.data()!['likedBy'] ?? []);
-      int currentLikesCount = packageDoc.data()!['likesCount'] ?? 0;
+        // 현재 상태 가져오기
+        List<String> userLikedPackages = List<String>.from(userDoc.data()!['likedPackages'] ?? []);
+        List<String> packageLikedBy = List<String>.from(packageDoc.data()!['likedBy'] ?? []);
+        int currentLikesCount = packageDoc.data()!['likesCount'] ?? 0;
 
-      // 좋아요 토글
-      bool isLiked = userLikedPackages.contains(packageId);
-      if (isLiked) {
-        // 좋아요 취소
-        userLikedPackages.remove(packageId);
-        packageLikedBy.remove(userId);
-        currentLikesCount = math.max(0, currentLikesCount - 1);
-        _likedPackageIds.remove(packageId);
-      } else {
-        // 좋아요 추가
-        userLikedPackages.add(packageId);
-        packageLikedBy.add(userId);
-        currentLikesCount++;
-        _likedPackageIds.add(packageId);
-      }
+        // 좋아요 토글
+        bool isLiked = userLikedPackages.contains(packageId);
+        if (isLiked) {
+          userLikedPackages.remove(packageId);
+          packageLikedBy.remove(userId);
+          currentLikesCount = math.max(0, currentLikesCount - 1);
+          _likedPackageIds.remove(packageId);
+        } else {
+          userLikedPackages.add(packageId);
+          packageLikedBy.add(userId);
+          currentLikesCount++;
+          _likedPackageIds.add(packageId);
+        }
 
-      // 각각 업데이트
-      await userRef.update({
-        'likedPackages': userLikedPackages,
+        // Firestore 업데이트
+        transaction.update(userRef, {'likedPackages': userLikedPackages});
+        transaction.update(packageRef, {
+          'likedBy': packageLikedBy,
+          'likesCount': currentLikesCount,
+        });
+
+        // 로컬 상태 업데이트
+        final packageIndex = _packages.indexWhere((p) => p.id == packageId);
+        if (packageIndex != -1) {
+          _packages[packageIndex] = _packages[packageIndex].copyWith(
+            likedBy: packageLikedBy,
+            likesCount: currentLikesCount,
+          );
+        }
       });
 
-      await packageRef.update({
-        'likedBy': packageLikedBy,
-        'likesCount': currentLikesCount,
-      });
-
-      // 로컬 상태 업데이트
-      final packageIndex = _packages.indexWhere((p) => p.id == packageId);
-      if (packageIndex != -1) {
-        final package = _packages[packageIndex];
-        package.likedBy = packageLikedBy;
-        package.likesCount = currentLikesCount;
-
-        // 패키지 리스트 재정렬
-        _sortPackagesByLikes();
+      // 정렬이 필요한 경우에만 정렬 수행
+      if (_currentSort == SortOption.popular) {
+        _packages.sort((a, b) => b.likesCount.compareTo(a.likesCount));
       }
 
       notifyListeners();

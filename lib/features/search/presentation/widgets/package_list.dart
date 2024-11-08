@@ -189,26 +189,12 @@ class _LikeablePackageCardState extends State<LikeablePackageCard> {
           color: Colors.white.withOpacity(0.8),
           borderRadius: BorderRadius.circular(20),
         ),
-        child: StreamBuilder<DocumentSnapshot>(
-          stream: packageStream,
-          builder: (context, snapshot) {
-            // 데이터가 없거나 오류가 있거나 문서가 존재하지 않는 경우 플레이스홀더 반환
-            if (!snapshot.hasData ||
-                snapshot.hasError ||
-                !snapshot.data!.exists) {
-              return _buildLikeButtonPlaceholder();
-            }
+        child: Consumer<TravelProvider>(  // StreamBuilder 대신 Consumer 사용
+          builder: (context, provider, _) {
+            final package = provider.getPackageById(widget.package.id);
+            if (package == null) return _buildLikeButtonPlaceholder();
 
-            // 안전한 데이터 타입 캐스팅
-            final data = snapshot.data!.data();
-            if (data == null || data is! Map<String, dynamic>) {
-              return _buildLikeButtonPlaceholder();
-            }
-
-            final likesCount = data['likesCount'] ?? 0;
-            final List<String> likedBy =
-                List<String>.from(data['likedBy'] ?? []);
-            final isLiked = userId != null && likedBy.contains(userId);
+            final isLiked = userId != null && package.likedBy.contains(userId);
 
             return Row(
               children: [
@@ -221,7 +207,7 @@ class _LikeablePackageCardState extends State<LikeablePackageCard> {
                 ),
                 SizedBox(width: 4.w),
                 Text(
-                  '$likesCount',
+                  '${package.likesCount}',
                   style: TextStyle(
                     fontSize: 20.sp,
                     fontWeight: FontWeight.bold,

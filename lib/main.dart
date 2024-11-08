@@ -15,6 +15,7 @@ import 'package:travel_on_final/features/auth/domain/usecases/reset_password_use
 // firebase
 import 'package:firebase_core/firebase_core.dart';
 import 'package:travel_on_final/firebase_options.dart';
+import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart' hide AuthProvider;
 import 'package:firebase_app_check/firebase_app_check.dart';
