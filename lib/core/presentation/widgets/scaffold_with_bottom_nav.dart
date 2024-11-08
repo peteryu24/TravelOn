@@ -9,7 +9,6 @@ import 'package:travel_on_final/features/profile/presentation/screens/profile_sc
 import 'package:travel_on_final/features/search/presentation/screens/detail_screens.dart';
 
 class ScaffoldWithBottomNavBar extends StatelessWidget {
-  // child 매개변수는 더 이상 필요 없으므로 제거
   const ScaffoldWithBottomNavBar({super.key});
 
   @override
@@ -17,11 +16,11 @@ class ScaffoldWithBottomNavBar extends StatelessWidget {
     return Scaffold(
       body: IndexedStack(
         index: context.watch<NavigationProvider>().currentIndex,
-        children: [
-          const HomeScreen(),
-          const DetailScreen(),
+        children: const [
+          HomeScreen(),
+          DetailScreen(),
           ChatListScreen(),
-          const ProfileScreen(),
+          ProfileScreen(),
         ],
       ),
       bottomNavigationBar: Consumer<NavigationProvider>(

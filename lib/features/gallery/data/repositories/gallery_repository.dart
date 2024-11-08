@@ -21,13 +21,9 @@ class GalleryRepository {
         .orderBy('createdAt', descending: true)
         .snapshots()
         .map((snapshot) {
-      print('Fetching gallery posts:');
       final posts = snapshot.docs.map((doc) {
         final data = doc.data();
-        print('Post data:');
-        print('ID: ${doc.id}');
-        print('Package ID: ${data['packageId']}');
-        print('Package Title: ${data['packageTitle']}');
+
         return GalleryPost.fromJson({
           'id': doc.id,
           ...data,
@@ -267,7 +263,6 @@ class GalleryRepository {
 
   Future<void> deleteComment(String postId, String commentId) async {
     try {
-      // 댓글 문 삭제
       await _firestore
           .collection('gallery_posts')
           .doc(postId)

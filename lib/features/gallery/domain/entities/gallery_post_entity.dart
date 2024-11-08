@@ -32,10 +32,6 @@ class GalleryPost {
   });
 
   factory GalleryPost.fromJson(Map<String, dynamic> json) {
-    print('Converting JSON to GalleryPost:');
-    print('Package ID from JSON: ${json['packageId']}');
-    print('Package Title from JSON: ${json['packageTitle']}');
-
     return GalleryPost(
       id: json['id'] as String,
       userId: json['userId'] as String,
