@@ -17,9 +17,14 @@ class HomeProvider extends ChangeNotifier {
     _isLoading = true;
     notifyListeners();
 
-    _nextTrip = await _getNextTrip(userId);
-
-    _isLoading = false;
-    notifyListeners();
+    try {
+      _nextTrip = await _getNextTrip(userId);
+    } catch (e) {
+      _nextTrip = null;
+      rethrow;
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
   }
 }

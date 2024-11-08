@@ -1,40 +1,45 @@
 // test/features/home/domain/usecases/get_next_trip_test.dart
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
-import 'package:travel_on_final/features/home/domain/entities/next_trip_entity.dart';
+import 'package:mockito/annotations.dart';
 import 'package:travel_on_final/features/home/domain/repositories/home_repository.dart';
+import 'package:travel_on_final/features/home/domain/entities/next_trip_entity.dart';
 import 'package:travel_on_final/features/home/domain/usecases/get_next_trip.dart';
 
-class MockHomeRepository extends Mock implements HomeRepository {}
+@GenerateNiceMocks([MockSpec<HomeRepository>()])
+import 'get_next_trip_test.mocks.dart';
 
 void main() {
-  late GetNextTrip usecase;
+  late GetNextTrip useCase;
   late MockHomeRepository mockRepository;
 
   setUp(() {
     mockRepository = MockHomeRepository();
-    usecase = GetNextTrip(mockRepository);
+    useCase = GetNextTrip(mockRepository);
   });
 
   test('should get next trip from repository', () async {
-    // given
-    final tUserId = 'test_user_id';
-    final tNextTrip = NextTripEntity(
-      packageTitle: '부산 여행',
-      tripDate: DateTime.now(),
-      dDay: 5,
+    final mockNextTrip = NextTripEntity(
+      packageTitle: 'Test Package',
+      tripDate: DateTime.now().add(const Duration(days: 1)),
       isTodayTrip: false,
     );
 
-    when(mockRepository.getNextTrip(tUserId))
-        .thenAnswer((_) async => tNextTrip);
+    when(mockRepository.getNextTrip('user1'))
+        .thenAnswer((_) async => mockNextTrip);
 
-    // when
-    final result = await usecase(tUserId);
+    final result = await useCase('user1');
 
-    // then
-    expect(result, tNextTrip);
-    verify(mockRepository.getNextTrip(tUserId));
-    verifyNoMoreInteractions(mockRepository);
+    expect(result, equals(mockNextTrip));
+    verify(mockRepository.getNextTrip('user1')).called(1);
+  });
+
+  test('should return null when no next trip exists', () async {
+    when(mockRepository.getNextTrip('user1')).thenAnswer((_) async => null);
+
+    final result = await useCase('user1');
+
+    expect(result, isNull);
+    verify(mockRepository.getNextTrip('user1')).called(1);
   });
 }
