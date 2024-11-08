@@ -66,26 +66,8 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
-  Future<void> _resetPassword() async {
-    final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    final email = _emailController.text;
-
-    if (email.isNotEmpty) {
-      try {
-        await authProvider.resetPassword(email);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('비밀번호 재설정 메일이 발송되었습니다.')),
-        );
-      } catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('비밀번호 재설정에 실패했습니다.')),
-        );
-      }
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('이메일을 입력해주세요.')),
-      );
-    }
+  void _resetPassword() {
+    context.push('/reset_password');
   }
 
   void _navigateToSignup() {
@@ -150,7 +132,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 TextButton(
                   onPressed: _resetPassword,
                   child: Text(
-                    '비밀번호 찾기',
+                    '비밀번호 재설정',
                     style: TextStyle(color: Colors.blue, fontSize: 14.sp),
                   ),
                 ),

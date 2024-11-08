@@ -1,6 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart'
-    hide AuthProvider; // AuthProvider 숨기기
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:travel_on_final/features/home/data/repositories/home_repository_impl.dart';
@@ -14,20 +11,21 @@ import 'package:travel_on_final/features/review/presentation/provider/review_pro
 import 'package:travel_on_final/features/search/data/repositories/travel_repositories_impl.dart';
 import 'package:travel_on_final/route.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:travel_on_final/features/auth/domain/usecases/reset_password_usecase.dart';
 // firebase
 import 'package:firebase_core/firebase_core.dart';
 import 'package:travel_on_final/firebase_options.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart'
+    hide AuthProvider;
 // provider
 import 'package:provider/provider.dart';
 import 'package:travel_on_final/core/providers/navigation_provider.dart';
 import 'package:travel_on_final/features/auth/presentation/providers/auth_provider.dart'
-    as app; // alias 추가
+    as app;
 import 'package:travel_on_final/features/chat/presentation/providers/chat_provider.dart';
 import 'package:travel_on_final/features/search/presentation/providers/travel_provider.dart';
-// social_login
-import 'package:kakao_flutter_sdk/kakao_flutter_sdk.dart';
 // DI
-import 'package:travel_on_final/features/auth/domain/usecases/kakao_login_usecase.dart';
 import 'package:travel_on_final/features/auth/data/repositories/auth_repository_impl.dart';
 import 'package:travel_on_final/features/auth/domain/repositories/auth_repository.dart';
 import 'package:travel_on_final/features/gallery/data/repositories/gallery_repository.dart';
@@ -37,11 +35,7 @@ Future<void> main() async {
   await dotenv.load(fileName: ".env");
 
   WidgetsFlutterBinding.ensureInitialized();
-  // String kakaoNativeAppKey = dotenv.env['KAKAO_NATIVE_APP_KEY'] ?? '';
 
-  // KakaoSdk.init(nativeAppKey: kakaoNativeAppKey);
-
-  // Firebase 초기화
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
@@ -58,11 +52,14 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        // Navigation
-        ChangeNotifierProvider(create: (_) => NavigationProvider()),
+        Provider<FirebaseAuth>.value(value: FirebaseAuth.instance),
+        Provider<FirebaseFirestore>.value(value: FirebaseFirestore.instance),
 
         // Auth 관련 Providers
         Provider<AuthRepository>(create: (_) => AuthRepositoryImpl()),
+        ProxyProvider<FirebaseAuth, ResetPasswordUseCase>(
+          update: (_, auth, __) => ResetPasswordUseCase(auth),
+        ),
 
         // Travel 관련 Providers
         ChangeNotifierProvider(
@@ -72,34 +69,35 @@ class MyApp extends StatelessWidget {
           ),
         ),
 
-        // KakaoLogin UseCase
-        ProxyProvider<AuthRepository, KakaoLoginUseCase>(
-          update: (_, authRepository, __) => KakaoLoginUseCase(authRepository),
-        ),
-
-        // Auth Provider
-        ChangeNotifierProxyProvider2<KakaoLoginUseCase, TravelProvider,
-            app.AuthProvider>(
+        ChangeNotifierProvider(
           create: (context) => app.AuthProvider(
-            context.read<KakaoLoginUseCase>(),
+            context.read<FirebaseAuth>(),          
+            context.read<ResetPasswordUseCase>(),
             context.read<TravelProvider>(),
           ),
-          update: (context, kakaoLoginUseCase, travelProvider, previous) =>
-              previous ?? app.AuthProvider(kakaoLoginUseCase, travelProvider),
         ),
 
-        // 기타 Providers
+        // 네비게이션 관련 Provider
+        ChangeNotifierProvider(create: (_) => NavigationProvider()),
+
+        // 채팅 관련 Provider
         ChangeNotifierProvider(create: (_) => ChatProvider()),
+
+        // 예약 관련 Provider
         ChangeNotifierProvider(
           create: (_) => ReservationProvider(FirebaseFirestore.instance),
         ),
+
+        // 리뷰 관련 Provider
         ChangeNotifierProvider(
           create: (context) => ReviewProvider(
             ReviewRepositoryImpl(
-              context.read<TravelProvider>(),  // TravelProvider 주입
+              context.read<TravelProvider>(),
             ),
           ),
         ),
+
+        // 홈 화면 관련 Provider
         ChangeNotifierProvider(
           create: (_) => HomeProvider(
             GetNextTrip(
@@ -107,7 +105,11 @@ class MyApp extends StatelessWidget {
             ),
           ),
         ),
+
+        // 날씨 관련 Provider
         ChangeNotifierProvider(create: (_) => WeatherProvider()),
+
+        // 갤러리 관련 Provider
         ChangeNotifierProvider(
           create: (context) => GalleryProvider(
             GalleryRepository(),

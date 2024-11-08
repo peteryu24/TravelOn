@@ -133,7 +133,7 @@ class _HomeScreenState extends State<HomeScreen> {
               // 가로 스크롤 되는 추천 이미지 카드
               Consumer<TravelProvider>(
                 builder: (context, provider, child) {
-                  final popularPackages = provider.popularPackages;
+                  final popularPackages = provider.getPopularPackages();
 
                   return SizedBox(
                     height: 200.h,

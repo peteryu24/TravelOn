@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 // auth
 import 'package:travel_on_final/features/auth/presentation/screens/login_screen.dart';
 import 'package:travel_on_final/features/auth/presentation/screens/signup_screen.dart';
+import 'package:travel_on_final/features/auth/presentation/screens/reset_password_screen.dart';
 // core
 import 'package:travel_on_final/core/presentation/widgets/scaffold_with_bottom_nav.dart';
 // chat
@@ -108,6 +109,10 @@ final goRouter = GoRouter(
     GoRoute(
       path: '/signup',
       builder: (context, state) => SignupScreen(),
+    ),
+    GoRoute(
+      path: '/reset_password',
+      builder: (context, state) => const ResetPasswordScreen(),
     ),
     GoRoute(
       path: '/liked-packages',

@@ -73,7 +73,7 @@ class ChatListScreen extends StatelessWidget {
                   final confirm = await showDialog<bool>(
                     context: context,
                     builder: (ctx) => AlertDialog(
-                      title: Text('${chatData['usernames'][otherUserId]}을 나가시겠습니까?'),
+                      title: Text('${chatData['usernames'][otherUserId]}님과의 대화방을 나가시겠습니까?'),
                       actions: [
                         TextButton(
                           onPressed: () => Navigator.of(ctx).pop(false),

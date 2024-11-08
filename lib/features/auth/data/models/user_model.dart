@@ -1,4 +1,5 @@
 import 'package:travel_on_final/features/auth/domain/entities/user_entity.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class UserModel extends User {
   final String id;
@@ -31,7 +32,9 @@ class UserModel extends User {
       profileImageUrl: json['profileImageUrl'] as String?,
       isGuide: json['isGuide'] as bool? ?? false,
       gender: json['gender'] as String?,
-      birthDate: json['birthDate'] != null ? DateTime.parse(json['birthDate']) : null,
+      birthDate: json['birthDate'] != null 
+          ? (json['birthDate'] as Timestamp).toDate() 
+          : null,
       likedPackages: List<String>.from(json['likedPackages'] ?? []),
     );
   }
