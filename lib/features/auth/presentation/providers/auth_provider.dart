@@ -5,22 +5,16 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:provider/provider.dart';
 import 'package:travel_on_final/features/auth/data/models/user_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:travel_on_final/features/auth/domain/usecases/kakao_login_usecase.dart';
 import 'package:travel_on_final/features/search/presentation/providers/travel_provider.dart';
-import 'package:travel_on_final/features/auth/domain/usecases/google_login_usecase.dart';
-import 'package:travel_on_final/features/auth/domain/usecases/naver_login_usecase.dart';
-import 'package:travel_on_final/features/auth/domain/usecases/facebook_login_usecase.dart';
+import 'package:travel_on_final/features/auth/domain/usecases/reset_password_usecase.dart';
 import 'package:travel_on_final/features/gallery/presentation/providers/gallery_provider.dart';
 
 class AuthProvider with ChangeNotifier {
-  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseAuth _auth;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseStorage _storage = FirebaseStorage.instance;
-  final KakaoLoginUseCase _kakaoLoginUseCase;
   final TravelProvider _travelProvider;
-  final GoogleLoginUseCase _googleLoginUseCase = GoogleLoginUseCase();
-  final FacebookLoginUseCase _facebookLoginUseCase = FacebookLoginUseCase();
-  final NaverLoginUseCase _naverLoginUseCase = NaverLoginUseCase();
+  final ResetPasswordUseCase _resetPasswordUseCase;
 
   UserModel? _currentUser;
   bool isEmailVerified = false;
@@ -28,7 +22,12 @@ class AuthProvider with ChangeNotifier {
   UserModel? get currentUser => _currentUser;
   bool get isAuthenticated => _currentUser != null;
 
-  AuthProvider(this._kakaoLoginUseCase, this._travelProvider) {
+  
+  AuthProvider(
+    this._auth,
+    this._resetPasswordUseCase,
+    this._travelProvider,
+  ) {
     _auth.authStateChanges().listen(_onAuthStateChanged);
   }
 
@@ -187,9 +186,7 @@ class AuthProvider with ChangeNotifier {
     if (firebaseUser != null && firebaseUser.emailVerified) {
       isEmailVerified = true;
       try {
-        final userDoc =
-            await _firestore.collection('users').doc(firebaseUser.uid).get();
-
+        final userDoc = await _firestore.collection('users').doc(firebaseUser.uid).get();
         final userData = userDoc.data() ?? {};
 
         if (!userDoc.exists) {
@@ -200,11 +197,10 @@ class AuthProvider with ChangeNotifier {
             'profileImageUrl': '',
             'isGuide': false,
             'likedPackages': [],
+            'gender': null,
+            'birthDate': null,
           };
-          await _firestore
-              .collection('users')
-              .doc(firebaseUser.uid)
-              .set(newUserDoc);
+          await _firestore.collection('users').doc(firebaseUser.uid).set(newUserDoc);
 
           _currentUser = UserModel.fromJson(newUserDoc);
         } else {
@@ -215,6 +211,10 @@ class AuthProvider with ChangeNotifier {
             profileImageUrl: userData['profileImageUrl'] as String?,
             isGuide: userData['isGuide'] as bool? ?? false,
             likedPackages: List<String>.from(userData['likedPackages'] ?? []),
+            gender: userData['gender'] as String?, // 추가
+            birthDate: userData['birthDate'] != null
+                ? (userData['birthDate'] as Timestamp).toDate()
+                : null, // 추가
           );
         }
 
@@ -259,7 +259,7 @@ class AuthProvider with ChangeNotifier {
       final userRef = _firestore.collection('users').doc(_currentUser!.id);
 
       String? imageUrl = profileImageUrl;
-      if (profileImageUrl != null && !profileImageUrl.startsWith('http')) {
+      if (profileImageUrl != null && File(profileImageUrl).existsSync()) {
         final ref = _storage.ref().child('user_profiles/${_currentUser!.id}.jpg');
         await ref.putFile(File(profileImageUrl));
         imageUrl = await ref.getDownloadURL();
@@ -287,102 +287,11 @@ class AuthProvider with ChangeNotifier {
   }
 
   // 비밀번호 재설정
+
   Future<void> resetPassword(String email) async {
-    try {
-      await _auth.sendPasswordResetEmail(email: email);
-    } catch (e) {
-      print('비밀번호 재설정 메일 전송 실패: $e');
-      throw '비밀번호 재설정 메일 전송에 실패했습니다';
-    }
+    await _resetPasswordUseCase.call(email);
   }
   
-  /////////////////////////////////////////////////////////////////////
-  /// 소셜 로그인
-  // Future<void> loginWithKakao() async {
-  //   try {
-  //     final userModel = await _kakaoLoginUseCase.execute();
-  //     if (userModel != null) {
-  //       await _firestore.collection('users').doc(userModel.id).set({
-  //         'id': userModel.id,
-  //         'name': userModel.name,
-  //         'email': userModel.email,
-  //         'profileImageUrl': userModel.profileImageUrl,
-  //         'isGuide': userModel.isGuide,
-  //       }, SetOptions(merge: true));
-
-  //       _currentUser = userModel;
-  //       notifyListeners();
-  //     } else {
-  //       print('카카오톡 로그인 실패');
-  //     }
-  //   } catch (e) {
-  //     print('카카오톡 로그인 에러: $e');
-  //   }
-  // }
-
-  // Future<void> loginWithGoogle() async {
-  //   final userModel = await _googleLoginUseCase.execute();
-  //   if (userModel != null) {
-  //     await _firestore.collection('users').doc(userModel.id).set({
-  //       'id': userModel.id,
-  //       'name': userModel.name,
-  //       'email': userModel.email,
-  //       'profileImageUrl': userModel.profileImageUrl ?? '',
-  //       'isGuide': userModel.isGuide ?? false,
-  //     }, SetOptions(merge: true));
-
-  //     _currentUser = userModel;
-  //     notifyListeners();
-  //   } else {
-  //     print('Google 로그인 실패');
-  //   }
-  // }
-
-  // // Facebook 로그인 메서드
-  // Future<void> loginWithFacebook() async {
-  //   try {
-  //     final userModel = await _facebookLoginUseCase.execute();
-  //     if (userModel != null) {
-  //       await _firestore.collection('users').doc(userModel.id).set({
-  //         'id': userModel.id,
-  //         'name': userModel.name,
-  //         'email': userModel.email,
-  //         'profileImageUrl': userModel.profileImageUrl ?? '',
-  //         'isGuide': userModel.isGuide ?? false,
-  //       }, SetOptions(merge: true));
-
-  //       _currentUser = userModel;
-  //       notifyListeners();
-  //     } else {
-  //       print('Facebook 로그인 실패');
-  //     }
-  //   } catch (e) {
-  //     print('Facebook 로그인 에러: $e');
-  //   }
-  // }
-
-  // Future<void> loginWithNaver() async {
-  //   try {
-  //     final userModel = await _naverLoginUseCase.execute();
-  //     if (userModel != null) {
-  //       await _firestore.collection('users').doc(userModel.id).set({
-  //         'id': userModel.id,
-  //         'name': userModel.name,
-  //         'email': userModel.email,
-  //         'profileImageUrl': userModel.profileImageUrl ?? '',
-  //         'isGuide': userModel.isGuide ?? false,
-  //       }, SetOptions(merge: true));
-
-  //       _currentUser = userModel;
-  //       notifyListeners();
-  //     } else {
-  //       print('Naver 로그인 실패');
-  //     }
-  //   } catch (e) {
-  //     print('Naver 로그인 에러: $e');
-  //   }
-  // }
-
   Future<void> toggleLikePackage(String packageId) async {
     if (_currentUser == null) throw '로그인이 필요합니다';
 
