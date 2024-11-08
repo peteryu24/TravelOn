@@ -46,21 +46,21 @@ class ReviewRepositoryImpl implements ReviewRepository {
   @override
   Future<bool> canUserReview(String userId, String packageId) async {
     try {
-      // 승인된 예약이 있는지 확인
       final reservations = await _firestore
           .collection('reservations')
-          .where('customerId', isEqualTo: userId)  // userId 대신 customerId 사용
+          .where('customerId', isEqualTo: userId)
           .where('packageId', isEqualTo: packageId)
           .where('status', isEqualTo: 'approved')
           .get();
 
-      // 디버깅을 위한 로그 추가
-      print('Checking review permission for user $userId and package $packageId');
-      print('Found ${reservations.docs.length} approved reservations');
+      // print('Checking reservations for user $userId and package $packageId');
+      for (var doc in reservations.docs) {
+        // print('Reservation data: ${doc.data()}');
+      }
 
       return reservations.docs.isNotEmpty;
     } catch (e) {
-      print('Error checking review permission: $e');
+      // print('Error in canUserReview: $e');
       return false;
     }
   }
