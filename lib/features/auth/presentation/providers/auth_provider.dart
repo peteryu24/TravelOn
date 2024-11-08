@@ -286,6 +286,16 @@ class AuthProvider with ChangeNotifier {
     }
   }
 
+  // 비밀번호 재설정
+  Future<void> resetPassword(String email) async {
+    try {
+      await _auth.sendPasswordResetEmail(email: email);
+    } catch (e) {
+      print('비밀번호 재설정 메일 전송 실패: $e');
+      throw '비밀번호 재설정 메일 전송에 실패했습니다';
+    }
+  }
+  
   /////////////////////////////////////////////////////////////////////
   /// 소셜 로그인
   // Future<void> loginWithKakao() async {

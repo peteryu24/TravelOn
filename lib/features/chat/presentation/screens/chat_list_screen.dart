@@ -54,41 +54,71 @@ class ChatListScreen extends StatelessWidget {
             itemBuilder: (ctx, index) {
               final chatData = chatDocs[index].data() as Map<String, dynamic>;
               final chatId = chatDocs[index].id;
-              final otherUserId =
-                  authProvider.currentUser!.id == chatData['participants'][0]
-                      ? chatData['participants'][1]
-                      : chatData['participants'][0];
+              final otherUserId = authProvider.currentUser!.id == chatData['participants'][0]
+                  ? chatData['participants'][1]
+                  : chatData['participants'][0];
 
               chatProvider.updateOtherUserInfo(chatId, otherUserId);
 
-              return ListTile(
-                leading: CircleAvatar(
-                  backgroundImage: chatData['userProfileImages'] != null &&
-                          chatData['userProfileImages'][otherUserId] != null &&
-                          chatData['userProfileImages'][otherUserId].isNotEmpty
-                      ? NetworkImage(chatData['userProfileImages'][otherUserId])
-                      : const AssetImage('assets/images/default_profile.png')
-                          as ImageProvider,
+              return Dismissible(
+                key: Key(chatId),
+                direction: DismissDirection.endToStart,
+                background: Container(
+                  color: Colors.red[200],
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  alignment: Alignment.centerRight,
+                  child: const Icon(Icons.delete, color: Colors.white),
                 ),
-                title: Text(
-                  chatData['usernames'][otherUserId]?.substring(
-                          0,
-                          chatData['usernames'][otherUserId].length > 15
-                              ? 15
-                              : chatData['usernames'][otherUserId].length) ??
-                      'Unknown User',
-                  style: const TextStyle(fontWeight: FontWeight.bold),
-                ),
-                subtitle: Text(
-                  (chatData['lastMessage'] != null &&
-                          chatData['lastMessage'].length > 65)
-                      ? '${chatData['lastMessage'].substring(0, 65)}...'
-                      : chatData['lastMessage'] ?? '',
-                ),
-                onTap: () {
-                  chatProvider.startListeningToMessages(chatId);
-                  GoRouter.of(context).push('/chat/$chatId');
+                confirmDismiss: (direction) async {
+                  final confirm = await showDialog<bool>(
+                    context: context,
+                    builder: (ctx) => AlertDialog(
+                      title: Text('${chatData['usernames'][otherUserId]}을 나가시겠습니까?'),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.of(ctx).pop(false),
+                          child: const Text('취소'),
+                        ),
+                        TextButton(
+                          onPressed: () => Navigator.of(ctx).pop(true),
+                          child: const Text('나가기'),
+                        ),
+                      ],
+                    ),
+                  );
+                  return confirm ?? false;
                 },
+                onDismissed: (direction) async {
+                  await chatProvider.leaveChatRoom(chatId, authProvider.currentUser!.id);
+                },
+                child: ListTile(
+                  leading: CircleAvatar(
+                    backgroundImage: chatData['userProfileImages'] != null &&
+                            chatData['userProfileImages'][otherUserId] != null &&
+                            chatData['userProfileImages'][otherUserId].isNotEmpty
+                        ? NetworkImage(chatData['userProfileImages'][otherUserId])
+                        : const AssetImage('assets/images/default_profile.png')
+                            as ImageProvider,
+                  ),
+                  title: Text(
+                    chatData['usernames'][otherUserId]?.substring(
+                            0,
+                            chatData['usernames'][otherUserId].length > 15
+                                ? 15
+                                : chatData['usernames'][otherUserId].length) ?? 
+                        'Unknown User',
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  subtitle: Text(
+                    (chatData['lastMessage'] != null && chatData['lastMessage'].length > 65)
+                        ? '${chatData['lastMessage'].substring(0, 65)}...'
+                        : chatData['lastMessage'] ?? '',
+                  ),
+                  onTap: () {
+                    chatProvider.startListeningToMessages(chatId);
+                    GoRouter.of(context).push('/chat/$chatId');
+                  },
+                ),
               );
             },
           );

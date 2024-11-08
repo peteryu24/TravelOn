@@ -128,4 +128,22 @@ class ChatProvider extends ChangeNotifier {
       'userProfileImages.$otherUserId': otherUserProfileImage,
     });
   }
+
+  // 채팅방 나가기
+  Future<void> leaveChatRoom(String chatId, String userId) async {
+    final chatRef = _firestore.collection('chats').doc(chatId);
+    final chatSnapshot = await chatRef.get();
+
+    if (chatSnapshot.exists) {
+      final participants = List<String>.from(chatSnapshot['participants']);
+
+      participants.remove(userId);
+
+      if (participants.isEmpty) {
+        await chatRef.delete();
+      } else {
+        await chatRef.update({'participants': participants});
+      }
+    }
+  }
 }
