@@ -38,10 +38,9 @@ class GalleryProvider extends ChangeNotifier {
     required File imageFile,
     required String location,
     required String description,
+    String? packageId,
+    String? packageTitle,
   }) async {
-    _isLoading = true;
-    notifyListeners();
-
     try {
       await _repository.uploadPost(
         userId: userId,
@@ -50,10 +49,11 @@ class GalleryProvider extends ChangeNotifier {
         imageFile: imageFile,
         location: location,
         description: description,
+        packageId: packageId,
+        packageTitle: packageTitle,
       );
-    } finally {
-      _isLoading = false;
-      notifyListeners();
+    } catch (e) {
+      throw Exception('게시물 업로드 실패: $e');
     }
   }
 
@@ -129,6 +129,8 @@ class GalleryProvider extends ChangeNotifier {
     required String location,
     required String description,
     File? newImage,
+    String? packageId,
+    String? packageTitle,
   }) async {
     _isLoading = true;
     notifyListeners();
@@ -139,6 +141,8 @@ class GalleryProvider extends ChangeNotifier {
         location: location,
         description: description,
         newImage: newImage,
+        packageId: packageId,
+        packageTitle: packageTitle,
       );
 
       // 로컬 상태 업데이트

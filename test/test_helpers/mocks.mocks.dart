@@ -129,6 +129,57 @@ class MockAuthProvider extends _i1.Mock implements _i2.AuthProvider {
       ) as _i3.Future<void>);
 
   @override
+  _i3.Future<bool> checkPassword(String? password) => (super.noSuchMethod(
+        Invocation.method(
+          #checkPassword,
+          [password],
+        ),
+        returnValue: _i3.Future<bool>.value(false),
+      ) as _i3.Future<bool>);
+
+  @override
+  _i3.Future<void> updateUserProfile({
+    required String? name,
+    String? gender,
+    DateTime? birthDate,
+    String? profileImageUrl,
+  }) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #updateUserProfile,
+          [],
+          {
+            #name: name,
+            #gender: gender,
+            #birthDate: birthDate,
+            #profileImageUrl: profileImageUrl,
+          },
+        ),
+        returnValue: _i3.Future<void>.value(),
+        returnValueForMissingStub: _i3.Future<void>.value(),
+      ) as _i3.Future<void>);
+
+  @override
+  _i3.Future<void> resetPassword(String? email) => (super.noSuchMethod(
+        Invocation.method(
+          #resetPassword,
+          [email],
+        ),
+        returnValue: _i3.Future<void>.value(),
+        returnValueForMissingStub: _i3.Future<void>.value(),
+      ) as _i3.Future<void>);
+
+  @override
+  _i3.Future<void> toggleLikePackage(String? packageId) => (super.noSuchMethod(
+        Invocation.method(
+          #toggleLikePackage,
+          [packageId],
+        ),
+        returnValue: _i3.Future<void>.value(),
+        returnValueForMissingStub: _i3.Future<void>.value(),
+      ) as _i3.Future<void>);
+
+  @override
   void addListener(_i5.VoidCallback? listener) => super.noSuchMethod(
         Invocation.method(
           #addListener,

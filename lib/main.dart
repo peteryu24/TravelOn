@@ -16,8 +16,8 @@ import 'package:travel_on_final/features/auth/domain/usecases/reset_password_use
 import 'package:firebase_core/firebase_core.dart';
 import 'package:travel_on_final/firebase_options.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart'
-    hide AuthProvider;
+import 'package:firebase_auth/firebase_auth.dart' hide AuthProvider;
+import 'package:firebase_app_check/firebase_app_check.dart';
 // provider
 import 'package:provider/provider.dart';
 import 'package:travel_on_final/core/providers/navigation_provider.dart';
@@ -43,7 +43,7 @@ Future<void> main() async {
   await FirebaseAppCheck.instance.activate(
     webProvider: ReCaptchaV3Provider('recaptcha-v3-site-key'),
     androidProvider: AndroidProvider.debug,
-    appleProvider: AppleProvider.appAttest,  // iOS용
+    appleProvider: AppleProvider.appAttest, // iOS용
   );
 
   await SharedPreferences.getInstance();

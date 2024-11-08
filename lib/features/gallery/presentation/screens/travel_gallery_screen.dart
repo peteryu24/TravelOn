@@ -5,7 +5,6 @@ import '../widgets/gallery_post.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../providers/gallery_provider.dart';
-import '../../domain/entities/comment_entity.dart';
 
 class TravelGalleryScreen extends StatelessWidget {
   const TravelGalleryScreen({super.key});
@@ -28,7 +27,7 @@ class TravelGalleryScreen extends StatelessWidget {
         actions: [
           IconButton(
             onPressed: () => context.push('/scrapped-posts'),
-            icon: const Icon(Icons.bookmark),
+            icon: const Icon(CupertinoIcons.bookmark_fill),
           ),
           IconButton(
             onPressed: () => context.push('/add-gallery-post'),
@@ -55,15 +54,17 @@ class TravelGalleryScreen extends StatelessWidget {
               final comments = provider.getCommentsForPost(post.id);
 
               return GalleryPost(
-                userId: post.userId,
-                postId: post.id,
                 imgUrl: post.imageUrl,
                 username: post.username,
                 location: post.location,
                 description: post.description,
+                postId: post.id,
                 likedBy: post.likedBy,
                 likeCount: post.likeCount,
                 comments: comments,
+                userId: post.userId,
+                packageId: post.packageId,
+                packageTitle: post.packageTitle,
               );
             },
           );

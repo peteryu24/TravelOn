@@ -12,6 +12,8 @@ class GalleryPost {
   final List<String> likedBy;
   final int likeCount;
   final List<String> comments;
+  final String? packageId;
+  final String? packageTitle;
 
   GalleryPost({
     required this.id,
@@ -25,6 +27,8 @@ class GalleryPost {
     required this.likedBy,
     required this.likeCount,
     required this.comments,
+    this.packageId,
+    this.packageTitle,
   });
 
   factory GalleryPost.fromJson(Map<String, dynamic> json) {
@@ -38,8 +42,10 @@ class GalleryPost {
       description: json['description'] as String,
       createdAt: (json['createdAt'] as Timestamp).toDate(),
       likedBy: List<String>.from(json['likedBy'] ?? []),
-      likeCount: json['likeCount'] as int? ?? 0,
+      likeCount: json['likeCount'] as int,
       comments: List<String>.from(json['comments'] ?? []),
+      packageId: json['packageId'] as String?,
+      packageTitle: json['packageTitle'] as String?,
     );
   }
 
@@ -56,6 +62,8 @@ class GalleryPost {
       'likedBy': likedBy,
       'likeCount': likeCount,
       'comments': comments,
+      'packageId': packageId,
+      'packageTitle': packageTitle,
     };
   }
 
@@ -71,6 +79,8 @@ class GalleryPost {
     List<String>? likedBy,
     int? likeCount,
     List<String>? comments,
+    String? packageId,
+    String? packageTitle,
   }) {
     return GalleryPost(
       id: id ?? this.id,
@@ -84,6 +94,8 @@ class GalleryPost {
       likedBy: likedBy ?? this.likedBy,
       likeCount: likeCount ?? this.likeCount,
       comments: comments ?? this.comments,
+      packageId: packageId ?? this.packageId,
+      packageTitle: packageTitle ?? this.packageTitle,
     );
   }
 }
