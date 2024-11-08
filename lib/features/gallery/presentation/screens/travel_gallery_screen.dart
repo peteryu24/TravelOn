@@ -5,7 +5,6 @@ import '../widgets/gallery_post.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../providers/gallery_provider.dart';
-import '../../domain/entities/comment_entity.dart';
 
 class TravelGalleryScreen extends StatelessWidget {
   const TravelGalleryScreen({super.key});

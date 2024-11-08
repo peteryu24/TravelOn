@@ -212,6 +212,8 @@ class GalleryRepository {
     required String location,
     required String description,
     File? newImage,
+    String? packageId,
+    String? packageTitle,
   }) async {
     try {
       final postRef = _firestore.collection('gallery_posts').doc(postId);
@@ -220,6 +222,8 @@ class GalleryRepository {
         'location': location,
         'description': description,
         'updatedAt': DateTime.now(),
+        'packageId': packageId,
+        'packageTitle': packageTitle,
       };
 
       // 새 이미지가 있는 경우에만 이미지 업로드 및 URL 업데이트

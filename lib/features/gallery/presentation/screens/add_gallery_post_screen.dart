@@ -252,6 +252,7 @@ class _AddGalleryPostScreenState extends State<AddGalleryPostScreen> {
                               reservation.packageTitle,
                               overflow: TextOverflow.ellipsis,
                               maxLines: 1,
+                              style: TextStyle(fontSize: 14.sp),
                             ),
                           );
                         }),

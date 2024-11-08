@@ -129,6 +129,8 @@ class GalleryProvider extends ChangeNotifier {
     required String location,
     required String description,
     File? newImage,
+    String? packageId,
+    String? packageTitle,
   }) async {
     _isLoading = true;
     notifyListeners();
@@ -139,6 +141,8 @@ class GalleryProvider extends ChangeNotifier {
         location: location,
         description: description,
         newImage: newImage,
+        packageId: packageId,
+        packageTitle: packageTitle,
       );
 
       // 로컬 상태 업데이트
