@@ -94,7 +94,6 @@ class TravelProvider extends ChangeNotifier {
       final userRef = _firestore.collection('users').doc(userId);
       final packageRef = _firestore.collection('packages').doc(packageId);
 
-      // Firestore 트랜잭션 실행
       await _firestore.runTransaction((transaction) async {
         final userDoc = await transaction.get(userRef);
         final packageDoc = await transaction.get(packageRef);
@@ -128,33 +127,23 @@ class TravelProvider extends ChangeNotifier {
           'likedBy': packageLikedBy,
           'likesCount': currentLikesCount,
         });
+
+        // 로컬 상태 업데이트
+        final packageIndex = _packages.indexWhere((p) => p.id == packageId);
+        if (packageIndex != -1) {
+          _packages[packageIndex] = _packages[packageIndex].copyWith(
+            likedBy: packageLikedBy,
+            likesCount: currentLikesCount,
+          );
+        }
       });
 
-      // 패키지 데이터 새로 가져오기
-      final packageDoc = await packageRef.get();
-      if (packageDoc.exists) {
-        final packageData = packageDoc.data()!;
-        final packageIndex = _packages.indexWhere((p) => p.id == packageId);
-
-        if (packageIndex != -1) {
-          // 최신 데이터로 패키지 업데이트
-          _packages[packageIndex] = TravelPackage.fromJson({
-            'id': packageId,
-            ...packageData,
-          });
-
-          // 정렬이 필요한 경우에만 정렬 수행
-          if (_currentSort == SortOption.popular) {
-            _packages.sort((a, b) => b.likesCount.compareTo(a.likesCount));
-          }
-        }
+      // 정렬이 필요한 경우에만 정렬 수행
+      if (_currentSort == SortOption.popular) {
+        _packages.sort((a, b) => b.likesCount.compareTo(a.likesCount));
       }
 
-      // UI 갱신을 위한 알림
       notifyListeners();
-
-      // 호출한 쪽에 결과 반환을 위해 최신 패키지 데이터 반환
-      return;
     } catch (e) {
       print('Error toggling like: $e');
       rethrow;
