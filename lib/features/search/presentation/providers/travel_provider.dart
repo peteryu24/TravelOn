@@ -312,4 +312,14 @@ class TravelProvider extends ChangeNotifier {
 
     return filtered;
   }
+
+  Future<bool> checkPackageExists(String packageId) async {
+    try {
+      final doc = await _firestore.collection('packages').doc(packageId).get();
+      return doc.exists;
+    } catch (e) {
+      print('Error checking package existence: $e');
+      return false;
+    }
+  }
 }

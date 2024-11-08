@@ -8,6 +8,7 @@ import 'comment_bottom_sheet.dart';
 import '../../domain/entities/comment_entity.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:go_router/go_router.dart';
+import 'package_tag.dart';
 
 class GalleryPost extends StatefulWidget {
   final String imgUrl;
@@ -19,6 +20,8 @@ class GalleryPost extends StatefulWidget {
   final int likeCount;
   final List<Comment> comments;
   final String userId;
+  final String? packageId;
+  final String? packageTitle;
 
   const GalleryPost({
     super.key,
@@ -31,6 +34,8 @@ class GalleryPost extends StatefulWidget {
     required this.likeCount,
     required this.comments,
     required this.userId,
+    this.packageId,
+    this.packageTitle,
   });
 
   @override
@@ -319,6 +324,13 @@ class _GalleryPostState extends State<GalleryPost> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(widget.description),
+              if (widget.packageId != null && widget.packageTitle != null) ...[
+                SizedBox(height: 8.h),
+                PackageTag(
+                  packageId: widget.packageId!,
+                  packageTitle: widget.packageTitle!,
+                ),
+              ],
               if (widget.comments.isNotEmpty)
                 TextButton(
                   onPressed: _showComments,

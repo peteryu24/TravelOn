@@ -21,9 +21,19 @@ class GalleryRepository {
         .orderBy('createdAt', descending: true)
         .snapshots()
         .map((snapshot) {
-      return snapshot.docs
-          .map((doc) => GalleryPost.fromJson(doc.data()))
-          .toList();
+      print('Fetching gallery posts:');
+      final posts = snapshot.docs.map((doc) {
+        final data = doc.data();
+        print('Post data:');
+        print('ID: ${doc.id}');
+        print('Package ID: ${data['packageId']}');
+        print('Package Title: ${data['packageTitle']}');
+        return GalleryPost.fromJson({
+          'id': doc.id,
+          ...data,
+        });
+      }).toList();
+      return posts;
     });
   }
 
@@ -35,6 +45,8 @@ class GalleryRepository {
     required File imageFile,
     required String location,
     required String description,
+    String? packageId,
+    String? packageTitle,
   }) async {
     try {
       // 1. 이미지를 Storage에 업로드
@@ -58,6 +70,8 @@ class GalleryRepository {
         likedBy: [],
         likeCount: 0,
         comments: [],
+        packageId: packageId,
+        packageTitle: packageTitle,
       );
 
       await docRef.set(post.toJson());
@@ -249,7 +263,7 @@ class GalleryRepository {
 
   Future<void> deleteComment(String postId, String commentId) async {
     try {
-      // 댓글 문��� 삭제
+      // 댓글 문 삭제
       await _firestore
           .collection('gallery_posts')
           .doc(postId)

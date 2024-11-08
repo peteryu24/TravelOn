@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 // auth
 import 'package:travel_on_final/features/auth/presentation/screens/login_screen.dart';
 import 'package:travel_on_final/features/auth/presentation/screens/signup_screen.dart';
@@ -15,6 +16,7 @@ import 'package:travel_on_final/features/reservation/presentation/screens/reserv
 import 'package:travel_on_final/features/review/presentation/screens/add_review_screen.dart';
 // search
 import 'package:travel_on_final/features/search/domain/entities/travel_package.dart';
+import 'package:travel_on_final/features/search/presentation/providers/travel_provider.dart';
 import 'package:travel_on_final/features/search/presentation/screens/add_package_screen.dart';
 import 'package:travel_on_final/features/search/presentation/screens/detail_screens.dart';
 import 'package:travel_on_final/features/search/presentation/screens/package_detail_screen.dart';
@@ -171,6 +173,23 @@ final goRouter = GoRouter(
     GoRoute(
       path: '/scrapped-posts',
       builder: (context, state) => const ScrappedPostsScreen(),
+    ),
+    // 패키지 상세 페이지 라우트 추가
+    GoRoute(
+      path: '/package/:id',
+      builder: (context, state) {
+        final packageId = state.pathParameters['id']!;
+        final package =
+            context.read<TravelProvider>().getPackageById(packageId);
+        if (package == null) {
+          return const Scaffold(
+            body: Center(
+              child: Text('패키지를 찾을 수 없습니다.'),
+            ),
+          );
+        }
+        return PackageDetailScreen(package: package);
+      },
     ),
   ],
 );
