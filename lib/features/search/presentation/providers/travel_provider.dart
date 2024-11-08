@@ -6,6 +6,15 @@ import '../../domain/entities/travel_package.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'dart:math' as math;
 
+enum SortOption {
+  latest,        // 최신순
+  priceHigh,     // 가격높은순
+  priceLow,      // 가격낮은순
+  popular,       // 인기순
+  highRating,    // 별점높은순
+  mostReviews    // 리뷰많은순
+}
+
 class TravelProvider extends ChangeNotifier {
   final TravelRepository _repository;
   final FirebaseAuth _auth;
@@ -16,6 +25,10 @@ class TravelProvider extends ChangeNotifier {
   String _searchQuery = '';
   bool _isLoading = false;
   String? _error;
+  SortOption _currentSort = SortOption.latest;
+  SortOption get currentSort => _currentSort;
+
+
 
   TravelProvider(this._repository, {required FirebaseAuth auth})
       : _auth = auth {
@@ -300,16 +313,64 @@ class TravelProvider extends ChangeNotifier {
   }
 
   // 인기 패키지 getter - 찜(좋아요) 수 기준 상위 5개
-  List<TravelPackage> get popularPackages {
-    // 이미 정렬된 _packages에서 좋아요가 있는 패키지만 필터링
-    final filtered =
-        _packages.where((package) => package.likesCount > 0).take(5).toList();
+  List<TravelPackage> getPopularPackages() {
+    // 패키지 리스트를 복사하여 정렬 (원본 리스트는 변경하지 않음)
+    final sortedPackages = List<TravelPackage>.from(_packages);
 
-    // 좋아요가 있는 패키지가 없다면 전체 패키지에서 최신순으로 5개 반환
-    if (filtered.isEmpty) {
-      return _packages.take(5).toList();
+    // 좋아요 수를 기준으로 정렬
+    sortedPackages.sort((a, b) => b.likesCount.compareTo(a.likesCount));
+
+    // 상위 5개만 반환
+    return sortedPackages.take(5).toList();
+  }
+
+  List<TravelPackage> get sortedPackages {  // 이름을 sortedPackages로 변경
+    List<TravelPackage> filteredPackages = _packages;
+
+    // 검색어 필터링
+    if (_searchQuery.isNotEmpty) {
+      filteredPackages = filteredPackages.where((package) {
+        final query = _searchQuery.toLowerCase();
+        return package.title.toLowerCase().contains(query) ||
+            package.description.toLowerCase().contains(query);
+      }).toList();
     }
 
-    return filtered;
+    // 지역 필터링
+    if (_selectedRegion != 'all') {
+      filteredPackages = filteredPackages
+          .where((package) => package.region == _selectedRegion)
+          .toList();
+    }
+
+    // 정렬
+    switch (_currentSort) {
+      case SortOption.latest:
+        filteredPackages.sort((a, b) => b.id.compareTo(a.id));
+        break;
+      case SortOption.priceHigh:
+        filteredPackages.sort((a, b) => b.price.compareTo(a.price));
+        break;
+      case SortOption.priceLow:
+        filteredPackages.sort((a, b) => a.price.compareTo(b.price));
+        break;
+      case SortOption.popular:
+        filteredPackages.sort((a, b) => b.likesCount.compareTo(a.likesCount));
+        break;
+      case SortOption.highRating:
+        filteredPackages.sort((a, b) => b.averageRating.compareTo(a.averageRating));
+        break;
+      case SortOption.mostReviews:
+        filteredPackages.sort((a, b) => b.reviewCount.compareTo(a.reviewCount));
+        break;
+    }
+
+    return filteredPackages;
+  }
+
+  // 정렬 옵션 변경 메서드
+  void sortPackages(SortOption option) {
+    _currentSort = option;
+    notifyListeners();
   }
 }

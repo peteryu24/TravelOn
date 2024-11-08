@@ -192,21 +192,188 @@ class _DetailScreenState extends State<DetailScreen> {
         centerTitle: true,
         leading: _isSearching
             ? IconButton(
-                icon: const Icon(Icons.arrow_back),
-                onPressed: _stopSearch,
-              )
+          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          onPressed: _stopSearch,
+        )
             : null,
-        title: _buildTitle(),
-        actions: _buildActions(),
+        title: _isSearching ? _buildSearchField() : const Text(
+          '여행 패키지',
+          style: TextStyle(
+            color: Colors.black,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        actions: [
+          if (!_isSearching)
+            IconButton(
+              icon: const Icon(Icons.search, color: Colors.black),
+              onPressed: _startSearch,
+            ),
+          Consumer<TravelProvider>(
+            builder: (context, provider, child) => RegionFilter(
+              onRegionChanged: (String region) {
+                provider.filterByRegion(region);
+              },
+            ),
+          ),
+          SizedBox(width: 8.w),
+        ],
       ),
       body: Column(
         children: [
+          _buildSortSelector(),  // 정렬 선택기를 상단에 배치
           _buildSearchInfo(),
           const Expanded(
             child: PackageList(),
           ),
         ],
       ),
+    );
+  }
+
+  String _getSortText(SortOption option) {
+    switch (option) {
+      case SortOption.latest:
+        return '최신순';
+      case SortOption.priceHigh:
+        return '가격 높은순';
+      case SortOption.priceLow:
+        return '가격 낮은순';
+      case SortOption.popular:
+        return '인기순';
+      case SortOption.highRating:
+        return '별점 높은순';
+      case SortOption.mostReviews:
+        return '리뷰 많은순';
+      default:
+        return '기본순';
+    }
+  }
+
+
+  Widget _buildSortSelector() {
+    return Consumer<TravelProvider>(
+      builder: (context, provider, _) {
+        return Container(
+          padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            border: Border(
+              bottom: BorderSide(
+                color: Colors.grey[200]!,
+                width: 1,
+              ),
+            ),
+          ),
+          child: Row(
+            children: [
+              GestureDetector(
+                onTap: () {
+                  showModalBottomSheet(
+                    context: context,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.vertical(top: Radius.circular(16.r)),
+                    ),
+                    builder: (context) {
+                      return Container(
+                        padding: EdgeInsets.symmetric(vertical: 20.h),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            ListTile(
+                              title: const Text('최신순'),
+                              trailing: provider.currentSort == SortOption.latest
+                                  ? Icon(Icons.check, color: Colors.blue)
+                                  : null,
+                              onTap: () {
+                                provider.sortPackages(SortOption.latest);
+                                Navigator.pop(context);
+                              },
+                            ),
+                            ListTile(
+                              title: const Text('인기순'),
+                              trailing: provider.currentSort == SortOption.popular
+                                  ? Icon(Icons.check, color: Colors.blue)
+                                  : null,
+                              onTap: () {
+                                provider.sortPackages(SortOption.popular);
+                                Navigator.pop(context);
+                              },
+                            ),
+                            ListTile(
+                              title: const Text('가격 낮은순'),
+                              trailing: provider.currentSort == SortOption.priceLow
+                                  ? Icon(Icons.check, color: Colors.blue)
+                                  : null,
+                              onTap: () {
+                                provider.sortPackages(SortOption.priceLow);
+                                Navigator.pop(context);
+                              },
+                            ),
+                            ListTile(
+                              title: const Text('가격 높은순'),
+                              trailing: provider.currentSort == SortOption.priceHigh
+                                  ? Icon(Icons.check, color: Colors.blue)
+                                  : null,
+                              onTap: () {
+                                provider.sortPackages(SortOption.priceHigh);
+                                Navigator.pop(context);
+                              },
+                            ),
+                            ListTile(
+                              title: const Text('별점 높은순'),
+                              trailing: provider.currentSort == SortOption.highRating
+                                  ? Icon(Icons.check, color: Colors.blue)
+                                  : null,
+                              onTap: () {
+                                provider.sortPackages(SortOption.highRating);
+                                Navigator.pop(context);
+                              },
+                            ),
+                            ListTile(
+                              title: const Text('리뷰 많은순'),
+                              trailing: provider.currentSort == SortOption.mostReviews
+                                  ? Icon(Icons.check, color: Colors.blue)
+                                  : null,
+                              onTap: () {
+                                provider.sortPackages(SortOption.mostReviews);
+                                Navigator.pop(context);
+                              },
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  );
+                },
+                child: Container(
+                  padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
+                  decoration: BoxDecoration(
+                    color: Colors.grey[100],
+                    borderRadius: BorderRadius.circular(20.r),
+                    border: Border.all(color: Colors.grey[300]!),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        _getSortText(provider.currentSort),
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 14.sp,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      SizedBox(width: 4.w),
+                      Icon(Icons.arrow_drop_down, color: Colors.black, size: 20.sp),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }
