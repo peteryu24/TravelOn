@@ -15,7 +15,6 @@ import 'package:travel_on_final/features/auth/domain/usecases/reset_password_use
 // firebase
 import 'package:firebase_core/firebase_core.dart';
 import 'package:travel_on_final/firebase_options.dart';
-import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart'
     hide AuthProvider;
@@ -41,8 +40,6 @@ Future<void> main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  await FirebaseAppCheck.instance.activate();
-
   await SharedPreferences.getInstance();
 
   runApp(const MyApp());
@@ -59,13 +56,6 @@ class MyApp extends StatelessWidget {
         Provider<FirebaseFirestore>.value(value: FirebaseFirestore.instance),
 
         // Auth 관련 Providers
-        ChangeNotifierProvider(
-          create: (context) => app.AuthProvider(
-            context.read<FirebaseAuth>(),          
-            context.read<ResetPasswordUseCase>(),
-            context.read<TravelProvider>(),
-          ),
-        ),
         Provider<AuthRepository>(create: (_) => AuthRepositoryImpl()),
         ProxyProvider<FirebaseAuth, ResetPasswordUseCase>(
           update: (_, auth, __) => ResetPasswordUseCase(auth),
@@ -76,6 +66,14 @@ class MyApp extends StatelessWidget {
           create: (_) => TravelProvider(
             TravelRepositoryImpl(),
             auth: FirebaseAuth.instance,
+          ),
+        ),
+
+        ChangeNotifierProvider(
+          create: (context) => app.AuthProvider(
+            context.read<FirebaseAuth>(),          
+            context.read<ResetPasswordUseCase>(),
+            context.read<TravelProvider>(),
           ),
         ),
 
