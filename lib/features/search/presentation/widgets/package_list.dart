@@ -15,7 +15,7 @@ class PackageList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Consumer<TravelProvider>(
-      builder: (context, provider, child) {
+      builder: (context, provider, _) {
         if (provider.isLoading) {
           return const Center(child: CircularProgressIndicator());
         }
@@ -24,7 +24,7 @@ class PackageList extends StatelessWidget {
           return Center(child: Text('Error: ${provider.error}'));
         }
 
-        final packages = provider.packages;
+        final packages = provider.sortedPackages;
         if (packages.isEmpty) {
           return const Center(child: Text('등록된 패키지가 없습니다.'));
         }
