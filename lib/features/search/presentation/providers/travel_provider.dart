@@ -91,63 +91,70 @@ class TravelProvider extends ChangeNotifier {
 
   Future<void> toggleLikePackage(String packageId, String userId) async {
     try {
-      // 패키지와 유저 문서 참조
       final userRef = _firestore.collection('users').doc(userId);
       final packageRef = _firestore.collection('packages').doc(packageId);
 
-      // 현재 상태 확인
-      final userDoc = await userRef.get();
+      // Firestore 트랜잭션 실행
+      await _firestore.runTransaction((transaction) async {
+        final userDoc = await transaction.get(userRef);
+        final packageDoc = await transaction.get(packageRef);
+
+        if (!userDoc.exists || !packageDoc.exists) {
+          throw '사용자 또는 패키지를 찾을 수 없습니다';
+        }
+
+        // 현재 상태 가져오기
+        List<String> userLikedPackages = List<String>.from(userDoc.data()!['likedPackages'] ?? []);
+        List<String> packageLikedBy = List<String>.from(packageDoc.data()!['likedBy'] ?? []);
+        int currentLikesCount = packageDoc.data()!['likesCount'] ?? 0;
+
+        // 좋아요 토글
+        bool isLiked = userLikedPackages.contains(packageId);
+        if (isLiked) {
+          userLikedPackages.remove(packageId);
+          packageLikedBy.remove(userId);
+          currentLikesCount = math.max(0, currentLikesCount - 1);
+          _likedPackageIds.remove(packageId);
+        } else {
+          userLikedPackages.add(packageId);
+          packageLikedBy.add(userId);
+          currentLikesCount++;
+          _likedPackageIds.add(packageId);
+        }
+
+        // Firestore 업데이트
+        transaction.update(userRef, {'likedPackages': userLikedPackages});
+        transaction.update(packageRef, {
+          'likedBy': packageLikedBy,
+          'likesCount': currentLikesCount,
+        });
+      });
+
+      // 패키지 데이터 새로 가져오기
       final packageDoc = await packageRef.get();
+      if (packageDoc.exists) {
+        final packageData = packageDoc.data()!;
+        final packageIndex = _packages.indexWhere((p) => p.id == packageId);
 
-      if (!userDoc.exists || !packageDoc.exists) {
-        throw '사용자 또는 패키지를 찾을 수 없습니다';
+        if (packageIndex != -1) {
+          // 최신 데이터로 패키지 업데이트
+          _packages[packageIndex] = TravelPackage.fromJson({
+            'id': packageId,
+            ...packageData,
+          });
+
+          // 정렬이 필요한 경우에만 정렬 수행
+          if (_currentSort == SortOption.popular) {
+            _packages.sort((a, b) => b.likesCount.compareTo(a.likesCount));
+          }
+        }
       }
 
-      // 현재 상태 가져오기
-      List<String> userLikedPackages =
-          List<String>.from(userDoc.data()!['likedPackages'] ?? []);
-      List<String> packageLikedBy =
-          List<String>.from(packageDoc.data()!['likedBy'] ?? []);
-      int currentLikesCount = packageDoc.data()!['likesCount'] ?? 0;
-
-      // 좋아요 토글
-      bool isLiked = userLikedPackages.contains(packageId);
-      if (isLiked) {
-        // 좋아요 취소
-        userLikedPackages.remove(packageId);
-        packageLikedBy.remove(userId);
-        currentLikesCount = math.max(0, currentLikesCount - 1);
-        _likedPackageIds.remove(packageId);
-      } else {
-        // 좋아요 추가
-        userLikedPackages.add(packageId);
-        packageLikedBy.add(userId);
-        currentLikesCount++;
-        _likedPackageIds.add(packageId);
-      }
-
-      // 각각 업데이트
-      await userRef.update({
-        'likedPackages': userLikedPackages,
-      });
-
-      await packageRef.update({
-        'likedBy': packageLikedBy,
-        'likesCount': currentLikesCount,
-      });
-
-      // 로컬 상태 업데이트
-      final packageIndex = _packages.indexWhere((p) => p.id == packageId);
-      if (packageIndex != -1) {
-        final package = _packages[packageIndex];
-        package.likedBy = packageLikedBy;
-        package.likesCount = currentLikesCount;
-
-        // 패키지 리스트 재정렬
-        _sortPackagesByLikes();
-      }
-
+      // UI 갱신을 위한 알림
       notifyListeners();
+
+      // 호출한 쪽에 결과 반환을 위해 최신 패키지 데이터 반환
+      return;
     } catch (e) {
       print('Error toggling like: $e');
       rethrow;

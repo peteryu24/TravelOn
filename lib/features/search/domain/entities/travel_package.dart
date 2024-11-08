@@ -84,8 +84,8 @@ class TravelPackage {
   TravelPackage copyWith({
     List<String>? likedBy,
     int? likesCount,
-    double? averageRating,     // 추가
-    int? reviewCount,          // 추가
+    double? averageRating,
+    int? reviewCount,
   }) {
     return TravelPackage(
       id: id,
@@ -103,8 +103,8 @@ class TravelPackage {
       departureDays: departureDays,
       likedBy: likedBy ?? List<String>.from(this.likedBy),
       likesCount: likesCount ?? this.likesCount,
-      averageRating: averageRating ?? this.averageRating,   // 추가
-      reviewCount: reviewCount ?? this.reviewCount,         // 추가
+      averageRating: averageRating ?? this.averageRating,
+      reviewCount: reviewCount ?? this.reviewCount,
     );
   }
 }
