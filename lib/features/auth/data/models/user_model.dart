@@ -9,6 +9,7 @@ class UserModel extends User {
   final bool isGuide;
   final String? gender;
   final DateTime? birthDate;
+  final String? introduction;
   List<String> likedPackages;
 
   UserModel({
@@ -19,6 +20,7 @@ class UserModel extends User {
     this.isGuide = false,
     this.gender,
     this.birthDate,
+    this.introduction,
     List<String>? likedPackages,
   }) : likedPackages = likedPackages ?? [],
         super(id: id, name: name, email: email);
@@ -35,6 +37,7 @@ class UserModel extends User {
       birthDate: json['birthDate'] != null 
           ? (json['birthDate'] as Timestamp).toDate() 
           : null,
+      introduction: json['introduction'] as String?,
       likedPackages: List<String>.from(json['likedPackages'] ?? []),
     );
   }
@@ -49,6 +52,7 @@ class UserModel extends User {
       'isGuide': isGuide,
       'gender': gender,
       'birthDate': birthDate?.toIso8601String(),
+      'introduction': introduction,
       'likedPackages': likedPackages,
     };
   }
@@ -62,6 +66,7 @@ class UserModel extends User {
     bool? isGuide,
     String? gender,
     DateTime? birthDate,
+    String? introduction,
     List<String>? likedPackages,
   }) {
     return UserModel(
@@ -72,6 +77,7 @@ class UserModel extends User {
       isGuide: isGuide ?? this.isGuide,
       gender: gender ?? this.gender,
       birthDate: birthDate ?? this.birthDate,
+      introduction: introduction ?? this.introduction,
       likedPackages: likedPackages ?? List<String>.from(this.likedPackages),
     );
   }

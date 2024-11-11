@@ -2,11 +2,42 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:travel_on_final/features/chat/presentation/screens/guide_search_screen.dart';
 import 'package:travel_on_final/features/auth/presentation/providers/auth_provider.dart';
 import 'package:travel_on_final/features/chat/presentation/providers/chat_provider.dart';
 
-class ChatListScreen extends StatelessWidget {
+class ChatListScreen extends StatefulWidget {
   const ChatListScreen({super.key});
+
+  @override
+  _ChatListScreenState createState() => _ChatListScreenState();
+}
+
+class _ChatListScreenState extends State<ChatListScreen> {
+  final TextEditingController _searchController = TextEditingController();
+  final FocusNode _focusNode = FocusNode();
+  bool _isGuideSearch = false;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _focusNode.addListener(() {
+      setState(() {});
+    });
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    _focusNode.dispose();
+    super.dispose();
+  }
+
+  void _clearFocus() {
+    FocusScope.of(context).unfocus();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -26,103 +57,177 @@ class ChatListScreen extends StatelessWidget {
       );
     }
 
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        scrolledUnderElevation: 0,
-        elevation: 0,
-        centerTitle: true,
-        title: const Text('채팅 목록'),
-      ),
-      body: StreamBuilder(
-        stream: FirebaseFirestore.instance
-            .collection('chats')
-            .orderBy('lastActivityTime', descending: true)
-            .snapshots(),
-        builder: (ctx, AsyncSnapshot<QuerySnapshot> chatSnapshot) {
-          if (chatSnapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          }
-
-          final chatDocs = chatSnapshot.data!.docs.where((doc) {
-            final participants = List<String>.from(doc['participants']);
-            return participants.contains(authProvider.currentUser!.id);
-          }).toList();
-
-          return ListView.builder(
-            itemCount: chatDocs.length,
-            itemBuilder: (ctx, index) {
-              final chatData = chatDocs[index].data() as Map<String, dynamic>;
-              final chatId = chatDocs[index].id;
-              final otherUserId = authProvider.currentUser!.id == chatData['participants'][0]
-                  ? chatData['participants'][1]
-                  : chatData['participants'][0];
-
-              chatProvider.updateOtherUserInfo(chatId, otherUserId);
-
-              return Dismissible(
-                key: Key(chatId),
-                direction: DismissDirection.endToStart,
-                background: Container(
-                  color: Colors.red[200],
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  alignment: Alignment.centerRight,
-                  child: const Icon(Icons.delete, color: Colors.white),
-                ),
-                confirmDismiss: (direction) async {
-                  final confirm = await showDialog<bool>(
-                    context: context,
-                    builder: (ctx) => AlertDialog(
-                      title: Text('${chatData['usernames'][otherUserId]}님과의 대화방을 나가시겠습니까?'),
-                      actions: [
-                        TextButton(
-                          onPressed: () => Navigator.of(ctx).pop(false),
-                          child: const Text('취소'),
-                        ),
-                        TextButton(
-                          onPressed: () => Navigator.of(ctx).pop(true),
-                          child: const Text('나가기'),
-                        ),
-                      ],
+    return GestureDetector(
+      onTap: _clearFocus,
+      child: Scaffold(
+        appBar: AppBar(
+          backgroundColor: Colors.white,
+          scrolledUnderElevation: 0,
+          elevation: 0,
+          centerTitle: true,
+          title: const Text('채팅 목록'),
+        ),
+        body: Column(
+          children: [
+            Container(
+              padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
+              margin: EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),
+              decoration: BoxDecoration(
+                border: Border.all(color: Colors.blue),
+                borderRadius: BorderRadius.circular(8.r),
+              ),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: _searchController,
+                      focusNode: _focusNode,
+                      decoration: InputDecoration(
+                        labelText: '검색',
+                        labelStyle: TextStyle(color: Colors.blue, fontSize: 14.sp),
+                        border: InputBorder.none,
+                      ),
+                      onChanged: (value) {
+                        setState(() {});
+                      },
                     ),
-                  );
-                  return confirm ?? false;
-                },
-                onDismissed: (direction) async {
-                  await chatProvider.leaveChatRoom(chatId, authProvider.currentUser!.id);
-                },
-                child: ListTile(
-                  leading: CircleAvatar(
-                    backgroundImage: chatData['userProfileImages'] != null &&
-                            chatData['userProfileImages'][otherUserId] != null &&
-                            chatData['userProfileImages'][otherUserId].isNotEmpty
-                        ? NetworkImage(chatData['userProfileImages'][otherUserId])
-                        : const AssetImage('assets/images/default_profile.png')
-                            as ImageProvider,
                   ),
-                  title: Text(
-                    chatData['usernames'][otherUserId]?.substring(
-                            0,
-                            chatData['usernames'][otherUserId].length > 15
-                                ? 15
-                                : chatData['usernames'][otherUserId].length) ?? 
-                        'Unknown User',
-                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  IconButton(
+                    icon: Icon(Icons.search, color: Colors.blue),
+                    onPressed: () {
+                      setState(() {});
+                    },
                   ),
-                  subtitle: Text(
-                    (chatData['lastMessage'] != null && chatData['lastMessage'].length > 65)
-                        ? '${chatData['lastMessage'].substring(0, 65)}...'
-                        : chatData['lastMessage'] ?? '',
+                ],
+              ),
+            ),
+            if (_focusNode.hasFocus || _searchController.text.isNotEmpty)
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16.w),
+                child: Align(
+                  alignment: Alignment.centerRight,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      _clearFocus();
+                      Navigator.of(context).push(MaterialPageRoute(
+                        builder: (_) => const GuideSearchScreen(),
+                      ));
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blueAccent,
+                      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+                    ),
+                    child: const Text(
+                      '가이드 검색',
+                      style: TextStyle(
+                        color: Colors.white,
+                      ),
+                    ),
                   ),
-                  onTap: () {
-                    chatProvider.startListeningToMessages(chatId);
-                    GoRouter.of(context).push('/chat/$chatId');
-                  },
                 ),
-              );
-            },
-          );
-        },
+              ),
+            Expanded(
+              child: StreamBuilder(
+                stream: FirebaseFirestore.instance
+                    .collection('chats')
+                    .orderBy('lastActivityTime', descending: true)
+                    .snapshots(),
+                builder: (ctx, AsyncSnapshot<QuerySnapshot> chatSnapshot) {
+                  if (chatSnapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+
+                  final chatDocs = chatSnapshot.data!.docs.where((doc) {
+                    final participants = List<String>.from(doc['participants']);
+                    final chatData = doc.data() as Map<String, dynamic>;
+
+                    final searchText = _searchController.text.toLowerCase();
+                    final isInChat = chatData['lastMessage']?.toLowerCase().contains(searchText) ?? false;
+                    final isGuideName = chatData['usernames'].values.any((name) =>
+                        name.toLowerCase().contains(searchText) &&
+                        (name != authProvider.currentUser!.name || _isGuideSearch));
+                    return participants.contains(authProvider.currentUser!.id) &&
+                        (_searchController.text.isEmpty || isInChat || isGuideName);
+                  }).toList();
+
+                  return ListView.builder(
+                    itemCount: chatDocs.length,
+                    itemBuilder: (ctx, index) {
+                      final chatData = chatDocs[index].data() as Map<String, dynamic>;
+                      final chatId = chatDocs[index].id;
+                      final otherUserId = authProvider.currentUser!.id == chatData['participants'][0]
+                          ? chatData['participants'][1]
+                          : chatData['participants'][0];
+
+                      chatProvider.updateOtherUserInfo(chatId, otherUserId);
+
+                      return Dismissible(
+                        key: Key(chatId),
+                        direction: DismissDirection.endToStart,
+                        background: Container(
+                          color: Colors.red[200],
+                          padding: const EdgeInsets.symmetric(horizontal: 20),
+                          alignment: Alignment.centerRight,
+                          child: const Icon(Icons.delete, color: Colors.white),
+                        ),
+                        confirmDismiss: (direction) async {
+                          final confirm = await showDialog<bool>(
+                            context: context,
+                            builder: (ctx) => AlertDialog(
+                              title: Text('${chatData['usernames'][otherUserId]}님과의 대화방을 나가시겠습니까?'),
+                              actions: [
+                                TextButton(
+                                  onPressed: () => Navigator.of(ctx).pop(false),
+                                  child: const Text('취소'),
+                                ),
+                                TextButton(
+                                  onPressed: () => Navigator.of(ctx).pop(true),
+                                  child: const Text('나가기'),
+                                ),
+                              ],
+                            ),
+                          );
+                          return confirm ?? false;
+                        },
+                        onDismissed: (direction) async {
+                          await chatProvider.leaveChatRoom(chatId, authProvider.currentUser!.id);
+                        },
+                        child: ListTile(
+                          leading: CircleAvatar(
+                            backgroundImage: chatData['userProfileImages'] != null &&
+                                    chatData['userProfileImages'][otherUserId] != null &&
+                                    chatData['userProfileImages'][otherUserId].isNotEmpty
+                                ? NetworkImage(chatData['userProfileImages'][otherUserId])
+                                : const AssetImage('assets/images/default_profile.png') as ImageProvider,
+                          ),
+                          title: Text(
+                            chatData['usernames'][otherUserId]?.substring(
+                                    0,
+                                    chatData['usernames'][otherUserId].length > 15
+                                        ? 15
+                                        : chatData['usernames'][otherUserId].length) ??
+                                'Unknown User',
+                            style: const TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          subtitle: Text(
+                            (chatData['lastMessage'] != null && chatData['lastMessage'].length > 65)
+                                ? '${chatData['lastMessage'].substring(0, 65)}...'
+                                : chatData['lastMessage'] ?? '',
+                          ),
+                          onTap: () {
+                            _clearFocus();
+                            chatProvider.startListeningToMessages(chatId);
+                            GoRouter.of(context).push('/chat/$chatId');
+                          },
+                        ),
+                      );
+                    },
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
