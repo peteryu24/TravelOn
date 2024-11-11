@@ -143,6 +143,7 @@ class MockAuthProvider extends _i1.Mock implements _i2.AuthProvider {
     String? gender,
     DateTime? birthDate,
     String? profileImageUrl,
+    String? introduction,
   }) =>
       (super.noSuchMethod(
         Invocation.method(
@@ -153,6 +154,7 @@ class MockAuthProvider extends _i1.Mock implements _i2.AuthProvider {
             #gender: gender,
             #birthDate: birthDate,
             #profileImageUrl: profileImageUrl,
+            #introduction: introduction,
           },
         ),
         returnValue: _i3.Future<void>.value(),
