@@ -51,6 +51,7 @@ class _HomeScreenState extends State<HomeScreen> {
         backgroundColor: Colors.white,
         scrolledUnderElevation: 0,
         elevation: 0,
+        centerTitle: true,
         title: Text(
           'TravelOn',
           style: TextStyle(

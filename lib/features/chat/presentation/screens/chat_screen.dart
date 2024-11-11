@@ -50,7 +50,10 @@ class _ChatScreenState extends State<ChatScreen> {
     final chatProvider = Provider.of<ChatProvider>(context);
 
     return Scaffold(
-      appBar: AppBar(title: Text("${otherUserName}님과의 대화")),
+      appBar: AppBar(
+        title: Text("${otherUserName}님과의 대화"),
+        scrolledUnderElevation: 0,
+      ),
       body: SafeArea(
         child: Column(
           children: [

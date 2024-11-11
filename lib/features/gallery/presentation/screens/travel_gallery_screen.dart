@@ -1,6 +1,5 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../widgets/gallery_post.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -17,17 +16,15 @@ class TravelGalleryScreen extends StatelessWidget {
         scrolledUnderElevation: 0,
         elevation: 0,
         centerTitle: true,
-        title: Text(
-          '여행갤러리',
-          style: TextStyle(
-            fontSize: 20.sp,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
+        title: const Text('여행갤러리'),
         actions: [
           IconButton(
+            onPressed: () => context.push('/gallery-search'),
+            icon: const Icon(CupertinoIcons.search),
+          ),
+          IconButton(
             onPressed: () => context.push('/scrapped-posts'),
-            icon: const Icon(CupertinoIcons.bookmark_fill),
+            icon: const Icon(CupertinoIcons.bookmark),
           ),
           IconButton(
             onPressed: () => context.push('/add-gallery-post'),

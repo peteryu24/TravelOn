@@ -14,6 +14,7 @@ import 'package:travel_on_final/features/chat/presentation/screens/chat_list_scr
 import 'package:travel_on_final/features/chat/presentation/screens/chat_screen.dart';
 import 'package:travel_on_final/features/guide/presentation/screens/guide_packages_screen.dart';
 import 'package:travel_on_final/features/guide/presentation/screens/guide_ranking_screen.dart';
+import 'package:travel_on_final/features/chat/presentation/screens/guide_search_screen.dart';
 // reservation
 import 'package:travel_on_final/features/reservation/presentation/screens/reservation_calendar_screen.dart';
 import 'package:travel_on_final/features/review/presentation/screens/add_review_screen.dart';
@@ -39,6 +40,7 @@ import 'package:travel_on_final/features/gallery/presentation/screens/travel_gal
 import 'package:travel_on_final/features/gallery/presentation/screens/add_gallery_post_screen.dart';
 import 'package:travel_on_final/features/gallery/presentation/screens/scrapped_posts_screen.dart';
 import 'package:travel_on_final/features/gallery/presentation/screens/edit_gallery_post_screen.dart';
+import 'package:travel_on_final/features/gallery/presentation/screens/gallery_search_screen.dart';
 // review
 import 'package:travel_on_final/features/review/presentation/screens/add_review_screen.dart';
 
@@ -121,7 +123,7 @@ final goRouter = GoRouter(
     // 로그인 관련 라우트
     GoRoute(
       path: '/login',
-      builder: (context, state) => LoginScreen(),
+      builder: (context, state) => const LoginScreen(),
     ),
     GoRoute(
       path: '/signup',
@@ -135,12 +137,17 @@ final goRouter = GoRouter(
       path: '/liked-packages',
       builder: (context, state) => const LikedPackagesScreen(),
     ),
+    // 채팅 관련 라우트
     GoRoute(
       path: '/chat/:chatId',
       builder: (context, state) {
         final chatId = state.pathParameters['chatId']!;
         return ChatScreen(chatId: chatId);
       },
+    ),
+    GoRoute(
+      path: '/guide_search',
+      builder: (context, state) => const GuideSearchScreen(),
     ),
     GoRoute(
       path: '/profile/edit',
@@ -212,6 +219,11 @@ final goRouter = GoRouter(
         }
         return PackageDetailScreen(package: package);
       },
+    ),
+    // 기존 라우트 목록에 추가
+    GoRoute(
+      path: '/gallery-search',
+      builder: (context, state) => const GallerySearchScreen(),
     ),
   ],
 );

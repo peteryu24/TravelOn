@@ -13,6 +13,8 @@ class GalleryProvider extends ChangeNotifier {
   StreamSubscription<List<GalleryPost>>? _subscription;
   final Map<String, List<Comment>> _postComments = {};
   List<GalleryPost> _scrappedPosts = [];
+  List<GalleryPost> _searchResults = [];
+  bool _isSearching = false;
 
   GalleryProvider(this._repository) {
     _initStream();
@@ -29,6 +31,8 @@ class GalleryProvider extends ChangeNotifier {
   List<GalleryPost> get posts => _posts;
   bool get isLoading => _isLoading;
   List<GalleryPost> get scrappedPosts => _scrappedPosts;
+  List<GalleryPost> get searchResults => _searchResults;
+  bool get isSearching => _isSearching;
 
   // 포스트 업로드
   Future<void> uploadPost({
@@ -192,6 +196,37 @@ class GalleryProvider extends ChangeNotifier {
     }
   }
 
+  void searchPosts(String query) {
+    if (query.isEmpty) {
+      _searchResults = [];
+      notifyListeners();
+      return;
+    }
+
+    _isSearching = true;
+    notifyListeners();
+
+    final lowercaseQuery = query.toLowerCase();
+    _searchResults = _posts.where((post) {
+      final locationMatch =
+          post.location.toLowerCase().contains(lowercaseQuery);
+      final descriptionMatch =
+          post.description.toLowerCase().contains(lowercaseQuery);
+      final packageMatch =
+          post.packageTitle?.toLowerCase().contains(lowercaseQuery) ?? false;
+
+      return locationMatch || descriptionMatch || packageMatch;
+    }).toList();
+
+    _isSearching = false;
+    notifyListeners();
+  }
+
+  void clearSearch() {
+    _searchResults = [];
+    notifyListeners();
+  }
+
   @override
   void dispose() {
     _subscription?.cancel();
@@ -202,6 +237,9 @@ class GalleryProvider extends ChangeNotifier {
   void reset() {
     _subscription?.cancel();
     _posts = [];
+    _scrappedPosts = [];
+    _searchResults = [];
+    _initStream();
     notifyListeners();
   }
 }

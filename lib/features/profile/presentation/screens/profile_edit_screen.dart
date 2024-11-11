@@ -12,6 +12,7 @@ class ProfileEditScreen extends StatefulWidget {
 class _ProfileEditScreenState extends State<ProfileEditScreen> {
   final ImagePicker _picker = ImagePicker();
   final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _introductionController = TextEditingController();
   String? _gender;
   DateTime? _birthDate;
   String? _profileImageUrl;
@@ -29,14 +30,11 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
           _gender = user.gender;
           _birthDate = user.birthDate;
           _profileImageUrl = user.profileImageUrl;
+          _introductionController.text = user.introduction ?? '';
         });
       }
-      print("User Gender: ${user?.name}");
-      print("User Gender: ${user?.gender}");
-      print("User BirthDate: ${user?.birthDate}");
     });
   }
-
 
   Future<void> _selectBirthDate() async {
     final pickedDate = await showDatePicker(
@@ -77,6 +75,7 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
         gender: _gender,
         birthDate: _birthDate,
         profileImageUrl: _selectedImageFile?.path,
+        introduction: _introductionController.text,
       );
       Navigator.pop(context);
     } catch (e) {
@@ -140,9 +139,27 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
               ),
               child: TextField(
                 enabled: false,
-                controller: TextEditingController(text: user?.email),
+                controller: TextEditingController(text: user.email),
                 decoration: InputDecoration(
                   labelText: '이메일',
+                  labelStyle: TextStyle(color: Colors.blue),
+                  border: InputBorder.none,
+                ),
+              ),
+            ),
+            SizedBox(height: 16),
+            Container(
+              padding: EdgeInsets.symmetric(horizontal: 12, vertical: 16), // 높이 조절
+              height: 120, // '내 소개'의 컨테이너 높이 설정
+              decoration: BoxDecoration(
+                border: Border.all(color: Colors.blue),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: TextField(
+                controller: _introductionController,
+                maxLines: 3, // 최대 줄 수 설정
+                decoration: InputDecoration(
+                  labelText: '내 소개',
                   labelStyle: TextStyle(color: Colors.blue),
                   border: InputBorder.none,
                 ),
@@ -171,8 +188,7 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
                           });
                         },
                         style: OutlinedButton.styleFrom(
-                          backgroundColor:
-                              _gender == '남성' ? Colors.blue.shade100 : null,
+                          backgroundColor: _gender == '남성' ? Colors.blue.shade100 : null,
                           side: BorderSide(color: Colors.blue),
                         ),
                         child: Text('남성'),
@@ -185,8 +201,7 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
                           });
                         },
                         style: OutlinedButton.styleFrom(
-                          backgroundColor:
-                              _gender == '여성' ? Colors.blue.shade100 : null,
+                          backgroundColor: _gender == '여성' ? Colors.blue.shade100 : null,
                           side: BorderSide(color: Colors.blue),
                         ),
                         child: Text('여성'),
