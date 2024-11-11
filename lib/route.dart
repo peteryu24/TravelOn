@@ -37,6 +37,7 @@ import 'package:travel_on_final/features/gallery/presentation/screens/travel_gal
 import 'package:travel_on_final/features/gallery/presentation/screens/add_gallery_post_screen.dart';
 import 'package:travel_on_final/features/gallery/presentation/screens/scrapped_posts_screen.dart';
 import 'package:travel_on_final/features/gallery/presentation/screens/edit_gallery_post_screen.dart';
+import 'package:travel_on_final/features/gallery/presentation/screens/gallery_search_screen.dart';
 // review
 import 'package:travel_on_final/features/review/presentation/screens/add_review_screen.dart';
 
@@ -104,7 +105,7 @@ final goRouter = GoRouter(
     // 로그인 관련 라우트
     GoRoute(
       path: '/login',
-      builder: (context, state) => LoginScreen(),
+      builder: (context, state) => const LoginScreen(),
     ),
     GoRoute(
       path: '/signup',
@@ -195,6 +196,11 @@ final goRouter = GoRouter(
         }
         return PackageDetailScreen(package: package);
       },
+    ),
+    // 기존 라우트 목록에 추가
+    GoRoute(
+      path: '/gallery-search',
+      builder: (context, state) => const GallerySearchScreen(),
     ),
   ],
 );
