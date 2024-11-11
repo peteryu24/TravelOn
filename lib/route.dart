@@ -12,6 +12,8 @@ import 'package:travel_on_final/core/presentation/widgets/scaffold_with_bottom_n
 // chat
 import 'package:travel_on_final/features/chat/presentation/screens/chat_list_screen.dart';
 import 'package:travel_on_final/features/chat/presentation/screens/chat_screen.dart';
+import 'package:travel_on_final/features/guide/presentation/screens/guide_packages_screen.dart';
+import 'package:travel_on_final/features/guide/presentation/screens/guide_ranking_screen.dart';
 // reservation
 import 'package:travel_on_final/features/reservation/presentation/screens/reservation_calendar_screen.dart';
 import 'package:travel_on_final/features/review/presentation/screens/add_review_screen.dart';
@@ -98,6 +100,21 @@ final goRouter = GoRouter(
         return AddReviewScreen(
           packageId: extra['packageId'],
           packageTitle: extra['packageTitle'],
+        );
+      },
+    ),
+    GoRoute(
+      path: '/guide-ranking',
+      builder: (context, state) => const GuideRankingScreen(),
+    ),
+    GoRoute(
+      path: '/guide-packages/:guideId',
+      builder: (context, state) {
+        final guideId = state.pathParameters['guideId']!;
+        final guideName = state.extra as String;
+        return GuidePackagesScreen(
+          guideId: guideId,
+          guideName: guideName,
         );
       },
     ),

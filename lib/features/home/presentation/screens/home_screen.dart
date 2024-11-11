@@ -182,6 +182,8 @@ class _HomeScreenState extends State<HomeScreen> {
           onTap: () {
             if (label == '여행갤러리') {
               context.push('/travel-gallery');
+            } else if (label == '가이드랭킹') {
+              context.push('/guide-ranking');
             }
           },
           child: Container(

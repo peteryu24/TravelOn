@@ -184,7 +184,7 @@ class _LikeablePackageCardState extends State<LikeablePackageCard> {
       top: 8,
       right: 8,
       child: Container(
-        padding: EdgeInsets.all(8.w),
+        padding: EdgeInsets.all(1.w),
         decoration: BoxDecoration(
           color: Colors.white.withOpacity(0.8),
           borderRadius: BorderRadius.circular(20),
@@ -205,7 +205,7 @@ class _LikeablePackageCardState extends State<LikeablePackageCard> {
                   ),
                   onPressed: () => _handleLikeButton(userId, context),
                 ),
-                SizedBox(width: 4.w),
+                // SizedBox(width: 4.w),
                 Text(
                   '${package.likesCount}',
                   style: TextStyle(
@@ -213,6 +213,7 @@ class _LikeablePackageCardState extends State<LikeablePackageCard> {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
+                SizedBox(width: 10.w),
               ],
             );
           },
