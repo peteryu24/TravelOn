@@ -52,5 +52,5 @@ ios/Podfile.lock
 firebase_options.dart
 
 # Gradle properties
-gradle.properties
+/android/gradle.properties
 .java-version
