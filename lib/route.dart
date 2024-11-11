@@ -12,6 +12,7 @@ import 'package:travel_on_final/core/presentation/widgets/scaffold_with_bottom_n
 // chat
 import 'package:travel_on_final/features/chat/presentation/screens/chat_list_screen.dart';
 import 'package:travel_on_final/features/chat/presentation/screens/chat_screen.dart';
+import 'package:travel_on_final/features/chat/presentation/screens/guide_search_screen.dart';
 // reservation
 import 'package:travel_on_final/features/reservation/presentation/screens/reservation_calendar_screen.dart';
 import 'package:travel_on_final/features/review/presentation/screens/add_review_screen.dart';
@@ -119,12 +120,17 @@ final goRouter = GoRouter(
       path: '/liked-packages',
       builder: (context, state) => const LikedPackagesScreen(),
     ),
+    // 채팅 관련 라우트
     GoRoute(
       path: '/chat/:chatId',
       builder: (context, state) {
         final chatId = state.pathParameters['chatId']!;
         return ChatScreen(chatId: chatId);
       },
+    ),
+    GoRoute(
+      path: '/guide_search',
+      builder: (context, state) => const GuideSearchScreen(),
     ),
     GoRoute(
       path: '/profile/edit',

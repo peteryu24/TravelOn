@@ -58,6 +58,7 @@ class AuthProvider with ChangeNotifier {
           'profileImageUrl': '',
           'isGuide': false,
           'likedPackages': [],
+          'introduction': '',
         };
         await _firestore
             .collection('users')
@@ -68,12 +69,12 @@ class AuthProvider with ChangeNotifier {
       } else {
         _currentUser = UserModel(
           id: userCredential.user!.uid,
-          name:
-              userData['name'] ?? userCredential.user!.displayName ?? 'No Name',
+          name: userData['name'] ?? userCredential.user!.displayName ?? 'No Name',
           email: userData['email'] ?? userCredential.user!.email!,
           profileImageUrl: userData['profileImageUrl'] as String?,
           isGuide: userData['isGuide'] as bool? ?? false,
           likedPackages: List<String>.from(userData['likedPackages'] ?? []),
+          introduction: userData['introduction'] as String?,
         );
       }
 
@@ -101,6 +102,7 @@ class AuthProvider with ChangeNotifier {
         'profileImageUrl': '',
         'isGuide': false,
         'likedPackages': [],
+        'introduction': '',
       };
       await _firestore
           .collection('users')
@@ -135,9 +137,8 @@ class AuthProvider with ChangeNotifier {
       await _auth.signOut();
       _currentUser = null;
 
-      // Provider를 통해 직접 GalleryProvider에 접근하는 방식으로 변경
       final context =
-          _auth.app.options.androidClientId as BuildContext?; // 임시방편
+          _auth.app.options.androidClientId as BuildContext?;
       if (context != null) {
         final galleryProvider =
             Provider.of<GalleryProvider>(context, listen: false);
@@ -199,6 +200,7 @@ class AuthProvider with ChangeNotifier {
             'likedPackages': [],
             'gender': null,
             'birthDate': null,
+            'introduction': '',
           };
           await _firestore.collection('users').doc(firebaseUser.uid).set(newUserDoc);
 
@@ -211,10 +213,11 @@ class AuthProvider with ChangeNotifier {
             profileImageUrl: userData['profileImageUrl'] as String?,
             isGuide: userData['isGuide'] as bool? ?? false,
             likedPackages: List<String>.from(userData['likedPackages'] ?? []),
-            gender: userData['gender'] as String?, // 추가
+            gender: userData['gender'] as String?,
             birthDate: userData['birthDate'] != null
                 ? (userData['birthDate'] as Timestamp).toDate()
-                : null, // 추가
+                : null,
+            introduction: userData['introduction'] as String?,
           );
         }
 
@@ -252,6 +255,7 @@ class AuthProvider with ChangeNotifier {
     String? gender,
     DateTime? birthDate,
     String? profileImageUrl,
+    String? introduction,
   }) async {
     if (_currentUser == null) throw '로그인이 필요합니다';
 
@@ -270,6 +274,7 @@ class AuthProvider with ChangeNotifier {
         'gender': gender,
         'birthDate': birthDate != null ? Timestamp.fromDate(birthDate) : null,
         'profileImageUrl': imageUrl,
+        'introduction': introduction,
       });
 
       _currentUser = _currentUser!.copyWith(
@@ -277,6 +282,7 @@ class AuthProvider with ChangeNotifier {
         gender: gender,
         birthDate: birthDate,
         profileImageUrl: imageUrl,
+        introduction: introduction,
       );
 
       notifyListeners();
