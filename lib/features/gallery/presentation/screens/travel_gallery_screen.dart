@@ -17,21 +17,19 @@ class TravelGalleryScreen extends StatelessWidget {
         scrolledUnderElevation: 0,
         elevation: 0,
         centerTitle: true,
-        title: Text(
-          '여행갤러리',
-          style: TextStyle(
-            fontSize: 20.sp,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
+        title: const Text('여행갤러리'),
         actions: [
+          IconButton(
+            onPressed: () => context.push('/gallery-search'),
+            icon: const Icon(CupertinoIcons.search),
+          ),
           IconButton(
             onPressed: () => context.push('/scrapped-posts'),
             icon: const Icon(CupertinoIcons.bookmark_fill),
           ),
           IconButton(
             onPressed: () => context.push('/add-gallery-post'),
-            icon: const Icon(CupertinoIcons.plus_circle),
+            icon: const Icon(CupertinoIcons.plus_circle_fill),
           ),
         ],
       ),
