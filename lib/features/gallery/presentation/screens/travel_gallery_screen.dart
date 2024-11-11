@@ -25,11 +25,11 @@ class TravelGalleryScreen extends StatelessWidget {
           ),
           IconButton(
             onPressed: () => context.push('/scrapped-posts'),
-            icon: const Icon(CupertinoIcons.bookmark_fill),
+            icon: const Icon(CupertinoIcons.bookmark),
           ),
           IconButton(
             onPressed: () => context.push('/add-gallery-post'),
-            icon: const Icon(CupertinoIcons.plus_circle_fill),
+            icon: const Icon(CupertinoIcons.plus_circle),
           ),
         ],
       ),
