@@ -200,7 +200,6 @@ class _DetailScreenState extends State<DetailScreen> {
           '여행 패키지',
           style: TextStyle(
             color: Colors.black,
-            fontWeight: FontWeight.bold,
           ),
         ),
         actions: [

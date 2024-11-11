@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:travel_on_final/features/guide/presentation/provider/guide_ranking_provider.dart';
 import 'package:travel_on_final/features/home/data/repositories/home_repository_impl.dart';
 import 'package:travel_on_final/features/home/domain/usecases/get_next_trip.dart';
 import 'package:travel_on_final/features/home/presentation/providers/home_provider.dart';
@@ -122,6 +123,10 @@ class MyApp extends StatelessWidget {
           create: (context) => GalleryProvider(
             GalleryRepository(),
           ),
+        ),
+        // 가이드랭킹 provider
+        ChangeNotifierProvider(
+          create: (context) => GuideRankingProvider(FirebaseFirestore.instance),
         ),
       ],
       child: ScreenUtilInit(
