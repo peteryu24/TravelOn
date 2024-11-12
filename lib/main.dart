@@ -21,7 +21,6 @@ import 'package:travel_on_final/firebase_options.dart';
 import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart' hide AuthProvider;
-import 'package:firebase_app_check/firebase_app_check.dart';
 // provider
 import 'package:provider/provider.dart';
 import 'package:travel_on_final/core/providers/navigation_provider.dart';
@@ -36,8 +35,6 @@ import 'package:travel_on_final/features/gallery/data/repositories/gallery_repos
 import 'package:travel_on_final/features/gallery/presentation/providers/gallery_provider.dart';
 import 'package:travel_on_final/features/notification/presentation/providers/notification_provider.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter/foundation.dart';
-import 'package:flutter/services.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();

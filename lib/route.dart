@@ -17,7 +17,6 @@ import 'package:travel_on_final/features/guide/presentation/screens/guide_rankin
 import 'package:travel_on_final/features/chat/presentation/screens/guide_search_screen.dart';
 // reservation
 import 'package:travel_on_final/features/reservation/presentation/screens/reservation_calendar_screen.dart';
-import 'package:travel_on_final/features/review/presentation/screens/add_review_screen.dart';
 // search
 import 'package:travel_on_final/features/search/domain/entities/travel_package.dart';
 import 'package:travel_on_final/features/search/presentation/providers/travel_provider.dart';
