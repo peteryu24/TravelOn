@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_naver_map/flutter_naver_map.dart';
 import 'package:travel_on_final/features/guide/presentation/provider/guide_ranking_provider.dart';
 import 'package:travel_on_final/features/home/data/repositories/home_repository_impl.dart';
 import 'package:travel_on_final/features/home/domain/usecases/get_next_trip.dart';
@@ -34,10 +35,19 @@ import 'package:travel_on_final/features/gallery/data/repositories/gallery_repos
 import 'package:travel_on_final/features/gallery/presentation/providers/gallery_provider.dart';
 
 Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();  // 가장 먼저 호출되어야 함
+
   await dotenv.load(fileName: ".env");
 
-  WidgetsFlutterBinding.ensureInitialized();
+  // 네이버 맵 초기화 (한 번만)
+  await NaverMapSdk.instance.initialize(
+    clientId: 'j3gnaneqmd',
+    onAuthFailed: (e) {
+      print("네이버맵 인증 실패: $e");
+    },
+  );
 
+  // Firebase 초기화
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
@@ -45,7 +55,7 @@ Future<void> main() async {
   await FirebaseAppCheck.instance.activate(
     webProvider: ReCaptchaV3Provider('recaptcha-v3-site-key'),
     androidProvider: AndroidProvider.debug,
-    appleProvider: AppleProvider.appAttest, // iOS용
+    appleProvider: AppleProvider.appAttest,
   );
 
   await SharedPreferences.getInstance();
