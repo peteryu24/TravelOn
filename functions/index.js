@@ -7,26 +7,44 @@ admin.initializeApp();
 exports.sendFCMNotification = onDocumentCreated(
     {
       region: "asia-northeast3", // 서울 리전 명시
-      document: "fcm_requests/{requestId}",
+      document: "notifications/{notificationId}",
     },
     async (event) => {
-      const data = event.data.data();
-      const token = data.token;
-
-      const message = {
-        notification: {
-          title: data.title,
-          body: data.body,
-        },
-        token: token,
-      };
-
+      const notification = event.data.data();
+      
       try {
+        // 사용자의 FCM 토큰 가져오기
+        const userDoc = await admin.firestore()
+          .collection("users")
+          .doc(notification.userId)
+          .get();
+        
+        const fcmToken = userDoc.data()?.fcmToken;
+        
+        if (!fcmToken) {
+          console.log("No FCM token found for user:", notification.userId);
+          return null;
+        }
+
+        // FCM 메시지 생성
+        const message = {
+          token: fcmToken,
+          notification: {
+            title: notification.title,
+            body: notification.message,
+          },
+          data: {
+            type: notification.type,
+            reservationId: notification.reservationId || "",
+          },
+        };
+
+        // FCM 메시지 전송
         const response = await admin.messaging().send(message);
         console.log("Successfully sent message:", response);
-        await event.data.ref.delete();
+        
       } catch (error) {
-        console.log("Error sending message:", error);
+        console.log("Error sending notification:", error);
       }
-    },
+    }
 );
