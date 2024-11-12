@@ -78,7 +78,6 @@ Future<void> main() async {
     webProvider: ReCaptchaV3Provider('recaptcha-v3-site-key'),
     androidProvider: AndroidProvider.debug,
     appleProvider: AppleProvider.appAttest,
-    appleProvider: AppleProvider.appAttest,
   );
 
   await SharedPreferences.getInstance();
@@ -116,7 +115,10 @@ Future<void> main() async {
         ChangeNotifierProvider(create: (_) => NavigationProvider()),
 
         // 채팅 Provider
-        ChangeNotifierProvider(create: (_) => ChatProvider()),
+        ChangeNotifierProvider(
+          create: (context) => ChatProvider(
+              Provider.of<NavigationProvider>(context, listen: false)),
+        ),
 
         // 예약 Provider
         ChangeNotifierProvider(
