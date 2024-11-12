@@ -12,6 +12,8 @@ import 'package:travel_on_final/features/search/presentation/providers/travel_pr
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/providers/navigation_provider.dart';
+import '../../../../features/notification/presentation/screens/notification_center_screen.dart';
+import '../../../../features/notification/presentation/providers/notification_provider.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -31,7 +33,6 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _loadData() async {
-    //로드 데이터
     final authProvider = context.read<AuthProvider>();
     final travelProvider = context.read<TravelProvider>();
 
@@ -62,9 +63,48 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.notifications_outlined),
-            onPressed: () {},
+          Stack(
+            children: [
+              IconButton(
+                icon: const Icon(Icons.notifications),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const NotificationCenterScreen(),
+                    ),
+                  );
+                },
+              ),
+              Consumer<NotificationProvider>(
+                builder: (context, provider, _) {
+                  if (provider.unreadCount == 0) return const SizedBox.shrink();
+                  return Positioned(
+                    right: 8,
+                    top: 8,
+                    child: Container(
+                      padding: const EdgeInsets.all(2),
+                      decoration: BoxDecoration(
+                        color: Colors.red,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      constraints: const BoxConstraints(
+                        minWidth: 16,
+                        minHeight: 16,
+                      ),
+                      child: Text(
+                        provider.unreadCount.toString(),
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 10,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ],
           ),
         ],
       ),

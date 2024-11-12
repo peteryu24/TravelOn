@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_naver_map/flutter_naver_map.dart';
@@ -20,7 +22,6 @@ import 'package:travel_on_final/firebase_options.dart';
 import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart' hide AuthProvider;
-import 'package:firebase_app_check/firebase_app_check.dart';
 // provider
 import 'package:provider/provider.dart';
 import 'package:travel_on_final/core/providers/navigation_provider.dart';
@@ -33,9 +34,11 @@ import 'package:travel_on_final/features/auth/data/repositories/auth_repository_
 import 'package:travel_on_final/features/auth/domain/repositories/auth_repository.dart';
 import 'package:travel_on_final/features/gallery/data/repositories/gallery_repository.dart';
 import 'package:travel_on_final/features/gallery/presentation/providers/gallery_provider.dart';
+import 'package:travel_on_final/features/notification/presentation/providers/notification_provider.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 
 Future<void> main() async {
-  WidgetsFlutterBinding.ensureInitialized();  // 가장 먼저 호출되어야 함
+  WidgetsFlutterBinding.ensureInitialized(); // 가장 먼저 호출되어야 함
 
   await dotenv.load(fileName: ".env");
 
@@ -48,9 +51,28 @@ Future<void> main() async {
   );
 
   // Firebase 초기화
+  WidgetsFlutterBinding.ensureInitialized();
+
+  await dotenv.load(fileName: ".env");
+
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+
+  // FCM 초기화
+  final messaging = FirebaseMessaging.instance;
+
+  // FCM 권한 요청 (iOS용)
+  if (Platform.isIOS) {
+    await messaging.requestPermission(
+      alert: true,
+      badge: true,
+      sound: true,
+    );
+  }
+
+  // 백그라운드 메시지 핸들러 등록
+  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
   await FirebaseAppCheck.instance.activate(
     webProvider: ReCaptchaV3Provider('recaptcha-v3-site-key'),
@@ -60,7 +82,109 @@ Future<void> main() async {
 
   await SharedPreferences.getInstance();
 
-  runApp(const MyApp());
+  runApp(
+    MultiProvider(
+      providers: [
+        // Firebase 서비스 프로바이더
+        Provider<FirebaseAuth>.value(value: FirebaseAuth.instance),
+        Provider<FirebaseFirestore>.value(value: FirebaseFirestore.instance),
+
+        // Auth 관련 Providers
+        Provider<AuthRepository>(create: (_) => AuthRepositoryImpl()),
+        ProxyProvider<FirebaseAuth, ResetPasswordUseCase>(
+          update: (_, auth, __) => ResetPasswordUseCase(auth),
+        ),
+
+        // Travel 관련 Providers
+        ChangeNotifierProvider(
+          create: (_) => TravelProvider(
+            TravelRepositoryImpl(),
+            auth: FirebaseAuth.instance,
+          ),
+        ),
+
+        ChangeNotifierProvider(
+          create: (context) => app.AuthProvider(
+            context.read<FirebaseAuth>(),
+            context.read<ResetPasswordUseCase>(),
+            context.read<TravelProvider>(),
+          ),
+        ),
+
+        // 네비게이션 관련 Provider
+        ChangeNotifierProvider(create: (_) => NavigationProvider()),
+
+        // 채팅 Provider
+        ChangeNotifierProvider(
+          create: (context) => ChatProvider(
+              Provider.of<NavigationProvider>(context, listen: false)),
+        ),
+
+        // 예약 Provider
+        ChangeNotifierProvider(
+          create: (_) => ReservationProvider(FirebaseFirestore.instance),
+        ),
+
+        // 리뷰 Provider
+        ChangeNotifierProvider(
+          create: (context) => ReviewProvider(
+            ReviewRepositoryImpl(
+              context.read<TravelProvider>(),
+            ),
+          ),
+        ),
+
+        // 홈 Provider
+        ChangeNotifierProvider(
+          create: (_) => HomeProvider(
+            GetNextTrip(
+              HomeRepositoryImpl(FirebaseFirestore.instance),
+            ),
+          ),
+        ),
+
+        // 날씨 Provider
+        ChangeNotifierProvider(create: (_) => WeatherProvider()),
+
+        // 갤러리 Provider
+        ChangeNotifierProvider(
+          create: (context) => GalleryProvider(
+            GalleryRepository(),
+          ),
+        ),
+        // 가이드랭킹 provider
+        ChangeNotifierProvider(
+          create: (context) => GuideRankingProvider(FirebaseFirestore.instance),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => NotificationProvider(
+            FirebaseFirestore.instance,
+            messaging,
+          ),
+        ),
+      ],
+      child: ScreenUtilInit(
+        designSize: const Size(375, 812),
+        child: MaterialApp.router(
+          title: 'Travel On',
+          debugShowCheckedModeBanner: false,
+          routerConfig: goRouter,
+          theme: ThemeData(
+            primaryColor: Colors.blue,
+            colorScheme: ColorScheme.fromSwatch(primarySwatch: Colors.blue)
+                .copyWith(secondary: Colors.blueAccent),
+          ),
+        ),
+      ),
+    ),
+  );
+}
+
+// 백그라운드 메시지 핸들러
+@pragma('vm:entry-point')
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  print("Handling a background message: ${message.messageId}");
 }
 
 class MyApp extends StatelessWidget {
@@ -101,9 +225,10 @@ class MyApp extends StatelessWidget {
 
         // 채팅 Provider
         ChangeNotifierProvider(
-          create: (context) => ChatProvider(Provider.of<NavigationProvider>(context, listen: false)),
+          create: (context) => ChatProvider(
+              Provider.of<NavigationProvider>(context, listen: false)),
         ),
-        
+
         // 예약 Provider
         ChangeNotifierProvider(
           create: (_) => ReservationProvider(FirebaseFirestore.instance),
