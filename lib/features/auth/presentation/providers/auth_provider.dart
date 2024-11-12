@@ -43,42 +43,7 @@ class AuthProvider with ChangeNotifier {
         throw '이메일 인증이 필요합니다. 인증 메일이 발송되었습니다.';
       }
 
-      final userDoc = await _firestore
-          .collection('users')
-          .doc(userCredential.user!.uid)
-          .get();
-
-      final userData = userDoc.data() ?? {};
-
-      if (!userDoc.exists) {
-        final newUserDoc = {
-          'id': userCredential.user!.uid,
-          'name': userCredential.user!.displayName ?? 'No Name',
-          'email': userCredential.user!.email!,
-          'profileImageUrl': '',
-          'isGuide': false,
-          'likedPackages': [],
-          'introduction': '',
-        };
-        await _firestore
-            .collection('users')
-            .doc(userCredential.user!.uid)
-            .set(newUserDoc);
-
-        _currentUser = UserModel.fromJson(newUserDoc);
-      } else {
-        _currentUser = UserModel(
-          id: userCredential.user!.uid,
-          name: userData['name'] ?? userCredential.user!.displayName ?? 'No Name',
-          email: userData['email'] ?? userCredential.user!.email!,
-          profileImageUrl: userData['profileImageUrl'] as String?,
-          isGuide: userData['isGuide'] as bool? ?? false,
-          likedPackages: List<String>.from(userData['likedPackages'] ?? []),
-          introduction: userData['introduction'] as String?,
-        );
-      }
-
-      await _travelProvider.loadLikedPackages(_currentUser!.id);
+      await _fetchUserData(userCredential.user!.uid);
       notifyListeners();
     } catch (e) {
       print('로그인 실패: $e');
@@ -183,50 +148,18 @@ class AuthProvider with ChangeNotifier {
     }
   }
 
+  Future<void> _fetchUserData(String userId) async {
+    final userDoc = await _firestore.collection('users').doc(userId).get();
+    if (userDoc.exists) {
+      _currentUser = UserModel.fromJson(userDoc.data()!);
+      await _travelProvider.loadLikedPackages(_currentUser!.id);
+    }
+  }
+
   void _onAuthStateChanged(User? firebaseUser) async {
     if (firebaseUser != null && firebaseUser.emailVerified) {
       isEmailVerified = true;
-      try {
-        final userDoc = await _firestore.collection('users').doc(firebaseUser.uid).get();
-        final userData = userDoc.data() ?? {};
-
-        if (!userDoc.exists) {
-          final newUserDoc = {
-            'id': firebaseUser.uid,
-            'name': firebaseUser.displayName ?? 'No Name',
-            'email': firebaseUser.email!,
-            'profileImageUrl': '',
-            'isGuide': false,
-            'likedPackages': [],
-            'gender': null,
-            'birthDate': null,
-            'introduction': '',
-          };
-          await _firestore.collection('users').doc(firebaseUser.uid).set(newUserDoc);
-
-          _currentUser = UserModel.fromJson(newUserDoc);
-        } else {
-          _currentUser = UserModel(
-            id: firebaseUser.uid,
-            name: userData['name'] ?? firebaseUser.displayName ?? 'No Name',
-            email: userData['email'] ?? firebaseUser.email!,
-            profileImageUrl: userData['profileImageUrl'] as String?,
-            isGuide: userData['isGuide'] as bool? ?? false,
-            likedPackages: List<String>.from(userData['likedPackages'] ?? []),
-            gender: userData['gender'] as String?,
-            birthDate: userData['birthDate'] != null
-                ? (userData['birthDate'] as Timestamp).toDate()
-                : null,
-            introduction: userData['introduction'] as String?,
-          );
-        }
-
-        if (_currentUser != null) {
-          await _travelProvider.loadLikedPackages(_currentUser!.id);
-        }
-      } catch (e) {
-        print('Error in _onAuthStateChanged: $e');
-      }
+      await _fetchUserData(firebaseUser.uid);
     } else {
       isEmailVerified = false;
       _currentUser = null;
@@ -262,11 +195,15 @@ class AuthProvider with ChangeNotifier {
     try {
       final userRef = _firestore.collection('users').doc(_currentUser!.id);
 
-      String? imageUrl = profileImageUrl;
+      String? imageUrl;
       if (profileImageUrl != null && File(profileImageUrl).existsSync()) {
+        // 새로운 프로필 이미지 업로드
         final ref = _storage.ref().child('user_profiles/${_currentUser!.id}.jpg');
         await ref.putFile(File(profileImageUrl));
         imageUrl = await ref.getDownloadURL();
+      } else {
+        // 기존 프로필 이미지 URL 유지
+        imageUrl = _currentUser!.profileImageUrl;
       }
 
       await userRef.update({
@@ -293,7 +230,6 @@ class AuthProvider with ChangeNotifier {
   }
 
   // 비밀번호 재설정
-
   Future<void> resetPassword(String email) async {
     await _resetPasswordUseCase.call(email);
   }

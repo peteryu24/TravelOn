@@ -74,7 +74,7 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
         name: _nameController.text,
         gender: _gender,
         birthDate: _birthDate,
-        profileImageUrl: _selectedImageFile?.path,
+        profileImageUrl: _selectedImageFile != null ? _selectedImageFile!.path : _profileImageUrl,
         introduction: _introductionController.text,
       );
       Navigator.pop(context);
@@ -88,13 +88,6 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
   @override
   Widget build(BuildContext context) {
     final user = context.watch<AuthProvider>().currentUser;
-
-    if (user == null) {
-      return Scaffold(
-        appBar: AppBar(title: Text('회원 정보 수정')),
-        body: Center(child: CircularProgressIndicator()),
-      );
-    }
 
     return Scaffold(
       resizeToAvoidBottomInset: true,
@@ -139,25 +132,24 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
               ),
               child: TextField(
                 enabled: false,
-                controller: TextEditingController(text: user.email),
                 decoration: InputDecoration(
                   labelText: '이메일',
                   labelStyle: TextStyle(color: Colors.blue),
                   border: InputBorder.none,
                 ),
+                controller: TextEditingController(text: user?.email ?? ''),
               ),
             ),
             SizedBox(height: 16),
             Container(
-              padding: EdgeInsets.symmetric(horizontal: 12, vertical: 16), // 높이 조절
-              height: 120, // '내 소개'의 컨테이너 높이 설정
+              padding: EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+              height: 120,
               decoration: BoxDecoration(
                 border: Border.all(color: Colors.blue),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: TextField(
                 controller: _introductionController,
-                maxLines: 3, // 최대 줄 수 설정
                 decoration: InputDecoration(
                   labelText: '내 소개',
                   labelStyle: TextStyle(color: Colors.blue),
