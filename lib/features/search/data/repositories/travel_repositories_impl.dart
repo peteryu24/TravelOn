@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:travel_on_final/features/map/domain/entities/travel_point.dart';
 import '../../domain/repositories/travel_repositories.dart';
 import '../../domain/entities/travel_package.dart';
 
@@ -30,9 +31,12 @@ class TravelRepositoryImpl implements TravelRepository {
           nights: (data['nights'] ?? 1).toInt(),
           departureDays: List<int>.from(data['departureDays'] ?? [1,2,3,4,5,6,7]),
           reviewCount: (data['reviewCount'] as num?)?.toInt() ?? 0,
-          averageRating: (data['averageRating'] as num?)?.toDouble() ?? 0.0,  // 이 부분 추가
+          averageRating: (data['averageRating'] as num?)?.toDouble() ?? 0.0,
           likedBy: List<String>.from(data['likedBy'] ?? []),
           likesCount: (data['likesCount'] as num?)?.toInt() ?? 0,
+          routePoints: (data['routePoints'] as List<dynamic>?)?.map((point) =>
+              TravelPoint.fromJson(point as Map<String, dynamic>)
+          ).toList() ?? [],  // routePoints 추가
         );
       }).toList();
     } catch (e) {
@@ -84,8 +88,9 @@ class TravelRepositoryImpl implements TravelRepository {
         'maxParticipants': package.maxParticipants,
         'nights': package.nights,
         'departureDays': package.departureDays,
-        'likedBy': [], // 초기 빈 배열로 설정
-        'likesCount': 0, // 초기값 0으로 설정
+        'likedBy': [],
+        'likesCount': 0,
+        'routePoints': package.routePoints.map((point) => point.toJson()).toList(),  // routePoints 추가
       };
 
       if (package.minParticipants <= 0) {
@@ -158,6 +163,7 @@ class TravelRepositoryImpl implements TravelRepository {
         'maxParticipants': package.maxParticipants,
         'nights': package.nights,
         'departureDays': package.departureDays,
+        'routePoints': package.routePoints.map((point) => point.toJson()).toList(),  // routePoints 추가
       };
 
       if (package.minParticipants <= 0) {

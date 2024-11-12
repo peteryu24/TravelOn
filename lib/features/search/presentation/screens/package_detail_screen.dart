@@ -1,10 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_naver_map/flutter_naver_map.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:travel_on_final/features/auth/presentation/providers/auth_provider.dart';
+import 'package:travel_on_final/features/map/domain/entities/travel_point.dart';
 import 'package:travel_on_final/features/review/presentation/provider/review_provider.dart';
 import 'package:travel_on_final/features/review/presentation/screens/add_review_screen.dart';
 import 'package:travel_on_final/features/review/presentation/screens/review_detail_screen.dart';
@@ -206,18 +208,18 @@ class _PackageDetailScreenState extends State<PackageDetailScreen> {
                                     ),
                                   ),
                                   if (_currentUserId != widget.package.guideId)
-                                  IconButton(
-                                    onPressed: () async {
-                                      final authProvider = Provider.of<AuthProvider>(context, listen: false);
-                                      final userId = authProvider.currentUser?.id;
-                                      if (userId != null) {
-                                        final otherUserId = widget.package.guideId;
-                                        final chatId = CreateChatId().call(userId, otherUserId);
-                                        context.push('/chat/$chatId');
-                                      }
-                                    },
-                                    icon: Icon(Icons.chat),
-                                  )
+                                    IconButton(
+                                      onPressed: () async {
+                                        final authProvider = Provider.of<AuthProvider>(context, listen: false);
+                                        final userId = authProvider.currentUser?.id;
+                                        if (userId != null) {
+                                          final otherUserId = widget.package.guideId;
+                                          final chatId = CreateChatId().call(userId, otherUserId);
+                                          context.push('/chat/$chatId');
+                                        }
+                                      },
+                                      icon: Icon(Icons.chat),
+                                    )
                                 ],
                               ),
                             ),
@@ -300,6 +302,121 @@ class _PackageDetailScreenState extends State<PackageDetailScreen> {
                       height: 1.5.h,
                     ),
                   ),
+
+                  SizedBox(height: 24.h),
+                  Text(
+                    '여행 코스',
+                    style: TextStyle(
+                      fontSize: 18.sp,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  SizedBox(height: 8.h),
+                  if (widget.package.routePoints.isNotEmpty)
+                    Container(
+                      height: 300.h,
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.grey.shade300),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: NaverMap(
+                        options: NaverMapViewOptions(
+                          initialCameraPosition: NCameraPosition(
+                            target: NLatLng(37.5666102, 126.9783881),
+                            zoom: 12,
+                          ),
+                          scrollGesturesEnable: true,
+                          tiltGesturesEnable: true,
+                          zoomGesturesEnable: true,
+                          rotationGesturesEnable: true,
+                        ),
+                        onMapReady: (controller) {
+                          // 마커 추가
+                          for (var i = 0; i < widget.package.routePoints.length; i++) {
+                            final point = widget.package.routePoints[i];
+                            final marker = NMarker(
+                              id: point.id,
+                              position: point.location,
+                            );
+
+                            // 마커 캡션(순서 표시)
+                            marker.setCaption(
+                              NOverlayCaption(
+                                text: '${i + 1}. ${point.name}',
+                                textSize: 14,
+                                color: Colors.blue,
+                                haloColor: Colors.white,
+                              ),
+                            );
+
+                            controller.addOverlay(marker);
+                          }
+
+                          // 경로 그리기
+                          for (var i = 0; i < widget.package.routePoints.length - 1; i++) {
+                            final start = widget.package.routePoints[i];
+                            final end = widget.package.routePoints[i + 1];
+
+                            final pathOverlay = NPathOverlay(
+                              id: 'path_$i',
+                              coords: [start.location, end.location],
+                              color: Colors.blue.withOpacity(0.8),
+                              width: 3,
+                              outlineColor: Colors.white,
+                            );
+
+                            controller.addOverlay(pathOverlay);
+                          }
+
+                          // 모든 마커가 보이도록 카메라 위치 조정
+                          if (widget.package.routePoints.isNotEmpty) {
+                            final bounds = _calculateBounds(widget.package.routePoints);
+                            controller.updateCamera(
+                              NCameraUpdate.fitBounds(
+                                bounds,
+                                padding: const EdgeInsets.all(50),
+                              ),
+                            );
+                          }
+                        },
+                      ),
+                    )
+                  else
+                    Container(
+                      height: 100.h,
+                      alignment: Alignment.center,
+                      child: Text(
+                        '등록된 여행 코스가 없습니다',
+                        style: TextStyle(
+                          color: Colors.grey[600],
+                          fontSize: 16.sp,
+                        ),
+                      ),
+                    ),
+
+// 여행 코스 목록 표시
+                  if (widget.package.routePoints.isNotEmpty) ...[
+                    SizedBox(height: 16.h),
+                    ListView.builder(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemCount: widget.package.routePoints.length,
+                      itemBuilder: (context, index) {
+                        final point = widget.package.routePoints[index];
+                        return ListTile(
+                          leading: Icon(
+                            point.type == PointType.hotel ? Icons.hotel :
+                            point.type == PointType.restaurant ? Icons.restaurant :
+                            Icons.photo_camera,
+                            color: Colors.blue,
+                          ),
+                          title: Text('${index + 1}. ${point.name}'),
+                          subtitle: Text(point.address),
+                        );
+                      },
+                    ),
+                  ],
+
                   SizedBox(height: 24.h),
                   // 설명 이미지들
                   if (widget.package.descriptionImages.isNotEmpty) ...[
@@ -470,6 +587,25 @@ class _PackageDetailScreenState extends State<PackageDetailScreen> {
           ),
         );
       },
+    );
+  }
+
+  NLatLngBounds _calculateBounds(List<TravelPoint> points) {
+    var minLat = points.first.location.latitude;
+    var maxLat = points.first.location.latitude;
+    var minLng = points.first.location.longitude;
+    var maxLng = points.first.location.longitude;
+
+    for (var point in points) {
+      if (point.location.latitude < minLat) minLat = point.location.latitude;
+      if (point.location.latitude > maxLat) maxLat = point.location.latitude;
+      if (point.location.longitude < minLng) minLng = point.location.longitude;
+      if (point.location.longitude > maxLng) maxLng = point.location.longitude;
+    }
+
+    return NLatLngBounds(
+      southWest: NLatLng(minLat, minLng),
+      northEast: NLatLng(maxLat, maxLng),
     );
   }
 }
