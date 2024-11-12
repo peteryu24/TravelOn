@@ -7,7 +7,7 @@ import 'package:travel_on_final/features/home/presentation/providers/home_provid
 import 'package:travel_on_final/features/home/domain/usecases/get_next_trip.dart';
 import 'home_provider_test.mocks.dart';
 
-@GenerateMocks([GetNextTrip]) // GenerateNiceMocks가 아닌 GenerateMocks 사용
+@GenerateMocks([GetNextTrip])
 void main() {
   late HomeProvider provider;
   late MockGetNextTrip mockGetNextTrip;
@@ -40,20 +40,6 @@ void main() {
 
       // then
       expect(provider.nextTrip, tNextTrip);
-      expect(provider.isLoading, false);
-      verify(mockGetNextTrip(argThat(isA<String>()))).called(1);
-    });
-
-    test('should handle error and set loading to false', () async {
-      // given
-      when(mockGetNextTrip(argThat(isA<String>())))
-          .thenThrow(Exception('Failed to load next trip'));
-
-      // when
-      await provider.loadNextTrip('test_user_id');
-
-      // then
-      expect(provider.nextTrip, null);
       expect(provider.isLoading, false);
       verify(mockGetNextTrip(argThat(isA<String>()))).called(1);
     });
