@@ -31,6 +31,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _loadData() async {
+    //로드 데이터
     final authProvider = context.read<AuthProvider>();
     final travelProvider = context.read<TravelProvider>();
 
