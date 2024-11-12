@@ -12,13 +12,13 @@ class NotificationProvider extends ChangeNotifier {
   final List<NotificationEntity> _notifications = [];
   bool _isLoading = false;
   String? _error;
-  final FlutterLocalNotificationsPlugin _localNotifications =
+
+  final FlutterLocalNotificationsPlugin _flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
 
   NotificationProvider(this._firestore, this._messaging)
       : _auth = FirebaseAuth.instance {
-    _initLocalNotifications();
-    _initFCM();
+    _initNotifications();
   }
 
   List<NotificationEntity> get notifications => _notifications;
@@ -26,97 +26,109 @@ class NotificationProvider extends ChangeNotifier {
   String? get error => _error;
   int get unreadCount => _notifications.where((n) => !n.isRead).length;
 
-  Future<void> _initLocalNotifications() async {
-    const androidSettings =
+  Future<void> _initNotifications() async {
+    // 로컬 알림 초기화
+    const androidInitialize =
         AndroidInitializationSettings('@mipmap/ic_launcher');
-    const iosSettings = DarwinInitializationSettings();
-    const initSettings = InitializationSettings(
-      android: androidSettings,
-      iOS: iosSettings,
+    const iosInitialize = DarwinInitializationSettings();
+    const initializationSettings = InitializationSettings(
+      android: androidInitialize,
+      iOS: iosInitialize,
     );
 
-    await _localNotifications.initialize(initSettings);
+    await _flutterLocalNotificationsPlugin.initialize(
+      initializationSettings,
+      onDidReceiveNotificationResponse: (NotificationResponse response) {
+        // 알림 탭 핸들링
+        print('Notification tapped: ${response.payload}');
+      },
+    );
 
-    // Android 채널 생성
-    const channel = AndroidNotificationChannel(
+    // iOS이면서 개발자 계정이 없는 경우 FCM 초기화 건너뛰기
+    if (defaultTargetPlatform == TargetPlatform.iOS) {
+      print('iOS 플랫폼에서는 개발자 계정 설정 전까지 푸시 알림이 제한됩니다.');
+      return;
+    }
+
+    // FCM 권한 요청
+    NotificationSettings settings = await _messaging.requestPermission(
+      alert: true,
+      badge: true,
+      sound: true,
+    );
+
+    if (settings.authorizationStatus == AuthorizationStatus.authorized) {
+      // FCM 토큰 가져오기
+      String? token = await _messaging.getToken();
+      if (token != null) {
+        final user = _auth.currentUser;
+        if (user != null) {
+          // 토큰을 Firestore에 저장
+          await _firestore.collection('users').doc(user.uid).update({
+            'fcmToken': token,
+          });
+        }
+      }
+
+      // 토큰 갱신 리스너
+      _messaging.onTokenRefresh.listen((newToken) async {
+        final user = _auth.currentUser;
+        if (user != null) {
+          await _firestore.collection('users').doc(user.uid).update({
+            'fcmToken': newToken,
+          });
+        }
+      });
+
+      // FCM 메시지 핸들링
+      FirebaseMessaging.onMessage.listen(_handleForegroundMessage);
+      FirebaseMessaging.onMessageOpenedApp.listen(_handleBackgroundMessage);
+    }
+  }
+
+  Future<void> _handleForegroundMessage(RemoteMessage message) async {
+    // 로컬 알림 표시
+    await _showLocalNotification(message);
+    // 알림 목록 새로고침
+    loadNotifications();
+  }
+
+  Future<void> _handleBackgroundMessage(RemoteMessage message) async {
+    // 알림 목록 새로고침
+    loadNotifications();
+  }
+
+  Future<void> _showLocalNotification(RemoteMessage message) async {
+    const AndroidNotificationChannel channel = AndroidNotificationChannel(
       'high_importance_channel',
       'High Importance Notifications',
       importance: Importance.max,
     );
 
-    await _localNotifications
+    await _flutterLocalNotificationsPlugin
         .resolvePlatformSpecificImplementation<
             AndroidFlutterLocalNotificationsPlugin>()
         ?.createNotificationChannel(channel);
-  }
 
-  Future<void> _initFCM() async {
-    // FCM 토큰 가져오기
-    String? token = await _messaging.getToken();
-    print('FCM Token: $token');
-
-    // 토큰을 Firestore에 저장
-    if (token != null) {
-      final user = _auth.currentUser;
-      if (user != null) {
-        await _firestore.collection('users').doc(user.uid).update({
-          'fcmToken': token,
-        });
-      }
-    }
-
-    // 토큰 갱신 리스너
-    _messaging.onTokenRefresh.listen((newToken) async {
-      final user = _auth.currentUser;
-      if (user != null) {
-        await _firestore.collection('users').doc(user.uid).update({
-          'fcmToken': newToken,
-        });
-      }
-    });
-
-    // FCM 메시지 핸들링
-    FirebaseMessaging.onMessage.listen(_handleForegroundMessage);
-    FirebaseMessaging.onMessageOpenedApp.listen(_handleBackgroundMessage);
-
-    // 알림 권한 요청 (Android 13+)
-    await _messaging.requestPermission(
-      alert: true,
-      badge: true,
-      sound: true,
+    final androidDetails = AndroidNotificationDetails(
+      channel.id,
+      channel.name,
+      importance: Importance.max,
+      priority: Priority.high,
     );
-  }
 
-  Future<void> _handleForegroundMessage(RemoteMessage message) async {
-    print("Got a message whilst in the foreground!");
-    print("Message data: ${message.data}");
+    const iosDetails = DarwinNotificationDetails();
 
-    if (message.notification != null) {
-      await _showLocalNotification(message);
-    }
+    final details = NotificationDetails(
+      android: androidDetails,
+      iOS: iosDetails,
+    );
 
-    await loadNotifications();
-  }
-
-  Future<void> _handleBackgroundMessage(RemoteMessage message) async {
-    print("Handling a background message: ${message.messageId}");
-    await loadNotifications();
-  }
-
-  Future<void> _showLocalNotification(RemoteMessage message) async {
-    await _localNotifications.show(
+    await _flutterLocalNotificationsPlugin.show(
       0,
       message.notification?.title ?? '',
       message.notification?.body ?? '',
-      const NotificationDetails(
-        android: AndroidNotificationDetails(
-          'high_importance_channel',
-          'High Importance Notifications',
-          importance: Importance.max,
-          priority: Priority.high,
-        ),
-        iOS: DarwinNotificationDetails(),
-      ),
+      details,
     );
   }
 
