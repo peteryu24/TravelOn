@@ -1,0 +1,9 @@
+{
+  "projects": {
+    "travel-on-app": "travel-on-app",
+    "default": "travel-on-app"
+  },
+  "targets": {},
+  "etags": {},
+  "dataconnectEmulatorConfig": {}
+}
