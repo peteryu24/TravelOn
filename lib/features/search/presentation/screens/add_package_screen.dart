@@ -5,6 +5,9 @@ import 'package:provider/provider.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:travel_on_final/features/auth/presentation/providers/auth_provider.dart';
 import 'package:travel_on_final/features/home/presentation/screens/home_screen.dart';
+import 'package:travel_on_final/features/map/domain/entities/travel_point.dart';
+import 'package:travel_on_final/features/map/presentation/screens/naver_route_map_screen.dart';
+import 'package:travel_on_final/features/map/presentation/screens/place_search_screen.dart';
 import 'dart:io';
 import '../providers/travel_provider.dart';
 import '../../domain/entities/travel_package.dart';
@@ -29,6 +32,9 @@ class _AddPackageScreenState extends State<AddPackageScreen> {
   int _nights = 1;  // 기본값 1박
   final Set<int> _selectedDepartureDays = {};  // 선택된 출발 요일들
   final _minParticipantsController = TextEditingController();
+  List<TravelPoint> _routePoints = [];
+
+
 
   final List<Map<String, dynamic>> _weekDays = [
     {'value': 1, 'label': '월'},
@@ -195,6 +201,7 @@ class _AddPackageScreenState extends State<AddPackageScreen> {
         maxParticipants: int.parse(_maxParticipantsController.text),
         nights: _nights,
         departureDays: _selectedDepartureDays.toList()..sort(),
+        routePoints: _routePoints,  // 추가
       );
 
       context.read<TravelProvider>().addPackage(newPackage);
@@ -327,6 +334,9 @@ class _AddPackageScreenState extends State<AddPackageScreen> {
                     return null;
                   },
                 ),
+                SizedBox(height: 16.h),
+
+                _buildRouteSelection(),  // 여기에 추가
                 SizedBox(height: 16.h),
 
                 _buildNightsSelection(),
@@ -499,6 +509,106 @@ class _AddPackageScreenState extends State<AddPackageScreen> {
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildRouteSelection() {
+    return Container(
+      padding: EdgeInsets.all(12.w),
+      decoration: BoxDecoration(
+        border: Border.all(color: const Color(0XFF2196F3)),
+        borderRadius: BorderRadius.circular(4),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('여행 코스', style: TextStyle(fontSize: 16.sp)),
+          SizedBox(height: 8.h),
+
+          // 선택된 장소들 표시
+          if (_routePoints.isNotEmpty)
+            ListView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: _routePoints.length,
+              itemBuilder: (context, index) {
+                final point = _routePoints[index];
+                return ListTile(
+                  leading: Icon(
+                    point.type == PointType.hotel ? Icons.hotel :
+                    point.type == PointType.restaurant ? Icons.restaurant :
+                    Icons.photo_camera,
+                  ),
+                  title: Text(point.name),
+                  subtitle: Text(point.address),
+                  trailing: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      IconButton(
+                        icon: const Icon(Icons.delete),
+                        onPressed: () {
+                          setState(() {
+                            _routePoints.removeAt(index);
+                            // 순서 재정렬
+                            for (var i = 0; i < _routePoints.length; i++) {
+                              _routePoints[i] = _routePoints[i].copyWith(order: i);
+                            }
+                          });
+                        },
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
+
+          SizedBox(height: 16.h),
+
+          // 장소 추가 버튼
+          Center(
+            child: ElevatedButton.icon(
+              icon: const Icon(Icons.add_location),
+              label: const Text('장소 추가'),
+              onPressed: () async {
+                final result = await Navigator.push<TravelPoint>(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => PlaceSearchScreen(
+                      selectedPoints: _routePoints,
+                    ),
+                  ),
+                );
+
+                if (result != null) {
+                  setState(() {
+                    _routePoints.add(result);
+                  });
+                }
+              },
+            ),
+          ),
+
+          if (_routePoints.isNotEmpty) ...[
+            SizedBox(height: 16.h),
+            Center(
+              child: ElevatedButton.icon(
+                icon: const Icon(Icons.map),
+                label: const Text('경로 미리보기'),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => NaverRouteMapScreen(
+                        points: _routePoints,
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+          ],
+        ],
       ),
     );
   }

@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_naver_map/flutter_naver_map.dart';
 import 'package:travel_on_final/features/guide/presentation/provider/guide_ranking_provider.dart';
 import 'package:travel_on_final/features/home/data/repositories/home_repository_impl.dart';
 import 'package:travel_on_final/features/home/domain/usecases/get_next_trip.dart';
@@ -37,6 +38,19 @@ import 'package:travel_on_final/features/notification/presentation/providers/not
 import 'package:firebase_messaging/firebase_messaging.dart';
 
 Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized(); // 가장 먼저 호출되어야 함
+
+  await dotenv.load(fileName: ".env");
+
+  // 네이버 맵 초기화 (한 번만)
+  await NaverMapSdk.instance.initialize(
+    clientId: 'j3gnaneqmd',
+    onAuthFailed: (e) {
+      print("네이버맵 인증 실패: $e");
+    },
+  );
+
+  // Firebase 초기화
   WidgetsFlutterBinding.ensureInitialized();
 
   await dotenv.load(fileName: ".env");
@@ -63,6 +77,7 @@ Future<void> main() async {
   await FirebaseAppCheck.instance.activate(
     webProvider: ReCaptchaV3Provider('recaptcha-v3-site-key'),
     androidProvider: AndroidProvider.debug,
+    appleProvider: AppleProvider.appAttest,
     appleProvider: AppleProvider.appAttest,
   );
 
@@ -207,7 +222,10 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => NavigationProvider()),
 
         // 채팅 Provider
-        ChangeNotifierProvider(create: (_) => ChatProvider()),
+        ChangeNotifierProvider(
+          create: (context) => ChatProvider(
+              Provider.of<NavigationProvider>(context, listen: false)),
+        ),
 
         // 예약 Provider
         ChangeNotifierProvider(

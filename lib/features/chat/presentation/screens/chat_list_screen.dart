@@ -6,6 +6,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:travel_on_final/features/chat/presentation/screens/guide_search_screen.dart';
 import 'package:travel_on_final/features/auth/presentation/providers/auth_provider.dart';
 import 'package:travel_on_final/features/chat/presentation/providers/chat_provider.dart';
+import 'package:travel_on_final/core/providers/navigation_provider.dart';
 
 class ChatListScreen extends StatefulWidget {
   const ChatListScreen({super.key});
@@ -26,6 +27,10 @@ class _ChatListScreenState extends State<ChatListScreen> {
     _focusNode.addListener(() {
       setState(() {});
     });
+
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final chatProvider = Provider.of<ChatProvider>(context, listen: false);
+    chatProvider.startListeningToUnreadCounts(authProvider.currentUser!.id);
   }
 
   @override
@@ -158,7 +163,9 @@ class _ChatListScreenState extends State<ChatListScreen> {
                       final otherUserId = authProvider.currentUser!.id == chatData['participants'][0]
                           ? chatData['participants'][1]
                           : chatData['participants'][0];
-
+                      final unreadCount = (chatData['unreadCount'] != null && chatData['unreadCount'][authProvider.currentUser!.id] != null)
+                          ? chatData['unreadCount'][authProvider.currentUser!.id] 
+                          : 0;
                       chatProvider.updateOtherUserInfo(chatId, otherUserId);
 
                       return Dismissible(
@@ -200,14 +207,29 @@ class _ChatListScreenState extends State<ChatListScreen> {
                                 ? NetworkImage(chatData['userProfileImages'][otherUserId])
                                 : const AssetImage('assets/images/default_profile.png') as ImageProvider,
                           ),
-                          title: Text(
-                            chatData['usernames'][otherUserId]?.substring(
-                                    0,
-                                    chatData['usernames'][otherUserId].length > 15
-                                        ? 15
-                                        : chatData['usernames'][otherUserId].length) ??
-                                'Unknown User',
-                            style: const TextStyle(fontWeight: FontWeight.bold),
+                          title: Row(
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  chatData['usernames'][otherUserId]?.substring(
+                                          0,
+                                          chatData['usernames'][otherUserId].length > 15
+                                              ? 15
+                                              : chatData['usernames'][otherUserId].length) ??
+                                      'Unknown User',
+                                  style: const TextStyle(fontWeight: FontWeight.bold),
+                                ),
+                              ),
+                              if (unreadCount > 0)
+                                CircleAvatar(
+                                  radius: 10,
+                                  backgroundColor: Colors.red,
+                                  child: Text(
+                                    '$unreadCount',
+                                    style: const TextStyle(color: Colors.white, fontSize: 12),
+                                  ),
+                                ),
+                            ],
                           ),
                           subtitle: Text(
                             (chatData['lastMessage'] != null && chatData['lastMessage'].length > 65)
@@ -217,6 +239,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
                           onTap: () {
                             _clearFocus();
                             chatProvider.startListeningToMessages(chatId);
+                            chatProvider.resetUnreadCount(chatId, authProvider.currentUser!.id);
                             GoRouter.of(context).push('/chat/$chatId');
                           },
                         ),

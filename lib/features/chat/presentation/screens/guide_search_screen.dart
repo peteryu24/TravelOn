@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:travel_on_final/features/auth/data/models/user_model.dart';
 import 'package:travel_on_final/features/auth/presentation/providers/auth_provider.dart';
 import 'package:travel_on_final/features/chat/domain/usecases/create_chat_id.dart';
+import 'package:go_router/go_router.dart';
 
 class GuideSearchScreen extends StatefulWidget {
   const GuideSearchScreen({Key? key}) : super(key: key);
@@ -33,6 +34,7 @@ class _GuideSearchScreenState extends State<GuideSearchScreen> {
   @override
   Widget build(BuildContext context) {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final currentUserId = authProvider.currentUser?.id;
 
     return Scaffold(
       appBar: AppBar(
@@ -94,16 +96,17 @@ class _GuideSearchScreenState extends State<GuideSearchScreen> {
                     maxLines: 3,
                     overflow: TextOverflow.ellipsis,
                   ),
-                  trailing: IconButton(
-                    icon: Icon(Icons.chat_bubble, color: Colors.blue),
-                    onPressed: () {
-                      final currentUserId = authProvider.currentUser?.id;
-                      if (currentUserId != null) {
-                        final chatId = CreateChatId().call(currentUserId, guide.id);
-                        Navigator.of(context).pushNamed('/chat/$chatId');
-                      }
-                    },
-                  ),
+                  trailing: currentUserId != guide.id
+                      ? IconButton(
+                          icon: Icon(Icons.chat_bubble, color: Colors.blue),
+                          onPressed: () {
+                            if (currentUserId != null) {
+                              final chatId = CreateChatId().call(currentUserId, guide.id);
+                              context.push('/chat/$chatId');
+                            }
+                          },
+                        )
+                      : null,
                 );
               },
             ),
