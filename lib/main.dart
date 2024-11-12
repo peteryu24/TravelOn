@@ -100,8 +100,10 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => NavigationProvider()),
 
         // 채팅 Provider
-        ChangeNotifierProvider(create: (_) => ChatProvider()),
-
+        ChangeNotifierProvider(
+          create: (context) => ChatProvider(Provider.of<NavigationProvider>(context, listen: false)),
+        ),
+        
         // 예약 Provider
         ChangeNotifierProvider(
           create: (_) => ReservationProvider(FirebaseFirestore.instance),

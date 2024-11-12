@@ -150,6 +150,7 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
               ),
               child: TextField(
                 controller: _introductionController,
+                maxLines: 3,
                 decoration: InputDecoration(
                   labelText: '내 소개',
                   labelStyle: TextStyle(color: Colors.blue),
