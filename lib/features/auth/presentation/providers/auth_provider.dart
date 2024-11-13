@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:provider/provider.dart';
 import 'package:travel_on_final/features/auth/data/models/user_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -22,7 +23,6 @@ class AuthProvider with ChangeNotifier {
   UserModel? get currentUser => _currentUser;
   bool get isAuthenticated => _currentUser != null;
 
-  
   AuthProvider(
     this._auth,
     this._resetPasswordUseCase,
@@ -102,8 +102,7 @@ class AuthProvider with ChangeNotifier {
       await _auth.signOut();
       _currentUser = null;
 
-      final context =
-          _auth.app.options.androidClientId as BuildContext?;
+      final context = _auth.app.options.androidClientId as BuildContext?;
       if (context != null) {
         final galleryProvider =
             Provider.of<GalleryProvider>(context, listen: false);
@@ -173,7 +172,8 @@ class AuthProvider with ChangeNotifier {
       final user = _auth.currentUser;
       if (user == null || user.email == null) return false;
 
-      final credential = EmailAuthProvider.credential(email: user.email!, password: password);
+      final credential =
+          EmailAuthProvider.credential(email: user.email!, password: password);
       await user.reauthenticateWithCredential(credential);
       return true;
     } catch (e) {
@@ -198,7 +198,8 @@ class AuthProvider with ChangeNotifier {
       String? imageUrl;
       if (profileImageUrl != null && File(profileImageUrl).existsSync()) {
         // 새로운 프로필 이미지 업로드
-        final ref = _storage.ref().child('user_profiles/${_currentUser!.id}.jpg');
+        final ref =
+            _storage.ref().child('user_profiles/${_currentUser!.id}.jpg');
         await ref.putFile(File(profileImageUrl));
         imageUrl = await ref.getDownloadURL();
       } else {
@@ -233,7 +234,7 @@ class AuthProvider with ChangeNotifier {
   Future<void> resetPassword(String email) async {
     await _resetPasswordUseCase.call(email);
   }
-  
+
   Future<void> toggleLikePackage(String packageId) async {
     if (_currentUser == null) throw '로그인이 필요합니다';
 
@@ -282,23 +283,82 @@ class AuthProvider with ChangeNotifier {
     try {
       final userCollection = _firestore.collection('users');
 
-      final emailSnapshot = await userCollection
-          .where('email', isEqualTo: query)
-          .get();
+      final emailSnapshot =
+          await userCollection.where('email', isEqualTo: query).get();
 
       final nameSnapshot = await userCollection
           .where('name', isGreaterThanOrEqualTo: query)
-          .where('name', isLessThanOrEqualTo: query + '\uf8ff')
+          .where('name', isLessThanOrEqualTo: '$query\uf8ff')
           .get();
 
-      final emailResults = emailSnapshot.docs.map((doc) => UserModel.fromJson(doc.data())).toList();
-      final nameResults = nameSnapshot.docs.map((doc) => UserModel.fromJson(doc.data())).toList();
+      final emailResults = emailSnapshot.docs
+          .map((doc) => UserModel.fromJson(doc.data()))
+          .toList();
+      final nameResults = nameSnapshot.docs
+          .map((doc) => UserModel.fromJson(doc.data()))
+          .toList();
 
       final allResults = {...emailResults, ...nameResults}.toList();
       return allResults;
     } catch (e) {
       print('사용자 검색 실패: $e');
       return [];
+    }
+  }
+
+  Future<void> signInWithGoogle() async {
+    try {
+      // Google 로그인 플로우 시작
+      final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+
+      if (googleUser == null) return;
+
+      // Google 인증 정보 획득
+      final GoogleSignInAuthentication googleAuth =
+          await googleUser.authentication;
+
+      // Firebase 인증 정보 생성
+      final credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
+
+      // Firebase로 로그인 수행
+      final userCredential = await _auth.signInWithCredential(credential);
+
+      // Firestore에 사용자 정보 저장 또는 업데이트
+      final userDoc = await _firestore
+          .collection('users')
+          .doc(userCredential.user!.uid)
+          .get();
+
+      if (!userDoc.exists) {
+        // 새 사용자인 경우 Firestore에 정보 저장
+        final newUser = {
+          'id': userCredential.user!.uid,
+          'name': userCredential.user!.displayName ?? '',
+          'email': userCredential.user!.email ?? '',
+          'profileImageUrl': userCredential.user!.photoURL ?? '',
+          'isGuide': false,
+          'likedPackages': [],
+          'introduction': '',
+        };
+
+        await _firestore
+            .collection('users')
+            .doc(userCredential.user!.uid)
+            .set(newUser);
+
+        _currentUser = UserModel.fromJson(newUser);
+      } else {
+        // 기존 사용자인 경우 정보 로드
+        await _fetchUserData(userCredential.user!.uid);
+      }
+
+      notifyListeners();
+    } catch (e) {
+      print('Google 로그인 실패: $e');
+      rethrow;
     }
   }
 }

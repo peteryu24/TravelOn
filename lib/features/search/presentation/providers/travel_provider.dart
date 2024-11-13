@@ -7,12 +7,12 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'dart:math' as math;
 
 enum SortOption {
-  latest,        // 최신순
-  priceHigh,     // 가격높은순
-  priceLow,      // 가격낮은순
-  popular,       // 인기순
-  highRating,    // 별점높은순
-  mostReviews    // 리뷰많은순
+  latest, // 최신순
+  priceHigh, // 가격높은순
+  priceLow, // 가격낮은순
+  popular, // 인기순
+  highRating, // 별점높은순
+  mostReviews // 리뷰많은순
 }
 
 class TravelProvider extends ChangeNotifier {
@@ -27,8 +27,6 @@ class TravelProvider extends ChangeNotifier {
   String? _error;
   SortOption _currentSort = SortOption.latest;
   SortOption get currentSort => _currentSort;
-
-
 
   TravelProvider(this._repository, {required FirebaseAuth auth})
       : _auth = auth {
@@ -103,8 +101,10 @@ class TravelProvider extends ChangeNotifier {
         }
 
         // 현재 상태 가져오기
-        List<String> userLikedPackages = List<String>.from(userDoc.data()!['likedPackages'] ?? []);
-        List<String> packageLikedBy = List<String>.from(packageDoc.data()!['likedBy'] ?? []);
+        List<String> userLikedPackages =
+            List<String>.from(userDoc.data()!['likedPackages'] ?? []);
+        List<String> packageLikedBy =
+            List<String>.from(packageDoc.data()!['likedBy'] ?? []);
         int currentLikesCount = packageDoc.data()!['likesCount'] ?? 0;
 
         // 좋아요 토글
@@ -320,7 +320,8 @@ class TravelProvider extends ChangeNotifier {
     return sortedPackages.take(5).toList();
   }
 
-  List<TravelPackage> get sortedPackages {  // 이름을 sortedPackages로 변경
+  List<TravelPackage> get sortedPackages {
+    // 이름을 sortedPackages로 변경
     List<TravelPackage> filteredPackages = _packages;
 
     // 검색어 필터링
@@ -354,7 +355,8 @@ class TravelProvider extends ChangeNotifier {
         filteredPackages.sort((a, b) => b.likesCount.compareTo(a.likesCount));
         break;
       case SortOption.highRating:
-        filteredPackages.sort((a, b) => b.averageRating.compareTo(a.averageRating));
+        filteredPackages
+            .sort((a, b) => b.averageRating.compareTo(a.averageRating));
         break;
       case SortOption.mostReviews:
         filteredPackages.sort((a, b) => b.reviewCount.compareTo(a.reviewCount));

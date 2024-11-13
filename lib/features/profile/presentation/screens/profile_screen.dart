@@ -39,9 +39,12 @@ class ProfileScreen extends StatelessWidget {
                           CircleAvatar(
                             radius: 30,
                             backgroundColor: Colors.grey[200],
-                            backgroundImage: user?.profileImageUrl != null && user!.profileImageUrl!.isNotEmpty
+                            backgroundImage: user?.profileImageUrl != null &&
+                                    user!.profileImageUrl!.isNotEmpty
                                 ? NetworkImage(user.profileImageUrl!)
-                                : AssetImage('assets/images/default_profile.png') as ImageProvider,
+                                : const AssetImage(
+                                        'assets/images/default_profile.png')
+                                    as ImageProvider,
                           ),
                           const SizedBox(width: 16),
                           Expanded(
@@ -70,7 +73,6 @@ class ProfileScreen extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 24),
-
 
                 // 가이드 기능 섹션 (가이드인 경우에만 표시)
                 if (user?.isGuide == true) ...[
