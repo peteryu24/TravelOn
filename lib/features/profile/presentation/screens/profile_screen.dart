@@ -183,6 +183,7 @@ class ProfileScreen extends StatelessWidget {
                         try {
                           context.read<GalleryProvider>().reset();
                           await context.read<AuthProvider>().logout();
+
                           if (context.mounted) {
                             context.go('/login');
                           }
