@@ -189,7 +189,7 @@ class _PlaceSearchScreenState extends State<PlaceSearchScreen> {
                       ),
                       address: place['address'] ?? '',
                       description: place['description'] ?? '',
-                      order: widget.selectedPoints.length,
+                      order: widget.selectedPoints.length, day: 1,
                     );
 
                     Navigator.pop(context, newPoint);

@@ -6,8 +6,13 @@ import 'package:travel_on_final/features/map/domain/entities/travel_point.dart';
 
 class NaverRouteMapScreen extends StatefulWidget {
   final List<TravelPoint> points;
+  final int totalDays;
 
-  const NaverRouteMapScreen({Key? key, required this.points}) : super(key: key);
+  const NaverRouteMapScreen({
+    Key? key,
+    required this.points,
+    required this.totalDays,
+  }) : super(key: key);
 
   @override
   State<NaverRouteMapScreen> createState() => _NaverRouteMapScreenState();
@@ -17,7 +22,34 @@ class _NaverRouteMapScreenState extends State<NaverRouteMapScreen> {
   NaverMapController? _mapController;
   String totalDistance = '';
   String totalDuration = '';
-  final Map<String, NPathOverlay> _pathOverlays = {}; // 경로 오버레이 관리용 맵
+  final List<NOverlay> _pathOverlays = [];  // Map 대신 List 사용
+
+  @override
+  void dispose() {
+    if (_mapController != null) {
+      for (var overlay in _pathOverlays) {
+        try {
+          _mapController?.deleteOverlay(overlay as NOverlayInfo);
+        } catch (e) {
+          // print('Error deleting overlay: $e');
+        }
+      }
+      _mapController?.dispose();
+    }
+    super.dispose();
+  }
+
+
+  final List<Color> dayColors = [
+    Colors.blue,    // 1일차
+    Colors.red,     // 2일차
+    Colors.green,   // 3일차
+    Colors.purple,  // 4일차
+    Colors.orange,  // 5일차
+    Colors.brown,   // 6일차
+    Colors.teal,    // 7일차
+  ];
+
 
   @override
   void initState() {
@@ -54,7 +86,7 @@ class _NaverRouteMapScreenState extends State<NaverRouteMapScreen> {
 
     try {
       // 기존 경로 제거
-      for (var overlay in _pathOverlays.values) {
+      for (var overlay in _pathOverlays) {
         await controller.deleteOverlay(overlay as NOverlayInfo);
       }
       _pathOverlays.clear();
@@ -62,62 +94,76 @@ class _NaverRouteMapScreenState extends State<NaverRouteMapScreen> {
       int totalDistanceMeters = 0;
       int totalDurationSeconds = 0;
 
-      for (var i = 0; i < widget.points.length - 1; i++) {
-        final start = widget.points[i];
-        final end = widget.points[i + 1];
+      // 일차별로 경로 생성
+      for (int day = 1; day <= widget.totalDays; day++) {
+        final dayPoints = widget.points.where((p) => p.day == day).toList()
+          ..sort((a, b) => a.order.compareTo(b.order));
 
-        final uri = Uri.parse('https://naveropenapi.apigw.ntruss.com/map-direction/v1/driving')
-            .replace(queryParameters: {
-          'start': '${start.location.longitude},${start.location.latitude}',
-          'goal': '${end.location.longitude},${end.location.latitude}',
-          'option': 'trafast',
-        });
+        if (dayPoints.length < 2) continue;
 
-        final response = await http.get(
-          uri,
-          headers: {
-            'X-NCP-APIGW-API-KEY-ID': 'j3gnaneqmd',
-            'X-NCP-APIGW-API-KEY': 'WdWzIfcchu614fM1CD1vKA9JzaJATTj0DGKM5CPF',
-          },
-        );
+        final routeColor = dayColors[(day - 1) % dayColors.length];
 
-        if (response.statusCode == 200) {
-          final data = json.decode(response.body);
-          if (data['route']?['trafast']?[0]?['path'] != null) {
-            final path = data['route']['trafast'][0]['path'] as List;
-            final coords = path.map((point) => NLatLng(
-              (point[1] as num).toDouble(),
-              (point[0] as num).toDouble(),
-            )).toList();
+        for (var i = 0; i < dayPoints.length - 1; i++) {
+          final start = dayPoints[i];
+          final end = dayPoints[i + 1];
 
-            final pathOverlay = NPathOverlay(
-              id: 'path_$i',
-              coords: coords,
-              color: Colors.blue.withOpacity(0.8),
-              width: 5,
-              outlineColor: Colors.white,
-              patternInterval: 80,
-            );
+          final uri = Uri.parse(
+              'https://naveropenapi.apigw.ntruss.com/map-direction/v1/driving')
+              .replace(queryParameters: {
+            'start': '${start.location.longitude},${start.location.latitude}',
+            'goal': '${end.location.longitude},${end.location.latitude}',
+            'option': 'trafast',
+          });
 
-            _pathOverlays['path_$i'] = pathOverlay;
-            await controller.addOverlay(pathOverlay);
+          final response = await http.get(
+            uri,
+            headers: {
+              'X-NCP-APIGW-API-KEY-ID': 'j3gnaneqmd',
+              'X-NCP-APIGW-API-KEY': 'WdWzIfcchu614fM1CD1vKA9JzaJATTj0DGKM5CPF',
+            },
+          );
 
-            // 거리와 시간 정보 누적
-            final summary = data['route']['trafast'][0]['summary'];
-            totalDistanceMeters += summary['distance'] as int;
-            totalDurationSeconds += summary['duration'] as int;
+          if (response.statusCode == 200) {
+            final data = json.decode(response.body);
+            if (data['route']?['trafast']?[0]?['path'] != null) {
+              final path = data['route']['trafast'][0]['path'] as List;
+              final coords = path.map((point) => NLatLng(
+                (point[1] as num).toDouble(),
+                (point[0] as num).toDouble(),
+              )).toList();
 
-            setState(() {
-              totalDistance = _formatDistance(totalDistanceMeters);
-              totalDuration = _formatDuration(totalDurationSeconds);
-            });
+              final pathOverlay = NPathOverlay(
+                id: 'path_${day}_$i',
+                coords: coords,
+                color: routeColor.withOpacity(0.8),
+                width: 5,
+                outlineColor: Colors.white,
+                patternInterval: 80,
+              );
+
+              try {
+                await controller.addOverlay(pathOverlay);
+                _pathOverlays.add(pathOverlay);
+              } catch (e) {
+                print('Error adding path overlay: $e');
+              }
+
+              // 거리와 시간 정보 누적
+              final summary = data['route']['trafast'][0]['summary'];
+              totalDistanceMeters += summary['distance'] as int;
+              totalDurationSeconds += summary['duration'] as int;
+            }
           }
-        } else {
-          throw Exception('Failed to load route: ${response.statusCode}');
         }
       }
+
+      setState(() {
+        totalDistance = _formatDistance(totalDistanceMeters);
+        totalDuration = _formatDuration(totalDurationSeconds);
+      });
+
     } catch (e) {
-      print('Error in _createRoute: $e');
+      print('Error creating route: $e');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('경로 생성 중 오류가 발생했습니다: $e')),
@@ -149,6 +195,52 @@ class _NaverRouteMapScreenState extends State<NaverRouteMapScreen> {
     return NLatLngBounds(
       southWest: NLatLng(minLat, minLng),
       northEast: NLatLng(maxLat, maxLng),
+    );
+  }
+
+  Widget _buildRouteLegend() {
+    return Positioned(
+      top: 16,
+      left: 16,
+      child: Container(
+        padding: const EdgeInsets.all(8),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(8),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 4,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: List.generate(widget.totalDays, (index) {
+            final day = index + 1;
+            final color = dayColors[index % dayColors.length];
+            return Padding(
+              padding: const EdgeInsets.symmetric(vertical: 4),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    width: 16,
+                    height: 3,
+                    color: color,
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    '$day일차',
+                    style: const TextStyle(fontSize: 12),
+                  ),
+                ],
+              ),
+            );
+          }),
+        ),
+      ),
     );
   }
 
@@ -209,46 +301,9 @@ class _NaverRouteMapScreenState extends State<NaverRouteMapScreen> {
               }
             },
           ),
-          if (totalDistance.isNotEmpty || totalDuration.isNotEmpty)
-            Positioned(
-              bottom: 16,
-              left: 16,
-              right: 16,
-              child: Card(
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      if (totalDistance.isNotEmpty)
-                        Text(
-                          '총 이동 거리: $totalDistance',
-                          style: const TextStyle(fontSize: 16),
-                        ),
-                      if (totalDuration.isNotEmpty)
-                        Text(
-                          '예상 소요 시간: $totalDuration',
-                          style: const TextStyle(fontSize: 16),
-                        ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
+          _buildRouteLegend(),
         ],
       ),
     );
-  }
-
-  @override
-  void dispose() {
-    // 모든 오버레이 제거
-    if (_mapController != null) {
-      for (var overlay in _pathOverlays.values) {
-        _mapController!.deleteOverlay(overlay as NOverlayInfo);
-      }
-    }
-    _mapController?.dispose();
-    super.dispose();
   }
 }

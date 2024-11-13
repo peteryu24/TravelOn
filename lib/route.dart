@@ -60,7 +60,7 @@ final goRouter = GoRouter(
       path: '/package-detail/:id',
       builder: (context, state) {
         final package = state.extra as TravelPackage;
-        return PackageDetailScreen(package: package);
+        return PackageDetailScreen(package: package, totalDays: 1,);
       },
     ),
     GoRoute(
@@ -216,7 +216,7 @@ final goRouter = GoRouter(
             ),
           );
         }
-        return PackageDetailScreen(package: package);
+        return PackageDetailScreen(package: package, totalDays: 1,);
       },
     ),
     // 기존 라우트 목록에 추가

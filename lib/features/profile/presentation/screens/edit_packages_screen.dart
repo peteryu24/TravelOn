@@ -206,7 +206,7 @@ class _EditPackageScreenState extends State<EditPackageScreen> {
           minParticipants: int.parse(_minParticipantsController.text),
           maxParticipants: int.parse(_maxParticipantsController.text),
           nights: _nights,
-          departureDays: _selectedDepartureDays.toList()..sort(),
+          departureDays: _selectedDepartureDays.toList()..sort(), totalDays: 1,
         );
 
         await context.read<TravelProvider>().updatePackage(updatedPackage);
