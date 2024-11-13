@@ -172,3 +172,10 @@ class MyApp extends StatelessWidget {
     );
   }
 }
+
+// 백그라운드 메시지 핸들러
+@pragma('vm:entry-point')
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  print("Handling a background message: ${message.messageId}");
+}

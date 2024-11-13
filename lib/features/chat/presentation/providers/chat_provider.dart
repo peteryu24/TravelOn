@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -19,11 +20,14 @@ class ChatProvider extends ChangeNotifier {
   List<MessageEntity> _messages = [];
   List<MessageEntity> get messages => _messages;
 
+  StreamSubscription? _unreadCountSubscription;
+  StreamSubscription? _messageSubscription;
+
   ChatProvider(this._navigationProvider);
 
   // 메시지 수신 및 구독
   void startListeningToMessages(String chatId) {
-    _firestore
+    _messageSubscription = _firestore
         .collection('chats')
         .doc(chatId)
         .collection('messages')
@@ -35,6 +39,30 @@ class ChatProvider extends ChangeNotifier {
           .toList();
       notifyListeners();
     });
+  }
+
+  // 채팅방 구독 중지 메서드 추가
+  void stopListeningToMessages() {
+    _messageSubscription?.cancel();
+    _unreadCountSubscription?.cancel();
+  }
+
+  // 읽지 않은 메시지 수 구독
+  void startListeningToUnreadCounts(String userId) {
+    _unreadCountSubscription = _firestore
+        .collection('chats')
+        .where('participants', arrayContains: userId)
+        .snapshots()
+        .listen((snapshot) {
+      _updateTotalUnreadCount(userId);
+    });
+  }
+
+  // 로그아웃 시 호출할 메서드
+  void clearDataOnLogout() {
+    stopListeningToMessages();
+    _messages.clear();
+    notifyListeners();
   }
 
   // 채팅방 생성 확인 및 생성
@@ -175,17 +203,6 @@ class ChatProvider extends ChangeNotifier {
     });
 
     _updateTotalUnreadCount(userId);
-  }
-
-  // 총 읽지 않은 메시지 수를 실시간으로 추적하여 NavigationProvider에 전달
-  void startListeningToUnreadCounts(String userId) {
-    _firestore
-        .collection('chats')
-        .where('participants', arrayContains: userId)
-        .snapshots()
-        .listen((snapshot) {
-      _updateTotalUnreadCount(userId);
-    });
   }
 
   void _updateTotalUnreadCount(String userId) async {

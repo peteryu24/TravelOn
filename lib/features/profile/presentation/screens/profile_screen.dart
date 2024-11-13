@@ -181,23 +181,13 @@ class ProfileScreen extends StatelessWidget {
                     child: ElevatedButton(
                       onPressed: () async {
                         try {
-                          context.read<GalleryProvider>().reset();
-                          await context.read<AuthProvider>().logout();
-                          if (context.mounted) {
-                            context.go('/login');
-                          }
+                          await Provider.of<AuthProvider>(context, listen: false).logout(context);
+                          context.go('/login');
                         } catch (e) {
-                          if (context.mounted) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text('로그아웃 중 오류가 발생했습니다: $e')),
-                            );
-                          }
+                          print('로그아웃 실패: $e');
                         }
                       },
-                      style: ElevatedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                      ),
-                      child: const Text('로그아웃'),
+                      child: Text("로그아웃"),
                     ),
                   ),
                 ),
