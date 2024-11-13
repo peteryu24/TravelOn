@@ -81,13 +81,6 @@ Future<void> main() async {
   runApp(const MyApp());
 }
 
-// Firebase 메시지 백그라운드 핸들러
-@pragma('vm:entry-point')
-Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  print("Handling a background message: ${message.messageId}");
-}
-
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 import 'package:travel_on_final/features/auth/presentation/providers/auth_provider.dart';
 import 'package:travel_on_final/features/chat/presentation/providers/chat_provider.dart';
@@ -20,7 +21,6 @@ class _ChatScreenState extends State<ChatScreen> {
   String? otherUserId;
   String otherUserName = "Chat";
   bool isMessageEntered = false;
-  Color intermediateColor = Color.lerp(Colors.lightBlue[50], Colors.lightBlue[100], 0.5)!;
 
   @override
   void initState() {
@@ -74,25 +74,17 @@ class _ChatScreenState extends State<ChatScreen> {
               ),
             ),
             Container(
-              decoration: BoxDecoration(
-                border: Border(
-                  top: BorderSide(
-                    width: 0.6,
-                    color: Colors.blue.withOpacity(0.5),
-                  ),
-                ),
-              ),
-              padding: EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+              padding: EdgeInsets.symmetric(vertical: 8.h, horizontal: 12.w),
               child: Row(
                 children: [
                   Container(
                     decoration: BoxDecoration(
-                      color: intermediateColor,
+                      border: Border.all(color: Colors.blue, width: 1.5.w),
                       shape: BoxShape.rectangle,
-                      borderRadius: BorderRadius.circular(20),
+                      borderRadius: BorderRadius.circular(8.r),
                     ),
                     child: IconButton(
-                      icon: Icon(Icons.add, color: Colors.lightBlue[700]),
+                      icon: Icon(Icons.add, color: Colors.blue, size: 24.w),
                       onPressed: () {
                         _bottomSheetWidget.showBottomSheetMenu(
                           parentContext: context,
@@ -105,7 +97,7 @@ class _ChatScreenState extends State<ChatScreen> {
                       },
                     ),
                   ),
-                  SizedBox(width: 8,),
+                  SizedBox(width: 8.w),
                   Expanded(
                     child: TextField(
                       controller: messageController,
@@ -116,27 +108,32 @@ class _ChatScreenState extends State<ChatScreen> {
                       },
                       decoration: InputDecoration(
                         hintText: '메시지를 입력하세요...',
+                        fillColor: Colors.transparent,
                         filled: true,
-                        fillColor: Colors.lightBlue[100],
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(20),
-                          borderSide: BorderSide.none,
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(20.r),
+                          borderSide: BorderSide(color: Colors.blue, width: 1.5.w),
                         ),
-                        contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(20.r),
+                          borderSide: BorderSide(color: Colors.blue.shade800, width: 1.5.w),
+                        ),
+                        contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),
                       ),
                     ),
                   ),
-                  SizedBox(width: 8,),
+                  SizedBox(width: 8.w),
                   Container(
                     decoration: BoxDecoration(
-                      color: intermediateColor,
+                      border: Border.all(color: Colors.blue, width: 1.5.w),
                       shape: BoxShape.rectangle,
-                      borderRadius: BorderRadius.circular(20),
+                      borderRadius: BorderRadius.circular(8.r),
                     ),
                     child: IconButton(
                       icon: Icon(
                         Icons.send,
                         color: isMessageEntered ? Colors.blue : Colors.grey,
+                        size: 24.w,
                       ),
                       onPressed: isMessageEntered
                           ? () {
