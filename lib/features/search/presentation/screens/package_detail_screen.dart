@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_naver_map/flutter_naver_map.dart';
@@ -14,6 +16,7 @@ import 'package:travel_on_final/features/review/presentation/widgets/review_list
 import 'package:travel_on_final/features/search/presentation/providers/travel_provider.dart';
 import '../../domain/entities/travel_package.dart';
 import 'package:travel_on_final/features/chat/domain/usecases/create_chat_id.dart';
+import 'package:http/http.dart' as http;
 
 class PackageDetailScreen extends StatefulWidget {
   final TravelPackage package;
@@ -35,6 +38,61 @@ class _PackageDetailScreenState extends State<PackageDetailScreen> {
   int _minParticipants = 0;  // 기본값 설정
   int _maxParticipants = 0;  // 기본값 설정
   String? _currentUserId;
+  NaverMapController? _mapController;
+  double _currentZoom = 8.0;
+
+  Future<void> _createRouteOverlay(NaverMapController controller) async {
+    try {
+      for (var i = 0; i < widget.package.routePoints.length - 1; i++) {
+        final start = widget.package.routePoints[i];
+        final end = widget.package.routePoints[i + 1];
+
+        final uri = Uri.parse('https://naveropenapi.apigw.ntruss.com/map-direction/v1/driving')
+            .replace(queryParameters: {
+          'start': '${start.location.longitude},${start.location.latitude}',
+          'goal': '${end.location.longitude},${end.location.latitude}',
+          'option': 'trafast',
+        });
+
+        final response = await http.get(
+          uri,
+          headers: {
+            'X-NCP-APIGW-API-KEY-ID': 'j3gnaneqmd',
+            'X-NCP-APIGW-API-KEY': 'WdWzIfcchu614fM1CD1vKA9JzaJATTj0DGKM5CPF',
+          },
+        );
+
+        if (response.statusCode == 200) {
+          final data = json.decode(response.body);
+          if (data['route']?['trafast']?[0]?['path'] != null) {
+            final path = data['route']['trafast'][0]['path'] as List;
+            final coords = path.map((point) => NLatLng(
+              (point[1] as num).toDouble(),
+              (point[0] as num).toDouble(),
+            )).toList();
+
+            final pathOverlay = NPathOverlay(
+              id: 'path_$i',
+              coords: coords,
+              color: Colors.blue.withOpacity(0.8),
+              width: 5,
+              outlineColor: Colors.white,
+            );
+
+            await controller.addOverlay(pathOverlay);
+          }
+        }
+      }
+    } catch (e) {
+      print('Error creating route: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('경로 생성 중 오류가 발생했습니다: $e')),
+        );
+      }
+    }
+  }
+
 
 
   @override
@@ -319,66 +377,136 @@ class _PackageDetailScreenState extends State<PackageDetailScreen> {
                         border: Border.all(color: Colors.grey.shade300),
                         borderRadius: BorderRadius.circular(8),
                       ),
-                      child: NaverMap(
-                        options: NaverMapViewOptions(
-                          initialCameraPosition: NCameraPosition(
-                            target: NLatLng(37.5666102, 126.9783881),
-                            zoom: 12,
+                      clipBehavior: Clip.antiAlias,
+                      child: Stack(
+                        children: [
+                          NaverMap(
+                            options: NaverMapViewOptions(
+                              initialCameraPosition: NCameraPosition(
+                                target: widget.package.routePoints.first.location,
+                                zoom: 8,
+                              ),
+                              scrollGesturesEnable: true,
+                              zoomGesturesEnable: true,
+                              rotationGesturesEnable: true,
+                              tiltGesturesEnable: true,
+                              stopGesturesEnable: true,
+                              locationButtonEnable: true,
+                              consumeSymbolTapEvents: false,
+                              // 추가할 옵션들
+                              mapType: NMapType.basic,
+                              liteModeEnable: false,
+                              indoorEnable: true,
+                              nightModeEnable: false,
+                              // 제스처 감도 설정 추가
+                              scrollGesturesFriction: 1.0,
+                              zoomGesturesFriction: 1.0,
+                              rotationGesturesFriction: 1.0, // 심볼 탭 이벤트 처리
+                            ),
+                            onMapReady: (controller) async {
+                              setState(() {
+                                _mapController = controller;  // 컨트롤러 저장
+                              });
+
+                              for (var i = 0; i < widget.package.routePoints.length; i++) {
+                                final point = widget.package.routePoints[i];
+                                final marker = NMarker(
+                                  id: 'marker_${point.id}',
+                                  position: point.location,
+                                );
+
+                                marker.setCaption(
+                                  NOverlayCaption(
+                                    text: '${i + 1}. ${point.name}',
+                                    textSize: 14,
+                                    color: Colors.blue,
+                                    haloColor: Colors.white,
+                                  ),
+                                );
+
+                                await controller.addOverlay(marker);
+                              }
+
+                              // 경로 생성
+                              if (widget.package.routePoints.length > 1) {
+                                await _createRouteOverlay(controller);
+                              }
+
+                              // 모든 포인트가 보이도록 카메라 위치 조정
+                              if (widget.package.routePoints.isNotEmpty) {
+                                final bounds = _calculateBounds(widget.package.routePoints);
+                                await controller.updateCamera(
+                                  NCameraUpdate.fitBounds(
+                                    bounds,
+                                    padding: const EdgeInsets.all(50),
+                                  ),
+                                );
+                              }
+                            },
                           ),
-                          scrollGesturesEnable: true,
-                          tiltGesturesEnable: true,
-                          zoomGesturesEnable: true,
-                          rotationGesturesEnable: true,
-                        ),
-                        onMapReady: (controller) {
-                          // 마커 추가
-                          for (var i = 0; i < widget.package.routePoints.length; i++) {
-                            final point = widget.package.routePoints[i];
-                            final marker = NMarker(
-                              id: point.id,
-                              position: point.location,
-                            );
 
-                            // 마커 캡션(순서 표시)
-                            marker.setCaption(
-                              NOverlayCaption(
-                                text: '${i + 1}. ${point.name}',
-                                textSize: 14,
-                                color: Colors.blue,
-                                haloColor: Colors.white,
-                              ),
-                            );
-
-                            controller.addOverlay(marker);
-                          }
-
-                          // 경로 그리기
-                          for (var i = 0; i < widget.package.routePoints.length - 1; i++) {
-                            final start = widget.package.routePoints[i];
-                            final end = widget.package.routePoints[i + 1];
-
-                            final pathOverlay = NPathOverlay(
-                              id: 'path_$i',
-                              coords: [start.location, end.location],
-                              color: Colors.blue.withOpacity(0.8),
-                              width: 3,
-                              outlineColor: Colors.white,
-                            );
-
-                            controller.addOverlay(pathOverlay);
-                          }
-
-                          // 모든 마커가 보이도록 카메라 위치 조정
-                          if (widget.package.routePoints.isNotEmpty) {
-                            final bounds = _calculateBounds(widget.package.routePoints);
-                            controller.updateCamera(
-                              NCameraUpdate.fitBounds(
-                                bounds,
-                                padding: const EdgeInsets.all(50),
-                              ),
-                            );
-                          }
-                        },
+                          // 줌 컨트롤 버튼
+                          // 기존 코드를 이렇게 수정
+                          Positioned(
+                            top: 16,
+                            right: 16,
+                            child: Column(
+                              children: [
+                                Container(
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(8),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black.withOpacity(0.1),
+                                        blurRadius: 4,
+                                        offset: const Offset(0, 2),
+                                      ),
+                                    ],
+                                  ),
+                                  child: Column(
+                                    children: [
+                                      // 확대 버튼
+                                      IconButton(
+                                        onPressed: () {
+                                          setState(() {
+                                            _currentZoom = (_currentZoom + 1).clamp(1.0, 20.0);
+                                            _mapController?.updateCamera(
+                                              NCameraUpdate.withParams(zoom: _currentZoom),
+                                            );
+                                          });
+                                        },
+                                        icon: const Icon(Icons.add),
+                                        padding: const EdgeInsets.all(8),
+                                        constraints: const BoxConstraints(),
+                                        iconSize: 20,
+                                      ),
+                                      Container(
+                                        height: 1,
+                                        color: Colors.grey.shade300,
+                                      ),
+                                      // 축소 버튼
+                                      IconButton(
+                                        onPressed: () {
+                                          setState(() {
+                                            _currentZoom = (_currentZoom - 1).clamp(1.0, 20.0);
+                                            _mapController?.updateCamera(
+                                              NCameraUpdate.withParams(zoom: _currentZoom),
+                                            );
+                                          });
+                                        },
+                                        icon: const Icon(Icons.remove),
+                                        padding: const EdgeInsets.all(8),
+                                        constraints: const BoxConstraints(),
+                                        iconSize: 20,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
                       ),
                     )
                   else
