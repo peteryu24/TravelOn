@@ -95,7 +95,7 @@ class BottomSheetWidget {
                     context,
                     icon: Icons.map,
                     label: '지도',
-                    backgroundColor: Colors.green,
+                    backgroundColor: Color(0xFF03C75A),
                     onTap: () {
                       Navigator.pop(context);
                     },

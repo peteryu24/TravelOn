@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
-import '../../../gallery/presentation/providers/gallery_provider.dart';
 import '../widgets/profile_dialogs.dart';
 
 class ProfileScreen extends StatelessWidget {

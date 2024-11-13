@@ -29,29 +29,30 @@ class MessageBubble extends StatelessWidget {
       children: [
         if (!isMe)
           Padding(
-            padding: EdgeInsets.only(left: 50.w),
-            child: Text(
-              otherUserName,
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                color: Colors.grey[700],
-                fontSize: 14.sp,
-              ),
-            ),
-          ),
-        Row(
-          mainAxisAlignment: isMe ? MainAxisAlignment.end : MainAxisAlignment.start,
-          children: <Widget>[
-            if (!isMe && message.profileImageUrl != null)
-              Padding(
-                padding: EdgeInsets.only(left: 8.w),
-                child: CircleAvatar(
+            padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
+            child: Row(
+              children: [
+                CircleAvatar(
                   backgroundImage: message.profileImageUrl != null && message.profileImageUrl!.isNotEmpty
                       ? CachedNetworkImageProvider(message.profileImageUrl!)
                       : AssetImage('assets/images/default_profile.png') as ImageProvider,
                   radius: 15.r,
                 ),
-              ),
+                SizedBox(width: 8.w),
+                Text(
+                  otherUserName,
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: Colors.grey[700],
+                    fontSize: 14.sp,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        Row(
+          mainAxisAlignment: isMe ? MainAxisAlignment.end : MainAxisAlignment.start,
+          children: <Widget>[
             Container(
               constraints: BoxConstraints(
                 maxWidth: isPackageMessage
@@ -61,6 +62,10 @@ class MessageBubble extends StatelessWidget {
               decoration: BoxDecoration(
                 color: isMe ? Colors.blue.shade100 : Colors.grey[200],
                 borderRadius: BorderRadius.circular(12.r),
+                border: Border.all(
+                  color: Colors.grey.shade300,
+                  width: 1.0,
+                ),
               ),
               padding: EdgeInsets.symmetric(vertical: 10.h, horizontal: 16.w),
               margin: EdgeInsets.symmetric(vertical: 4.h, horizontal: 8.w),
@@ -77,7 +82,7 @@ class MessageBubble extends StatelessWidget {
                           : Text(
                               message.text,
                               style: TextStyle(
-                                color: isMe ? Colors.black : Colors.white,
+                                color: isMe ? Colors.black : Colors.black,
                                 fontSize: 14.sp,
                               ),
                             ))),
