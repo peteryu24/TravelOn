@@ -8,6 +8,7 @@ class MessageModel {
   final Timestamp createdAt;
   String? profileImageUrl;
   String? imageUrl;
+  Map<String, dynamic>? sharedUser;
 
   MessageModel({
     required this.id,
@@ -16,6 +17,7 @@ class MessageModel {
     required this.createdAt,
     this.profileImageUrl,
     this.imageUrl,
+    this.sharedUser,
   });
 
   factory MessageModel.fromDocument(DocumentSnapshot doc) {
@@ -28,6 +30,7 @@ class MessageModel {
       createdAt: data?['createdAt'] ?? Timestamp.now(),
       profileImageUrl: data?['profileImageUrl'],
       imageUrl: data?['imageUrl'],
+      sharedUser: data?['sharedUser'],
     );
   }
 
@@ -38,6 +41,7 @@ class MessageModel {
       'createdAt': createdAt,
       'profileImageUrl': profileImageUrl,
       'imageUrl': imageUrl,
+      if (sharedUser != null) 'sharedUser': sharedUser,
     };
   }
 
@@ -48,6 +52,7 @@ class MessageModel {
       createdAt: createdAt,
       profileImageUrl: profileImageUrl,
       imageUrl: imageUrl,
+      sharedUser: sharedUser,
     );
   }
 }

@@ -68,6 +68,7 @@ class _ChatScreenState extends State<ChatScreen> {
                     message: message,
                     isMe: isMe,
                     otherUserName: otherUserName,
+                    currentUserId: Provider.of<AuthProvider>(context, listen: false).currentUser!.id,
                   );
                 },
               ),
