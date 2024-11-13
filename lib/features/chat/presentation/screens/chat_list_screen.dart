@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:travel_on_final/features/chat/presentation/screens/guide_search_screen.dart';
+import 'package:travel_on_final/features/chat/presentation/screens/search/guide_search_screen.dart';
 import 'package:travel_on_final/features/auth/presentation/providers/auth_provider.dart';
 import 'package:travel_on_final/features/chat/presentation/providers/chat_provider.dart';
 import 'package:travel_on_final/core/providers/navigation_provider.dart';

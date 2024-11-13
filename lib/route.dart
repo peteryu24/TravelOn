@@ -14,8 +14,9 @@ import 'package:travel_on_final/features/chat/presentation/screens/chat_list_scr
 import 'package:travel_on_final/features/chat/presentation/screens/chat_screen.dart';
 import 'package:travel_on_final/features/guide/presentation/screens/guide_packages_screen.dart';
 import 'package:travel_on_final/features/guide/presentation/screens/guide_ranking_screen.dart';
-import 'package:travel_on_final/features/chat/presentation/screens/guide_search_screen.dart';
+import 'package:travel_on_final/features/chat/presentation/screens/search/guide_search_screen.dart';
 import 'package:travel_on_final/features/chat/presentation/screens/search/user_search_screen.dart';
+import 'package:travel_on_final/features/chat/presentation/screens/search/package_search_screen.dart';
 // reservation
 import 'package:travel_on_final/features/reservation/presentation/screens/reservation_calendar_screen.dart';
 // search
@@ -163,6 +164,21 @@ final goRouter = GoRouter(
           );
         }
         return UserSearchScreen(chatId: chatId, otherUserId: otherUserId);
+      },
+    ),
+    GoRoute(
+      path: '/package-search',
+      builder: (context, state) {
+        final extraData = state.extra as Map<String, dynamic>?;
+
+        if (extraData != null && extraData.containsKey('chatId') && extraData.containsKey('otherUserId')) {
+          return PackageSearchScreen(
+            chatId: extraData['chatId'],
+            otherUserId: extraData['otherUserId'],
+          );
+        } else {
+          return HomeScreen();
+        }
       },
     ),
     GoRoute(

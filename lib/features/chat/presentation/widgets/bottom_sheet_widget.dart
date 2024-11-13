@@ -84,6 +84,10 @@ class BottomSheetWidget {
                     backgroundColor: Colors.orange,
                     onTap: () {
                       Navigator.pop(context);
+                      context.push(
+                        '/package-search',
+                        extra: {'chatId': chatId, 'otherUserId': otherUserId},
+                      );
                     },
                   ),
                   // 지도 버튼
