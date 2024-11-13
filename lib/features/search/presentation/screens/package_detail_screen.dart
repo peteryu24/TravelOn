@@ -11,6 +11,7 @@ import 'package:travel_on_final/features/map/domain/entities/travel_point.dart';
 import 'package:travel_on_final/features/map/presentation/screens/naver_route_map_screen.dart';
 import 'package:travel_on_final/features/review/presentation/provider/review_provider.dart';
 import 'package:travel_on_final/features/review/presentation/screens/review_detail_screen.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../domain/entities/travel_package.dart';
 import 'package:travel_on_final/features/chat/domain/usecases/create_chat_id.dart';
 import 'package:http/http.dart' as http;
@@ -585,17 +586,51 @@ class _PackageDetailScreenState extends State<PackageDetailScreen> {
                       itemCount: widget.package.routePoints.length,
                       itemBuilder: (context, index) {
                         final point = widget.package.routePoints[index];
-                        return ListTile(
-                          leading: Icon(
-                            point.type == PointType.hotel
-                                ? Icons.hotel
-                                : point.type == PointType.restaurant
-                                    ? Icons.restaurant
-                                    : Icons.photo_camera,
-                            color: Colors.blue,
+                        return Card(
+                          margin: EdgeInsets.symmetric(
+                            horizontal: 16.w,
+                            vertical: 4.h,
                           ),
-                          title: Text('${index + 1}. ${point.name}'),
-                          subtitle: Text(point.address),
+                          child: ListTile(
+                            leading: Container(
+                              width: 40.w,
+                              height: 40.w,
+                              decoration: BoxDecoration(
+                                color: Colors.blue[50],
+                                shape: BoxShape.circle,
+                              ),
+                              child: Center(
+                                child: Icon(
+                                  point.type == PointType.hotel ? Icons.hotel :
+                                  point.type == PointType.restaurant ? Icons.restaurant :
+                                  Icons.photo_camera,
+                                  color: Colors.blue,
+                                ),
+                              ),
+                            ),
+                            title: Text(
+                              '${index + 1}. ${point.name}',
+                              style: TextStyle(
+                                fontWeight: FontWeight.w500,
+                                fontSize: 16.sp,
+                              ),
+                            ),
+                            subtitle: Text(
+                              point.address,
+                              style: TextStyle(
+                                fontSize: 14.sp,
+                                color: Colors.grey[600],
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            trailing: Icon(
+                              Icons.arrow_forward_ios,
+                              size: 16.sp,
+                              color: Colors.grey,
+                            ),
+                            onTap: () => _showLocationInfo(point),
+                          ),
                         );
                       },
                     ),
@@ -798,5 +833,216 @@ class _PackageDetailScreenState extends State<PackageDetailScreen> {
       southWest: NLatLng(minLat, minLng),
       northEast: NLatLng(maxLat, maxLng),
     );
+  }
+
+  void _showLocationInfo(TravelPoint point) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => Container(
+        height: MediaQuery.of(context).size.height * 0.7,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(20.r),
+            topRight: Radius.circular(20.r),
+          ),
+        ),
+        child: Column(
+          children: [
+            // Handle bar
+            Container(
+              margin: EdgeInsets.symmetric(vertical: 12.h),
+              width: 40.w,
+              height: 4.h,
+              decoration: BoxDecoration(
+                color: Colors.grey[300],
+                borderRadius: BorderRadius.circular(2.r),
+              ),
+            ),
+
+            // Content
+            Expanded(
+              child: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    // Map Preview
+                    Container(
+                      height: 200.h,
+                      margin: EdgeInsets.symmetric(horizontal: 16.w),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(12.r),
+                        border: Border.all(color: Colors.grey[300]!),
+                      ),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(12.r),
+                        child: NaverMap(
+                          options: NaverMapViewOptions(
+                            initialCameraPosition: NCameraPosition(
+                              target: point.location,
+                              zoom: 15,
+                            ),
+                            locationButtonEnable: true,
+                          ),
+                          onMapReady: (controller) {
+                            controller.addOverlay(
+                              NMarker(
+                                id: 'detail_marker',
+                                position: point.location,
+                              )..setCaption(
+                                NOverlayCaption(
+                                  text: point.name,
+                                  textSize: 14,
+                                  color: Colors.blue,
+                                  haloColor: Colors.white,
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                    ),
+
+                    // Location Info
+                    Padding(
+                      padding: EdgeInsets.all(16.w),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Title with icon
+                          Row(
+                            children: [
+                              Icon(
+                                point.type == PointType.hotel ? Icons.hotel :
+                                point.type == PointType.restaurant ? Icons.restaurant :
+                                Icons.photo_camera,
+                                color: Colors.blue,
+                                size: 28.sp,
+                              ),
+                              SizedBox(width: 12.w),
+                              Expanded(
+                                child: Text(
+                                  point.name,
+                                  style: TextStyle(
+                                    fontSize: 20.sp,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          SizedBox(height: 16.h),
+
+                          // Address
+                          Container(
+                            padding: EdgeInsets.all(12.w),
+                            decoration: BoxDecoration(
+                              color: Colors.grey[100],
+                              borderRadius: BorderRadius.circular(8.r),
+                            ),
+                            child: Row(
+                              children: [
+                                Icon(Icons.location_on,
+                                  color: Colors.blue,
+                                  size: 20.sp,
+                                ),
+                                SizedBox(width: 8.w),
+                                Expanded(
+                                  child: Text(
+                                    point.address,
+                                    style: TextStyle(
+                                      fontSize: 16.sp,
+                                      color: Colors.black87,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+
+                          if (point.description.isNotEmpty) ...[
+                            SizedBox(height: 16.h),
+                            Container(
+                              padding: EdgeInsets.all(12.w),
+                              decoration: BoxDecoration(
+                                color: Colors.blue[50],
+                                borderRadius: BorderRadius.circular(8.r),
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    '상세 정보',
+                                    style: TextStyle(
+                                      fontSize: 16.sp,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.blue,
+                                    ),
+                                  ),
+                                  SizedBox(height: 8.h),
+                                  Text(
+                                    point.description,
+                                    style: TextStyle(
+                                      fontSize: 15.sp,
+                                      color: Colors.black87,
+                                      height: 1.5,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+
+                          SizedBox(height: 24.h),
+
+                          // Open in Naver Map Button
+                          ElevatedButton.icon(
+                            onPressed: () => _openInNaverMap(point),
+                            icon: const Icon(Icons.map),
+                            label: const Text('지도에서 보기'),
+                            style: ElevatedButton.styleFrom(
+                              minimumSize: Size(double.infinity, 48.h),
+                              backgroundColor: Colors.green,
+                              foregroundColor: Colors.white,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _openInNaverMap(TravelPoint point) async {
+    final webUrl = 'https://map.naver.com/v5/search/${Uri.encodeComponent(point.name)}?c=${point.location.longitude},${point.location.latitude},15,0,0,0,dh';
+
+    try {
+      // 웹 URL을 바로 시도
+      if (!await launchUrl(
+        Uri.parse(webUrl),
+        mode: LaunchMode.platformDefault,
+      )) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('지도를 열 수 없습니다.')),
+          );
+        }
+      }
+    } catch (e) {
+      print('Error launching URL: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('지도를 열 수 없습니다.')),
+        );
+      }
+    }
   }
 }
