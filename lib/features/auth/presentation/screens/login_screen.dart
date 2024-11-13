@@ -106,26 +106,18 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
             SizedBox(height: 5.h),
             Row(
-              mainAxisAlignment: MainAxisAlignment.end,
+              mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 Padding(
                   padding: EdgeInsets.only(left: 8.0.w),
                   child: Row(
                     children: [
-                      Text(
-                        '로그인 정보 저장',
-                        style: TextStyle(
-                            fontSize: 14.sp,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.black),
-                      ),
-                      SizedBox(width: 5.w),
-                      CupertinoSwitch(
-                        activeColor: Colors.blue,
+                      Text('로그인 정보 저장', style: TextStyle(fontSize: 14.sp)),
+                      Checkbox(
                         value: _saveCredentials,
                         onChanged: (value) {
                           setState(() {
-                            _saveCredentials = value;
+                            _saveCredentials = value ?? false;
                           });
                         },
                       ),
