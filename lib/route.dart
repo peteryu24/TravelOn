@@ -15,6 +15,7 @@ import 'package:travel_on_final/features/chat/presentation/screens/chat_screen.d
 import 'package:travel_on_final/features/guide/presentation/screens/guide_packages_screen.dart';
 import 'package:travel_on_final/features/guide/presentation/screens/guide_ranking_screen.dart';
 import 'package:travel_on_final/features/chat/presentation/screens/guide_search_screen.dart';
+import 'package:travel_on_final/features/chat/presentation/screens/search/user_search_screen.dart';
 // reservation
 import 'package:travel_on_final/features/reservation/presentation/screens/reservation_calendar_screen.dart';
 // search
@@ -147,6 +148,22 @@ final goRouter = GoRouter(
     GoRoute(
       path: '/guide_search',
       builder: (context, state) => const GuideSearchScreen(),
+    ),
+    GoRoute(
+      path: '/user-search',
+      builder: (context, state) {
+        final extra = state.extra as Map<String, dynamic>?;
+        final chatId = extra?['chatId'] as String?;
+        final otherUserId = extra?['otherUserId'] as String?;
+        if (chatId == null || otherUserId == null) {
+          return Scaffold(
+            body: Center(
+              child: Text('필요한 정보가 없습니다.'),
+            ),
+          );
+        }
+        return UserSearchScreen(chatId: chatId, otherUserId: otherUserId);
+      },
     ),
     GoRoute(
       path: '/profile/edit',

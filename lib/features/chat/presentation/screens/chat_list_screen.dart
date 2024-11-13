@@ -19,6 +19,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
   final TextEditingController _searchController = TextEditingController();
   final FocusNode _focusNode = FocusNode();
   bool _isGuideSearch = false;
+  String _searchText = '';
 
   @override
   void initState() {
@@ -31,17 +32,45 @@ class _ChatListScreenState extends State<ChatListScreen> {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     final chatProvider = Provider.of<ChatProvider>(context, listen: false);
     chatProvider.startListeningToUnreadCounts(authProvider.currentUser!.id);
+
+    final navigationProvider = Provider.of<NavigationProvider>(context, listen: false);
+    navigationProvider.addListener(_checkForReset);
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _checkForReset();
+  }
+
+  void _checkForReset() {
+    final navigationProvider = Provider.of<NavigationProvider>(context, listen: false);
+    if (navigationProvider.shouldResetChatListScreen) {
+      _searchController.clear();
+      _searchText = '';
+      _clearFocus();
+      navigationProvider.confirmChatListReset();
+      setState(() {});
+    }
   }
 
   @override
   void dispose() {
     _searchController.dispose();
     _focusNode.dispose();
+    final navigationProvider = Provider.of<NavigationProvider>(context, listen: false);
+    navigationProvider.removeListener(_checkForReset);
     super.dispose();
   }
 
   void _clearFocus() {
     FocusScope.of(context).unfocus();
+  }
+
+  void _applySearchFilter() {
+    setState(() {
+      _searchText = _searchController.text.toLowerCase();
+    });
   }
 
   @override
@@ -92,16 +121,11 @@ class _ChatListScreenState extends State<ChatListScreen> {
                         labelStyle: TextStyle(color: Colors.blue, fontSize: 14.sp),
                         border: InputBorder.none,
                       ),
-                      onChanged: (value) {
-                        setState(() {});
-                      },
                     ),
                   ),
                   IconButton(
                     icon: Icon(Icons.search, color: Colors.blue),
-                    onPressed: () {
-                      setState(() {});
-                    },
+                    onPressed: _applySearchFilter,
                   ),
                 ],
               ),
@@ -146,13 +170,12 @@ class _ChatListScreenState extends State<ChatListScreen> {
                     final participants = List<String>.from(doc['participants']);
                     final chatData = doc.data() as Map<String, dynamic>;
 
-                    final searchText = _searchController.text.toLowerCase();
-                    final isInChat = chatData['lastMessage']?.toLowerCase().contains(searchText) ?? false;
+                    final isInChat = chatData['lastMessage']?.toLowerCase().contains(_searchText) ?? false;
                     final isGuideName = chatData['usernames'].values.any((name) =>
-                        name.toLowerCase().contains(searchText) &&
+                        name.toLowerCase().contains(_searchText) &&
                         (name != authProvider.currentUser!.name || _isGuideSearch));
                     return participants.contains(authProvider.currentUser!.id) &&
-                        (_searchController.text.isEmpty || isInChat || isGuideName);
+                        (_searchText.isEmpty || isInChat || isGuideName);
                   }).toList();
 
                   return ListView.builder(
@@ -215,17 +238,20 @@ class _ChatListScreenState extends State<ChatListScreen> {
                                           0,
                                           chatData['usernames'][otherUserId].length > 15
                                               ? 15
-                                              : chatData['usernames'][otherUserId].length) ??
-                                      'Unknown User',
+                                              : chatData['usernames'][otherUserId].length) ?? 'Unknown User',
                                   style: const TextStyle(fontWeight: FontWeight.bold),
                                 ),
                               ),
                               if (unreadCount > 0)
-                                CircleAvatar(
-                                  radius: 10,
-                                  backgroundColor: Colors.red,
+                                Container(
+                                  margin: const EdgeInsets.only(left: 8),
+                                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                  decoration: BoxDecoration(
+                                    color: Colors.red,
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
                                   child: Text(
-                                    '$unreadCount',
+                                    unreadCount > 999 ? "+999" : "+$unreadCount",
                                     style: const TextStyle(color: Colors.white, fontSize: 12),
                                   ),
                                 ),
@@ -238,8 +264,8 @@ class _ChatListScreenState extends State<ChatListScreen> {
                           ),
                           onTap: () {
                             _clearFocus();
+                            chatProvider.resetUnreadCount(chatId, authProvider.currentUser!.id); // 안 읽은 메시지 수 초기화
                             chatProvider.startListeningToMessages(chatId);
-                            chatProvider.resetUnreadCount(chatId, authProvider.currentUser!.id);
                             GoRouter.of(context).push('/chat/$chatId');
                           },
                         ),

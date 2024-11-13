@@ -4,6 +4,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:travel_on_final/features/chat/presentation/providers/chat_provider.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
 
 class BottomSheetWidget {
   final ImagePicker _picker = ImagePicker();
@@ -15,44 +16,89 @@ class BottomSheetWidget {
     required String otherUserId,
     required String currentUserProfileImage,
     required String username,
+    double initialHeightFactor = 0.3,
   }) {
     final chatProvider = Provider.of<ChatProvider>(parentContext, listen: false);
 
     showModalBottomSheet(
       context: parentContext,
+      isScrollControlled: true,
       builder: (BuildContext context) {
-        return Padding(
-          padding: EdgeInsets.symmetric(vertical: 16.h),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              buildIconButton(
-                context,
-                icon: Icons.image,
-                label: '갤러리',
-                backgroundColor: Colors.lightBlue,
-                onTap: () async {
-                  Navigator.pop(context);
-                  final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
-                  if (image != null) {
-                    _showConfirmationDialog(parentContext, image, chatId, userId, otherUserId, currentUserProfileImage, username);
-                  }
-                },
+        return FractionallySizedBox(
+          heightFactor: initialHeightFactor,
+          child: SingleChildScrollView(
+            child: Padding(
+              padding: EdgeInsets.symmetric(vertical: 16.h, horizontal: 4.w),
+              child: Wrap(
+                alignment: WrapAlignment.center,
+                spacing: 16.w,
+                runSpacing: 16.h,
+                children: [
+                  // 갤러리 버튼
+                  buildIconButton(
+                    context,
+                    icon: Icons.image,
+                    label: '갤러리',
+                    backgroundColor: Colors.lightBlue,
+                    onTap: () async {
+                      Navigator.pop(context);
+                      final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
+                      if (image != null) {
+                        _showConfirmationDialog(parentContext, image, chatId, userId, otherUserId, currentUserProfileImage, username);
+                      }
+                    },
+                  ),
+                  // 카메라 버튼
+                  buildIconButton(
+                    context,
+                    icon: Icons.camera_alt,
+                    label: '카메라',
+                    backgroundColor: Colors.blueAccent,
+                    onTap: () async {
+                      Navigator.pop(context);
+                      final XFile? image = await _picker.pickImage(source: ImageSource.camera);
+                      if (image != null) {
+                        _showConfirmationDialog(parentContext, image, chatId, userId, otherUserId, currentUserProfileImage, username);
+                      }
+                    },
+                  ),
+                  // 사용자 버튼
+                  buildIconButton(
+                    context,
+                    icon: Icons.person,
+                    label: '사용자',
+                    backgroundColor: Colors.purple,
+                    onTap: () {
+                      Navigator.pop(context);
+                      context.push(
+                        '/user-search',
+                        extra: {'chatId': chatId, 'otherUserId': otherUserId},
+                      );
+                    },
+                  ),
+                  // 패키지 버튼
+                  buildIconButton(
+                    context,
+                    icon: Icons.card_travel,
+                    label: '패키지',
+                    backgroundColor: Colors.orange,
+                    onTap: () {
+                      Navigator.pop(context);
+                    },
+                  ),
+                  // 지도 버튼
+                  buildIconButton(
+                    context,
+                    icon: Icons.map,
+                    label: '지도',
+                    backgroundColor: Colors.green,
+                    onTap: () {
+                      Navigator.pop(context);
+                    },
+                  ),
+                ],
               ),
-              buildIconButton(
-                context,
-                icon: Icons.camera_alt,
-                label: '카메라',
-                backgroundColor: Colors.blueAccent,
-                onTap: () async {
-                  Navigator.pop(context);
-                  final XFile? image = await _picker.pickImage(source: ImageSource.camera);
-                  if (image != null) {
-                    _showConfirmationDialog(parentContext, image, chatId, userId, otherUserId, currentUserProfileImage, username);
-                  }
-                },
-              ),
-            ],
+            ),
           ),
         );
       },
@@ -65,8 +111,8 @@ class BottomSheetWidget {
     required VoidCallback onTap,
     required Color backgroundColor,
   }) {
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 12.w),
+    return SizedBox(
+      width: 60.w,
       child: Column(
         children: [
           InkWell(
@@ -74,13 +120,14 @@ class BottomSheetWidget {
             child: CircleAvatar(
               backgroundColor: backgroundColor,
               radius: 30.w,
-              child: Icon(icon, size: 30.w, color: Colors.white),
+              child: Icon(icon, size: 35.w, color: Colors.white),
             ),
           ),
           SizedBox(height: 4.h),
           Text(
             label,
-            style: TextStyle(fontSize: 14.sp),
+            style: TextStyle(fontSize: 12.sp),
+            textAlign: TextAlign.center,
           ),
         ],
       ),

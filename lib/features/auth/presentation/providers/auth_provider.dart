@@ -277,4 +277,28 @@ class AuthProvider with ChangeNotifier {
       rethrow;
     }
   }
+
+  Future<List<UserModel>> searchUsers(String query) async {
+    try {
+      final userCollection = _firestore.collection('users');
+
+      final emailSnapshot = await userCollection
+          .where('email', isEqualTo: query)
+          .get();
+
+      final nameSnapshot = await userCollection
+          .where('name', isGreaterThanOrEqualTo: query)
+          .where('name', isLessThanOrEqualTo: query + '\uf8ff')
+          .get();
+
+      final emailResults = emailSnapshot.docs.map((doc) => UserModel.fromJson(doc.data())).toList();
+      final nameResults = nameSnapshot.docs.map((doc) => UserModel.fromJson(doc.data())).toList();
+
+      final allResults = {...emailResults, ...nameResults}.toList();
+      return allResults;
+    } catch (e) {
+      print('사용자 검색 실패: $e');
+      return [];
+    }
+  }
 }
