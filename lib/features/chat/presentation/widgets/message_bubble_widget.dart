@@ -3,6 +3,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:travel_on_final/features/chat/domain/entities/message_entity.dart';
 import 'package:travel_on_final/features/chat/domain/usecases/create_chat_id.dart';
+import 'package:travel_on_final/features/map/domain/entities/travel_point.dart';
+import 'package:travel_on_final/features/search/domain/entities/travel_package.dart';
 import 'package:go_router/go_router.dart';
 
 class MessageBubble extends StatelessWidget {
@@ -20,6 +22,8 @@ class MessageBubble extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isPackageMessage = message.sharedPackage != null;
+
     return Column(
       crossAxisAlignment: isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
       children: [
@@ -49,30 +53,131 @@ class MessageBubble extends StatelessWidget {
                 ),
               ),
             Container(
-              constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.6),
+              constraints: BoxConstraints(
+                maxWidth: isPackageMessage
+                    ? MediaQuery.of(context).size.width * 0.8
+                    : MediaQuery.of(context).size.width * 0.6,
+              ),
               decoration: BoxDecoration(
-                color: isMe ? Colors.blue.shade100 : Colors.blueAccent,
+                color: isMe ? Colors.blue.shade100 : Colors.grey[200],
                 borderRadius: BorderRadius.circular(12.r),
               ),
               padding: EdgeInsets.symmetric(vertical: 10.h, horizontal: 16.w),
               margin: EdgeInsets.symmetric(vertical: 4.h, horizontal: 8.w),
-              child: (message.sharedUser != null)
-                  ? _buildUserDetails(context, message.sharedUser!)
-                  : (message.imageUrl != null && message.imageUrl!.isNotEmpty
-                      ? CachedNetworkImage(
-                          imageUrl: message.imageUrl!,
-                          placeholder: (context, url) => CircularProgressIndicator(),
-                          errorWidget: (context, url, error) => Icon(Icons.error),
-                        )
-                      : Text(
-                          message.text,
-                          style: TextStyle(
-                            color: isMe ? Colors.black : Colors.white,
-                            fontSize: 14.sp,
-                          ),
-                        )),
+              child: isPackageMessage
+                  ? _buildPackageDetails(context, message.sharedPackage!)
+                  : (message.sharedUser != null
+                      ? _buildUserDetails(context, message.sharedUser!)
+                      : (message.imageUrl != null && message.imageUrl!.isNotEmpty
+                          ? CachedNetworkImage(
+                              imageUrl: message.imageUrl!,
+                              placeholder: (context, url) => CircularProgressIndicator(),
+                              errorWidget: (context, url, error) => Icon(Icons.error),
+                            )
+                          : Text(
+                              message.text,
+                              style: TextStyle(
+                                color: isMe ? Colors.black : Colors.white,
+                                fontSize: 14.sp,
+                              ),
+                            ))),
             ),
           ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildPackageDetails(BuildContext context, Map<String, dynamic> package) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        if (package['mainImage'] != null)
+          ClipRRect(
+            borderRadius: BorderRadius.circular(8.r),
+            child: CachedNetworkImage(
+              imageUrl: package['mainImage'] ?? '',
+              placeholder: (context, url) => CircularProgressIndicator(),
+              errorWidget: (context, url, error) => Image.asset(
+                'assets/images/default_image.png',
+                width: 250.w,
+                height: 250.h,
+                fit: BoxFit.cover,
+              ),
+              width: 250.w,
+              height: 250.h,
+              fit: BoxFit.cover,
+            ),
+          ),
+        SizedBox(height: 8.h),
+        Text(
+          package['title'] ?? '패키지 이름 없음',
+          style: TextStyle(fontSize: 20.sp, fontWeight: FontWeight.bold),
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
+        ),
+        Text('가격: ${package['price']}원', style: TextStyle(fontSize: 16.sp, color: Colors.blue)),
+        Text('가이드: ${package['guideName']}', style: TextStyle(fontSize: 14.sp, color: Colors.black)),
+        SizedBox(height: 8.h),
+        Text(
+          package['description'] ?? '설명 없음',
+          maxLines: 4,
+          overflow: TextOverflow.ellipsis,
+          style: TextStyle(fontSize: 14.sp),
+        ),
+        SizedBox(height: 16.h),
+        Center(
+          child: ElevatedButton(
+            onPressed: () {
+              try {
+                final travelPackage = TravelPackage(
+                  id: package['id'] as String? ?? '',
+                  title: package['title'] as String? ?? '',
+                  description: package['description'] as String? ?? '',
+                  price: (package['price'] as num?)?.toDouble() ?? 0.0,
+                  mainImage: package['mainImage'] as String?,
+                  guideName: package['guideName'] as String? ?? '',
+                  guideId: package['guideId'] as String? ?? '',
+                  region: package['region'] as String? ?? '',
+                  descriptionImages: package['descriptionImages'] is List
+                      ? List<String>.from(package['descriptionImages'])
+                      : [],
+                  minParticipants: package['minParticipants'] as int? ?? 4,
+                  maxParticipants: package['maxParticipants'] as int? ?? 8,
+                  nights: package['nights'] as int? ?? 0,
+                  departureDays: package['departureDays'] is List
+                      ? List<int>.from(package['departureDays'])
+                      : [],
+                  likedBy: package['likedBy'] is List
+                      ? List<String>.from(package['likedBy'])
+                      : [],
+                  likesCount: package['likesCount'] as int? ?? 0,
+                  averageRating: (package['averageRating'] as num?)?.toDouble() ?? 0.0,
+                  reviewCount: package['reviewCount'] as int? ?? 0,
+                  routePoints: package['routePoints'] is List
+                      ? (package['routePoints'] as List)
+                          .map((point) => TravelPoint.fromJson(point as Map<String, dynamic>))
+                          .toList()
+                      : [],
+                );
+
+                context.push(
+                  '/package-detail/${travelPackage.id}',
+                  extra: travelPackage,
+                );
+              } catch (e) {
+                print('패키지를 못 불러왔습니다.: $e');
+              }
+            },
+            style: ElevatedButton.styleFrom(
+              padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
+              minimumSize: Size(100.w, 36.h),
+            ),
+            child: Text(
+              '패키지 상세 정보 보기',
+              style: TextStyle(fontSize: 14.sp),
+            ),
+          ),
         ),
       ],
     );
@@ -123,7 +228,7 @@ class MessageBubble extends StatelessWidget {
                       print('Navigation error: $e');
                     }
                   } else {
-                    print('유효하지 않은 ID입니당');
+                    print('유효하지 않은 ID입니다.');
                   }
                 },
                 child: Text(

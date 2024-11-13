@@ -7,6 +7,7 @@ import 'package:travel_on_final/features/chat/data/models/message_model.dart';
 import 'package:travel_on_final/features/chat/domain/entities/message_entity.dart';
 import 'package:travel_on_final/features/auth/presentation/providers/auth_provider.dart';
 import 'package:travel_on_final/features/auth/data/models/user_model.dart';
+import 'package:travel_on_final/features/search/domain/entities/travel_package.dart';
 import 'package:travel_on_final/core/providers/navigation_provider.dart';
 import 'package:provider/provider.dart';
 
@@ -69,6 +70,7 @@ class ChatProvider extends ChangeNotifier {
     required String otherUserId,
     XFile? imageFile,
     required BuildContext context,
+    Map<String, dynamic>? packageData,
   }) async {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     if (authProvider.currentUser == null) return;
@@ -101,7 +103,6 @@ class ChatProvider extends ChangeNotifier {
 
     notifyListeners();
   }
-
 
   // Firestore에서 사용자 이름 가져오기
   Future<String> _getOtherUserName(String uid) async {
@@ -238,6 +239,43 @@ class ChatProvider extends ChangeNotifier {
     await chatRef.update({
       'lastActivityTime': Timestamp.now(),
       'lastMessage': '사용자 정보가 공유되었습니다.',
+    });
+
+    notifyListeners();
+  }
+  
+  // 패키지 정보를 상대방에게 전송하는 메서드
+  Future<void> sendPackageDetailsMessage({
+    required String chatId,
+    required TravelPackage package,
+    required String otherUserId,
+    required BuildContext context,
+  }) async {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    if (authProvider.currentUser == null) return;
+
+    await _ensureChatRoomExists(chatId, context, otherUserId);
+    final chatRef = _firestore.collection('chats').doc(chatId);
+
+    await chatRef.collection('messages').add({
+      'text': '패키지 정보',
+      'uId': authProvider.currentUser!.id,
+      'username': authProvider.currentUser!.name,
+      'createdAt': Timestamp.now(),
+      'profileImageUrl': authProvider.currentUser!.profileImageUrl,
+      'sharedPackage': {
+        'id': package.id,
+        'title': package.title,
+        'price': package.price,
+        'guideName': package.guideName,
+        'mainImage': package.mainImage,
+        'description': package.description,
+      },
+    });
+
+    await chatRef.update({
+      'lastActivityTime': Timestamp.now(),
+      'lastMessage': '패키지 정보가 공유되었습니다.',
     });
 
     notifyListeners();

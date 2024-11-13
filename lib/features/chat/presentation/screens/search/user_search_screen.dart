@@ -38,7 +38,7 @@ class _UserSearchScreenState extends State<UserSearchScreen> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: Text('사용자 정보 공유'),
+          title: Text('공유하기'),
           content: Container(
             padding: EdgeInsets.all(16.w),
             decoration: BoxDecoration(

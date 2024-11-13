@@ -379,4 +379,14 @@ class TravelProvider extends ChangeNotifier {
       return false;
     }
   }
+
+  // 검색 메서드
+  List<TravelPackage> searchPackages(String query) {
+    return _packages.where((package) {
+      final lowerQuery = query.toLowerCase();
+      return package.title.toLowerCase().contains(lowerQuery) ||
+          package.region.toLowerCase().contains(lowerQuery) ||
+          package.guideName.toLowerCase().contains(lowerQuery);
+    }).toList();
+  }
 }

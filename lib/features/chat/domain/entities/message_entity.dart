@@ -6,7 +6,8 @@ class MessageEntity {
   final Timestamp createdAt;
   final String? profileImageUrl;
   final String? imageUrl;
-  Map<String, dynamic>? sharedUser;
+  final Map<String, dynamic>? sharedUser;
+  final Map<String, dynamic>? sharedPackage;
 
   MessageEntity({
     required this.text,
@@ -15,5 +16,6 @@ class MessageEntity {
     this.profileImageUrl,
     this.imageUrl,
     this.sharedUser,
+    this.sharedPackage,
   });
 }
