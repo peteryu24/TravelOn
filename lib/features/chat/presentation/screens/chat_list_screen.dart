@@ -166,29 +166,44 @@ class _ChatListScreenState extends State<ChatListScreen> {
                     return const Center(child: CircularProgressIndicator());
                   }
 
+                  if (chatSnapshot.hasError) {
+                    return const Center(child: Text('오류가 발생했습니다.'));
+                  }
+
+                  if (!chatSnapshot.hasData || chatSnapshot.data!.docs.isEmpty) {
+                    return const Center(child: Text('채팅방이 없습니다.'));
+                  }
+
                   final chatDocs = chatSnapshot.data!.docs.where((doc) {
-                    final participants = List<String>.from(doc['participants']);
-                    final chatData = doc.data() as Map<String, dynamic>;
+                    final participants = List<String>.from(doc['participants'] ?? []);
+                    final chatData = doc.data() as Map<String, dynamic>? ?? {};
 
                     final isInChat = chatData['lastMessage']?.toLowerCase().contains(_searchText) ?? false;
-                    final isGuideName = chatData['usernames'].values.any((name) =>
-                        name.toLowerCase().contains(_searchText) &&
-                        (name != authProvider.currentUser!.name || _isGuideSearch));
+                    final isGuideName = (chatData['usernames']?.values ?? [])
+                        .any((name) => name.toLowerCase().contains(_searchText) &&
+                              (name != authProvider.currentUser!.name || _isGuideSearch));
+                    
                     return participants.contains(authProvider.currentUser!.id) &&
                         (_searchText.isEmpty || isInChat || isGuideName);
                   }).toList();
 
+                  if (chatDocs.isEmpty) {
+                    return const Center(child: Text('조건에 맞는 채팅방이 없습니다.'));
+                  }
+
                   return ListView.builder(
                     itemCount: chatDocs.length,
                     itemBuilder: (ctx, index) {
-                      final chatData = chatDocs[index].data() as Map<String, dynamic>;
+                      final chatData = chatDocs[index].data() as Map<String, dynamic>? ?? {};
                       final chatId = chatDocs[index].id;
-                      final otherUserId = authProvider.currentUser!.id == chatData['participants'][0]
-                          ? chatData['participants'][1]
-                          : chatData['participants'][0];
-                      final unreadCount = (chatData['unreadCount'] != null && chatData['unreadCount'][authProvider.currentUser!.id] != null)
-                          ? chatData['unreadCount'][authProvider.currentUser!.id] 
-                          : 0;
+                      
+                      final participants = chatData['participants'] as List<dynamic>? ?? [];
+                      final otherUserId = authProvider.currentUser!.id == participants[0]
+                          ? participants[1]
+                          : participants[0];
+                      
+                      final unreadCount = chatData['unreadCount']?[authProvider.currentUser!.id] ?? 0;
+                      
                       chatProvider.updateOtherUserInfo(chatId, otherUserId);
 
                       return Dismissible(
@@ -204,7 +219,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
                           final confirm = await showDialog<bool>(
                             context: context,
                             builder: (ctx) => AlertDialog(
-                              title: Text('${chatData['usernames'][otherUserId]}님과의 대화방을 나가시겠습니까?'),
+                              title: Text('${chatData['usernames'][otherUserId] ?? 'Unknown'}님과의 대화방을 나가시겠습니까?'),
                               actions: [
                                 TextButton(
                                   onPressed: () => Navigator.of(ctx).pop(false),
@@ -251,7 +266,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
                                     borderRadius: BorderRadius.circular(12),
                                   ),
                                   child: Text(
-                                    unreadCount > 999 ? "+999" : "+$unreadCount",
+                                    unreadCount > 999 ? "+999" : "$unreadCount",
                                     style: const TextStyle(color: Colors.white, fontSize: 12),
                                   ),
                                 ),
@@ -264,7 +279,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
                           ),
                           onTap: () {
                             _clearFocus();
-                            chatProvider.resetUnreadCount(chatId, authProvider.currentUser!.id); // 안 읽은 메시지 수 초기화
+                            chatProvider.resetUnreadCount(chatId, authProvider.currentUser!.id);
                             chatProvider.startListeningToMessages(chatId);
                             GoRouter.of(context).push('/chat/$chatId');
                           },
