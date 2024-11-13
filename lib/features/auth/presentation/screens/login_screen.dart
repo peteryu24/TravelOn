@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -87,8 +88,8 @@ class _LoginScreenState extends State<LoginScreen> {
           children: [
             Image.asset(
               'assets/images/travel-on-login.png',
-              height: 230.h,
-              width: 230.w,
+              height: 200.h,
+              width: 200.w,
             ),
             TextFieldWidget(controller: _emailController, labelText: '이메일'),
             SizedBox(height: 20.h),
@@ -98,39 +99,51 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
             SizedBox(height: 5.h),
             Row(
+              mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 Padding(
                   padding: EdgeInsets.only(left: 8.0.w),
                   child: Row(
                     children: [
-                      Text('로그인 정보 저장', style: TextStyle(fontSize: 14.sp)),
-                      Checkbox(
+                      Text(
+                        '로그인 정보 저장',
+                        style: TextStyle(
+                            fontSize: 14.sp,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.black),
+                      ),
+                      SizedBox(width: 5.w),
+                      CupertinoSwitch(
+                        activeColor: Colors.blue,
                         value: _saveCredentials,
                         onChanged: (value) {
                           setState(() {
-                            _saveCredentials = value ?? false;
+                            _saveCredentials = value;
                           });
                         },
                       ),
                     ],
                   ),
                 ),
-                const Spacer(),
-                Padding(
-                  padding: EdgeInsets.only(right: 8.0.w),
-                  child: TextButton(
-                    onPressed: _navigateToSignup,
-                    child: Text(
-                      '회원가입',
-                      style: TextStyle(color: Colors.blue, fontSize: 14.sp),
-                    ),
-                  ),
-                ),
               ],
             ),
             Row(
-              mainAxisAlignment: MainAxisAlignment.end,
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
+                TextButton(
+                  onPressed: _navigateToSignup,
+                  child: Text(
+                    '회원가입',
+                    style: TextStyle(color: Colors.blue, fontSize: 14.sp),
+                  ),
+                ),
+                Text(
+                  '·',
+                  style: TextStyle(
+                      fontSize: 14.sp,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.grey),
+                ),
                 TextButton(
                   onPressed: _resetPassword,
                   child: Text(
@@ -140,21 +153,156 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
               ],
             ),
-            SizedBox(height: 20.h),
+            SizedBox(height: 10.h),
             ElevatedButton(
               onPressed: _login,
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.blue[500],
-                padding: EdgeInsets.symmetric(horizontal: 50.w, vertical: 16.h),
+                padding: EdgeInsets.symmetric(horizontal: 40.w, vertical: 14.h),
               ),
               child: Text(
                 '로그인',
                 style: TextStyle(color: Colors.white, fontSize: 14.sp),
               ),
             ),
+            SizedBox(height: 10.h),
+            Row(
+              children: [
+                Expanded(child: Divider(color: Colors.grey[400])),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 16.w),
+                  child: Text(
+                    'OR',
+                    style: TextStyle(
+                      color: Colors.grey[600],
+                      fontSize: 14.sp,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+                Expanded(child: Divider(color: Colors.grey[400])),
+              ],
+            ),
+            SizedBox(height: 10.h),
+            Text(
+              'SNS 계정으로 로그인',
+              style: TextStyle(
+                fontSize: 14.sp,
+                color: Colors.grey[600],
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            SizedBox(height: 20.h),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                _buildSocialButton(
+                  iconWidget: ClipOval(
+                    child: Image.asset(
+                      'assets/images/google_light.png',
+                      width: 58.sp,
+                      height: 58.sp,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                  color: Colors.white,
+                  onPressed: () async {
+                    try {
+                      final authProvider =
+                          Provider.of<AuthProvider>(context, listen: false);
+                      await authProvider.signInWithGoogle();
+
+                      if (authProvider.isAuthenticated) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                              content: Text(
+                                  '${authProvider.currentUser!.name}님 환영합니다.')),
+                        );
+                        context.go('/');
+                      }
+                    } catch (e) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Google 로그인에 실패했습니다.')),
+                      );
+                    }
+                  },
+                ),
+                SizedBox(width: 20.w),
+                _buildSocialButton(
+                  iconWidget: ClipOval(
+                    child: Image.asset(
+                      'assets/images/apple_light.png',
+                      width: 120.sp,
+                      height: 120.sp,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                  color: Colors.black,
+                  onPressed: () {
+                    // Apple 로그인 구현
+                  },
+                ),
+                SizedBox(width: 20.w),
+                _buildSocialButton(
+                  iconWidget: ClipOval(
+                    child: Image.asset(
+                      'assets/images/naver_light.png',
+                      width: 40.sp,
+                      height: 40.sp,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                  color: const Color(0xFF03C75A),
+                  onPressed: () {
+                    // Naver 로그인 구현
+                  },
+                ),
+                SizedBox(width: 20.w),
+                _buildSocialButton(
+                  iconWidget: ClipOval(
+                    child: Image.asset(
+                      'assets/images/kakao_light.png',
+                      width: 100.sp,
+                      height: 100.sp,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                  color: const Color(0xFFFEE500),
+                  onPressed: () {
+                    // Kakao 로그인 구현
+                  },
+                ),
+              ],
+            ),
             SizedBox(height: 30.h),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildSocialButton({
+    required Widget iconWidget,
+    required Color color,
+    required VoidCallback onPressed,
+  }) {
+    return InkWell(
+      onTap: onPressed,
+      child: Container(
+        width: 45.w,
+        height: 45.w,
+        decoration: BoxDecoration(
+          color: color,
+          shape: BoxShape.circle,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Center(child: iconWidget),
       ),
     );
   }
