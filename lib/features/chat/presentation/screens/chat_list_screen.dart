@@ -20,6 +20,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
   final FocusNode _focusNode = FocusNode();
   bool _isGuideSearch = false;
   String _searchText = '';
+  late NavigationProvider navigationProvider;
 
   @override
   void initState() {
@@ -32,19 +33,26 @@ class _ChatListScreenState extends State<ChatListScreen> {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     final chatProvider = Provider.of<ChatProvider>(context, listen: false);
     chatProvider.startListeningToUnreadCounts(authProvider.currentUser!.id);
-
-    final navigationProvider = Provider.of<NavigationProvider>(context, listen: false);
-    navigationProvider.addListener(_checkForReset);
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+    navigationProvider = Provider.of<NavigationProvider>(context, listen: false);
+    navigationProvider.addListener(_checkForReset);
     _checkForReset();
   }
 
+  @override
+  void dispose() {
+    _searchController.dispose();
+    _focusNode.dispose();
+    navigationProvider.removeListener(_checkForReset);
+    super.dispose();
+  }
+
   void _checkForReset() {
-    final navigationProvider = Provider.of<NavigationProvider>(context, listen: false);
+    if (!mounted) return;
     if (navigationProvider.shouldResetChatListScreen) {
       _searchController.clear();
       _searchText = '';
@@ -54,17 +62,10 @@ class _ChatListScreenState extends State<ChatListScreen> {
     }
   }
 
-  @override
-  void dispose() {
-    _searchController.dispose();
-    _focusNode.dispose();
-    final navigationProvider = Provider.of<NavigationProvider>(context, listen: false);
-    navigationProvider.removeListener(_checkForReset);
-    super.dispose();
-  }
-
   void _clearFocus() {
-    FocusScope.of(context).unfocus();
+    if (mounted) {
+      FocusScope.of(context).unfocus();
+    }
   }
 
   void _applySearchFilter() {

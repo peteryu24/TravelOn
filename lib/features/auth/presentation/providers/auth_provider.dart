@@ -8,7 +8,7 @@ import 'package:travel_on_final/features/auth/data/models/user_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:travel_on_final/features/search/presentation/providers/travel_provider.dart';
 import 'package:travel_on_final/features/auth/domain/usecases/reset_password_usecase.dart';
-import 'package:travel_on_final/features/gallery/presentation/providers/gallery_provider.dart';
+import 'package:travel_on_final/features/chat/presentation/providers/chat_provider.dart';
 
 class AuthProvider with ChangeNotifier {
   final FirebaseAuth _auth;
@@ -97,18 +97,14 @@ class AuthProvider with ChangeNotifier {
     }
   }
 
-  Future<void> logout() async {
+  Future<void> logout(BuildContext context) async {
     try {
+      Provider.of<ChatProvider>(context, listen: false).clearDataOnLogout();
+
       await _auth.signOut();
       _currentUser = null;
 
-      final context = _auth.app.options.androidClientId as BuildContext?;
-      if (context != null) {
-        final galleryProvider =
-            Provider.of<GalleryProvider>(context, listen: false);
-        galleryProvider.reset();
-      }
-
+      // 기타 필요한 데이터 초기화
       notifyListeners();
     } catch (e) {
       print('로그아웃 에러: $e');
