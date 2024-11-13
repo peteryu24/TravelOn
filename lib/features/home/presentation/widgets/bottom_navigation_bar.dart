@@ -46,7 +46,7 @@ class CustomBottomNavigationBar extends StatelessWidget {
                     radius: 8,
                     backgroundColor: Colors.red,
                     child: Text(
-                      '${navigationProvider.totalUnreadCount}',
+                      navigationProvider.totalUnreadDisplay,
                       style: const TextStyle(color: Colors.white, fontSize: 10),
                     ),
                   ),

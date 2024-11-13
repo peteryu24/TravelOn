@@ -6,6 +6,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:travel_on_final/features/chat/data/models/message_model.dart';
 import 'package:travel_on_final/features/chat/domain/entities/message_entity.dart';
 import 'package:travel_on_final/features/auth/presentation/providers/auth_provider.dart';
+import 'package:travel_on_final/features/auth/data/models/user_model.dart';
 import 'package:travel_on_final/core/providers/navigation_provider.dart';
 import 'package:provider/provider.dart';
 
@@ -28,7 +29,9 @@ class ChatProvider extends ChangeNotifier {
         .orderBy('createdAt', descending: true)
         .snapshots()
         .listen((querySnapshot) {
-      _messages = querySnapshot.docs.map((doc) => MessageModel.fromDocument(doc).toEntity()).toList();
+      _messages = querySnapshot.docs
+          .map((doc) => MessageModel.fromDocument(doc).toEntity())
+          .toList();
       notifyListeners();
     });
   }
@@ -151,6 +154,9 @@ class ChatProvider extends ChangeNotifier {
     }
   }
 
+  /////////////////////////////////////////////////////////////
+  /// 안읽은 메세지 관련 메서드
+  
   // 읽지 않은 메시지 수 증가
   Future<void> incrementUnreadCount(String chatId, String otherUserId) async {
     final chatRef = _firestore.collection('chats').doc(chatId);
@@ -162,9 +168,12 @@ class ChatProvider extends ChangeNotifier {
   // 사용자가 채팅방을 열면 그 방의 읽지 않은 메시지 수를 초기화
   Future<void> resetUnreadCount(String chatId, String userId) async {
     final chatRef = _firestore.collection('chats').doc(chatId);
+
     await chatRef.update({
       'unreadCount.$userId': 0,
     });
+
+    _updateTotalUnreadCount(userId);
   }
 
   // 총 읽지 않은 메시지 수를 실시간으로 추적하여 NavigationProvider에 전달
@@ -174,13 +183,63 @@ class ChatProvider extends ChangeNotifier {
         .where('participants', arrayContains: userId)
         .snapshots()
         .listen((snapshot) {
-      int totalUnread = 0;
-      for (var doc in snapshot.docs) {
-        final data = doc.data() as Map<String, dynamic>;
-        final count = (data['unreadCount']?[userId] ?? 0) as int; // null 처리 및 int 변환
-        totalUnread += count;
-      }
-      _navigationProvider.updateTotalUnreadCount(totalUnread); // NavigationProvider를 통해 업데이트
+      _updateTotalUnreadCount(userId);
     });
+  }
+
+  void _updateTotalUnreadCount(String userId) async {
+    int totalUnread = 0;
+
+    final snapshot = await _firestore
+        .collection('chats')
+        .where('participants', arrayContains: userId)
+        .get();
+
+    for (var doc in snapshot.docs) {
+      final data = doc.data() as Map<String, dynamic>;
+      final count = (data['unreadCount']?[userId] ?? 0) as int;
+      totalUnread += count;
+    }
+
+    _navigationProvider.updateTotalUnreadCount(totalUnread);
+  }
+
+  ///////////////////////////////////////////////////////
+  /// 사용자 정보 공유 관련 메서드
+  
+  // 사용자 정보를 상대방에게 메시지로 전송하는 메서드
+  Future<void> sendUserDetailsMessage({
+    required String chatId,
+    required UserModel user,
+    required String otherUserId,
+    required BuildContext context,
+  }) async {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    if (authProvider.currentUser == null) return;
+
+    await _ensureChatRoomExists(chatId, context, otherUserId);
+    final chatRef = _firestore.collection('chats').doc(chatId);
+
+    await chatRef.collection('messages').add({
+      'text': '사용자 정보',
+      'uId': authProvider.currentUser!.id,
+      'username': authProvider.currentUser!.name,
+      'createdAt': Timestamp.now(),
+      'profileImageUrl': authProvider.currentUser!.profileImageUrl,
+      'sharedUser': {
+        'id': user.id,
+        'name': user.name,
+        'email': user.email,
+        'profileImageUrl': user.profileImageUrl,
+        'introduction': user.introduction,
+      },
+    });
+
+    await chatRef.update({
+      'lastActivityTime': Timestamp.now(),
+      'lastMessage': '사용자 정보가 공유되었습니다.',
+    });
+
+    notifyListeners();
   }
 }

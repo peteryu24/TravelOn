@@ -7,14 +7,32 @@ class NavigationProvider extends ChangeNotifier {
   int get currentIndex => _currentIndex;
   int get totalUnreadCount => _totalUnreadCount;
 
+  bool shouldResetChatListScreen = false;
+
   void setIndex(int index) {
     _currentIndex = index;
+    if (index != 2) {
+      requestChatListReset();
+    }
     notifyListeners();
   }
 
   void updateTotalUnreadCount(int count) {
     _totalUnreadCount = count;
     notifyListeners();
+  }
+
+  void requestChatListReset() {
+    shouldResetChatListScreen = true;
+    notifyListeners();
+  }
+
+  void confirmChatListReset() {
+    shouldResetChatListScreen = false;
+  }
+
+  String get totalUnreadDisplay {
+    return _totalUnreadCount > 999 ? "+999" : _totalUnreadCount.toString();
   }
 
   String getPathForIndex(int index) {

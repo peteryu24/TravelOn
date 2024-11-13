@@ -54,18 +54,25 @@ class _LoginScreenState extends State<LoginScreen> {
     setState(() => _isLoading = true);
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     await authProvider.login(_emailController.text, _passwordController.text);
-    setState(() => _isLoading = false);
+
+    if (mounted) {
+      setState(() => _isLoading = false);
+    }
 
     if (authProvider.isAuthenticated) {
       await _saveCredentialsToPrefs();
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('${authProvider.currentUser!.name}님 환영합니다.')),
-      );
-      context.go('/');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('${authProvider.currentUser!.name}님 환영합니다.')),
+        );
+        context.go('/');
+      }
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('로그인에 실패했습니다. 다시 시도해주세요.')),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('로그인에 실패했습니다. 다시 시도해주세요.')),
+        );
+      }
     }
   }
 
