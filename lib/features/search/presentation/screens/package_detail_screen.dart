@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_naver_map/flutter_naver_map.dart';
@@ -9,11 +8,9 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:travel_on_final/features/auth/presentation/providers/auth_provider.dart';
 import 'package:travel_on_final/features/map/domain/entities/travel_point.dart';
+import 'package:travel_on_final/features/map/presentation/screens/naver_route_map_screen.dart';
 import 'package:travel_on_final/features/review/presentation/provider/review_provider.dart';
-import 'package:travel_on_final/features/review/presentation/screens/add_review_screen.dart';
 import 'package:travel_on_final/features/review/presentation/screens/review_detail_screen.dart';
-import 'package:travel_on_final/features/review/presentation/widgets/review_list.dart';
-import 'package:travel_on_final/features/search/presentation/providers/travel_provider.dart';
 import '../../domain/entities/travel_package.dart';
 import 'package:travel_on_final/features/chat/domain/usecases/create_chat_id.dart';
 import 'package:http/http.dart' as http;
@@ -21,10 +18,9 @@ import 'package:http/http.dart' as http;
 class PackageDetailScreen extends StatefulWidget {
   final TravelPackage package;
 
-  const PackageDetailScreen({
-    Key? key,
-    required this.package,
-  }) : super(key: key);
+  const PackageDetailScreen(
+      {Key? key, required this.package, required int totalDays})
+      : super(key: key);
 
   @override
   State<PackageDetailScreen> createState() => _PackageDetailScreenState();
@@ -35,51 +31,78 @@ class _PackageDetailScreenState extends State<PackageDetailScreen> {
   Future<int>? _todayParticipants;
   bool _isAvailable = true;
   bool _showReviews = false;
-  int _minParticipants = 0;  // 기본값 설정
-  int _maxParticipants = 0;  // 기본값 설정
+  int _minParticipants = 0; // 기본값 설정
+  int _maxParticipants = 0; // 기본값 설정
   String? _currentUserId;
   NaverMapController? _mapController;
   double _currentZoom = 8.0;
+  final Map<String, NOverlayInfo> _pathOverlays = {}; // 추가
 
   Future<void> _createRouteOverlay(NaverMapController controller) async {
     try {
-      for (var i = 0; i < widget.package.routePoints.length - 1; i++) {
-        final start = widget.package.routePoints[i];
-        final end = widget.package.routePoints[i + 1];
+      // 기존 경로 제거
+      for (var overlay in _pathOverlays.values) {
+        await controller.deleteOverlay(overlay);
+      }
+      _pathOverlays.clear();
 
-        final uri = Uri.parse('https://naveropenapi.apigw.ntruss.com/map-direction/v1/driving')
-            .replace(queryParameters: {
-          'start': '${start.location.longitude},${start.location.latitude}',
-          'goal': '${end.location.longitude},${end.location.latitude}',
-          'option': 'trafast',
-        });
+      // 일차별 색상 정의
+      final colors = [
+        Colors.blue,
+        Colors.red,
+        Colors.green,
+        Colors.purple,
+        Colors.orange,
+      ];
 
-        final response = await http.get(
-          uri,
-          headers: {
-            'X-NCP-APIGW-API-KEY-ID': 'j3gnaneqmd',
-            'X-NCP-APIGW-API-KEY': 'WdWzIfcchu614fM1CD1vKA9JzaJATTj0DGKM5CPF',
-          },
-        );
+      // 일차별로 경로 생성
+      for (int day = 1; day <= widget.package.totalDays; day++) {
+        final dayPoints = widget.package.routePoints
+            .where((p) => p.day == day)
+            .toList()
+          ..sort((a, b) => a.order.compareTo(b.order));
 
-        if (response.statusCode == 200) {
-          final data = json.decode(response.body);
-          if (data['route']?['trafast']?[0]?['path'] != null) {
-            final path = data['route']['trafast'][0]['path'] as List;
-            final coords = path.map((point) => NLatLng(
-              (point[1] as num).toDouble(),
-              (point[0] as num).toDouble(),
-            )).toList();
+        for (var i = 0; i < dayPoints.length - 1; i++) {
+          final start = dayPoints[i];
+          final end = dayPoints[i + 1];
 
-            final pathOverlay = NPathOverlay(
-              id: 'path_$i',
-              coords: coords,
-              color: Colors.blue.withOpacity(0.8),
-              width: 5,
-              outlineColor: Colors.white,
-            );
+          final uri = Uri.parse(
+                  'https://naveropenapi.apigw.ntruss.com/map-direction/v1/driving')
+              .replace(queryParameters: {
+            'start': '${start.location.longitude},${start.location.latitude}',
+            'goal': '${end.location.longitude},${end.location.latitude}',
+            'option': 'trafast',
+          });
 
-            await controller.addOverlay(pathOverlay);
+          final response = await http.get(
+            uri,
+            headers: {
+              'X-NCP-APIGW-API-KEY-ID': 'j3gnaneqmd',
+              'X-NCP-APIGW-API-KEY': 'WdWzIfcchu614fM1CD1vKA9JzaJATTj0DGKM5CPF',
+            },
+          );
+
+          if (response.statusCode == 200) {
+            final data = json.decode(response.body);
+            if (data['route']?['trafast']?[0]?['path'] != null) {
+              final path = data['route']['trafast'][0]['path'] as List;
+              final coords = path
+                  .map((point) => NLatLng(
+                        (point[1] as num).toDouble(),
+                        (point[0] as num).toDouble(),
+                      ))
+                  .toList();
+
+              final pathOverlay =
+                  NPathOverlay(id: 'path_${day}_$i', coords: coords);
+              _pathOverlays['path_${day}_$i'] = pathOverlay as NOverlayInfo;
+              await controller.addOverlay(pathOverlay);
+
+              _pathOverlays['path_${day}_$i'] =
+                  pathOverlay as NOverlayInfo; // Map에 저장
+              await controller
+                  .addOverlay(pathOverlay as NAddableOverlay<NOverlay<void>>);
+            }
           }
         }
       }
@@ -93,7 +116,16 @@ class _PackageDetailScreenState extends State<PackageDetailScreen> {
     }
   }
 
-
+  @override
+  void dispose() {
+    if (_mapController != null) {
+      for (var overlay in _pathOverlays.values) {
+        _mapController?.deleteOverlay(overlay as NOverlayInfo);
+      }
+      _mapController?.dispose();
+    }
+    super.dispose();
+  }
 
   @override
   void initState() {
@@ -110,7 +142,6 @@ class _PackageDetailScreenState extends State<PackageDetailScreen> {
     });
   }
 
-
   Future<void> _loadTodayParticipants() async {
     setState(() {
       _todayParticipants = _getParticipantsForDate(DateTime.now());
@@ -118,22 +149,30 @@ class _PackageDetailScreenState extends State<PackageDetailScreen> {
   }
 
   Future<int> _getParticipantsForDate(DateTime date) async {
-    final start = DateTime(date.year, date.month, date.day);
-    final end = start.add(const Duration(days: 1));
+    try {
+      final start = DateTime(date.year, date.month, date.day);
+      final end = start.add(const Duration(days: 1));
 
-    final snapshot = await FirebaseFirestore.instance
-        .collection('reservations')
-        .where('packageId', isEqualTo: widget.package.id)
-        .where('status', isEqualTo: 'approved')
-        .where('reservationDate', isGreaterThanOrEqualTo: Timestamp.fromDate(start))
-        .where('reservationDate', isLessThan: Timestamp.fromDate(end))
-        .get();
+      final snapshot = await FirebaseFirestore.instance
+          .collection('reservations')
+          .where('packageId', isEqualTo: widget.package.id)
+          .where('status', isEqualTo: 'approved')
+          .where('reservationDate',
+              isGreaterThanOrEqualTo: Timestamp.fromDate(start))
+          .where('reservationDate', isLessThan: Timestamp.fromDate(end))
+          .get();
 
-    setState(() {
-      _isAvailable = snapshot.docs.length < widget.package.maxParticipants;
-    });
+      if (mounted) {
+        setState(() {
+          _isAvailable = snapshot.docs.length < widget.package.maxParticipants;
+        });
+      }
 
-    return snapshot.docs.length;
+      return snapshot.docs.length;
+    } catch (e) {
+      print('Error getting participants: $e');
+      return 0;
+    }
   }
 
   @override
@@ -147,7 +186,8 @@ class _PackageDetailScreenState extends State<PackageDetailScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // 메인 이미지
-            if (widget.package.mainImage != null && widget.package.mainImage!.isNotEmpty)
+            if (widget.package.mainImage != null &&
+                widget.package.mainImage!.isNotEmpty)
               Image.network(
                 widget.package.mainImage!,
                 height: 200.h,
@@ -163,7 +203,7 @@ class _PackageDetailScreenState extends State<PackageDetailScreen> {
                       child: CircularProgressIndicator(
                         value: loadingProgress.expectedTotalBytes != null
                             ? loadingProgress.cumulativeBytesLoaded /
-                            loadingProgress.expectedTotalBytes!
+                                loadingProgress.expectedTotalBytes!
                             : null,
                       ),
                     ),
@@ -268,11 +308,16 @@ class _PackageDetailScreenState extends State<PackageDetailScreen> {
                                   if (_currentUserId != widget.package.guideId)
                                     IconButton(
                                       onPressed: () async {
-                                        final authProvider = Provider.of<AuthProvider>(context, listen: false);
-                                        final userId = authProvider.currentUser?.id;
+                                        final authProvider =
+                                            Provider.of<AuthProvider>(context,
+                                                listen: false);
+                                        final userId =
+                                            authProvider.currentUser?.id;
                                         if (userId != null) {
-                                          final otherUserId = widget.package.guideId;
-                                          final chatId = CreateChatId().call(userId, otherUserId);
+                                          final otherUserId =
+                                              widget.package.guideId;
+                                          final chatId = CreateChatId()
+                                              .call(userId, otherUserId);
                                           context.push('/chat/$chatId');
                                         }
                                       },
@@ -283,13 +328,13 @@ class _PackageDetailScreenState extends State<PackageDetailScreen> {
                             ),
                           ],
                         ),
-
                         Row(
                           children: [
                             SizedBox(width: 8.w),
                             const Icon(Icons.group, color: Colors.black),
                             Text(
-                              widget.package.minParticipants != null && widget.package.maxParticipants != null
+                              widget.package.minParticipants != null &&
+                                      widget.package.maxParticipants != null
                                   ? '예약 가능 인원: ${widget.package.minParticipants}명 ~ ${widget.package.maxParticipants}명'
                                   : '예약 가능 인원: 정보 없음',
                               style: TextStyle(
@@ -300,7 +345,6 @@ class _PackageDetailScreenState extends State<PackageDetailScreen> {
                             ),
                           ],
                         ),
-
                         SizedBox(height: 8.h),
                         Row(
                           children: [
@@ -383,7 +427,8 @@ class _PackageDetailScreenState extends State<PackageDetailScreen> {
                           NaverMap(
                             options: NaverMapViewOptions(
                               initialCameraPosition: NCameraPosition(
-                                target: widget.package.routePoints.first.location,
+                                target:
+                                    widget.package.routePoints.first.location,
                                 zoom: 8,
                               ),
                               scrollGesturesEnable: true,
@@ -393,22 +438,15 @@ class _PackageDetailScreenState extends State<PackageDetailScreen> {
                               stopGesturesEnable: true,
                               locationButtonEnable: true,
                               consumeSymbolTapEvents: false,
-                              // 추가할 옵션들
-                              mapType: NMapType.basic,
-                              liteModeEnable: false,
-                              indoorEnable: true,
-                              nightModeEnable: false,
-                              // 제스처 감도 설정 추가
-                              scrollGesturesFriction: 1.0,
-                              zoomGesturesFriction: 1.0,
-                              rotationGesturesFriction: 1.0, // 심볼 탭 이벤트 처리
                             ),
-                            onMapReady: (controller) async {
+                            onMapReady: (NaverMapController controller) {
                               setState(() {
-                                _mapController = controller;  // 컨트롤러 저장
+                                _mapController = controller;
                               });
 
-                              for (var i = 0; i < widget.package.routePoints.length; i++) {
+                              for (var i = 0;
+                                  i < widget.package.routePoints.length;
+                                  i++) {
                                 final point = widget.package.routePoints[i];
                                 final marker = NMarker(
                                   id: 'marker_${point.id}',
@@ -424,18 +462,14 @@ class _PackageDetailScreenState extends State<PackageDetailScreen> {
                                   ),
                                 );
 
-                                await controller.addOverlay(marker);
-                              }
-
-                              // 경로 생성
-                              if (widget.package.routePoints.length > 1) {
-                                await _createRouteOverlay(controller);
+                                controller.addOverlay(marker);
                               }
 
                               // 모든 포인트가 보이도록 카메라 위치 조정
                               if (widget.package.routePoints.isNotEmpty) {
-                                final bounds = _calculateBounds(widget.package.routePoints);
-                                await controller.updateCamera(
+                                final bounds = _calculateBounds(
+                                    widget.package.routePoints);
+                                controller.updateCamera(
                                   NCameraUpdate.fitBounds(
                                     bounds,
                                     padding: const EdgeInsets.all(50),
@@ -444,9 +478,7 @@ class _PackageDetailScreenState extends State<PackageDetailScreen> {
                               }
                             },
                           ),
-
                           // 줌 컨트롤 버튼
-                          // 기존 코드를 이렇게 수정
                           Positioned(
                             top: 16,
                             right: 16,
@@ -466,13 +498,14 @@ class _PackageDetailScreenState extends State<PackageDetailScreen> {
                                   ),
                                   child: Column(
                                     children: [
-                                      // 확대 버튼
                                       IconButton(
                                         onPressed: () {
                                           setState(() {
-                                            _currentZoom = (_currentZoom + 1).clamp(1.0, 20.0);
+                                            _currentZoom = (_currentZoom + 1)
+                                                .clamp(1.0, 20.0);
                                             _mapController?.updateCamera(
-                                              NCameraUpdate.withParams(zoom: _currentZoom),
+                                              NCameraUpdate.withParams(
+                                                  zoom: _currentZoom),
                                             );
                                           });
                                         },
@@ -483,15 +516,16 @@ class _PackageDetailScreenState extends State<PackageDetailScreen> {
                                       ),
                                       Container(
                                         height: 1,
-                                        color: Colors.grey.shade300,
+                                        color: Colors.grey[300],
                                       ),
-                                      // 축소 버튼
                                       IconButton(
                                         onPressed: () {
                                           setState(() {
-                                            _currentZoom = (_currentZoom - 1).clamp(1.0, 20.0);
+                                            _currentZoom = (_currentZoom - 1)
+                                                .clamp(1.0, 20.0);
                                             _mapController?.updateCamera(
-                                              NCameraUpdate.withParams(zoom: _currentZoom),
+                                              NCameraUpdate.withParams(
+                                                  zoom: _currentZoom),
                                             );
                                           });
                                         },
@@ -504,6 +538,26 @@ class _PackageDetailScreenState extends State<PackageDetailScreen> {
                                   ),
                                 ),
                               ],
+                            ),
+                          ),
+                          // 상세 경로 보기 버튼
+                          Positioned(
+                            bottom: 16,
+                            left: 120,
+                            right: 120,
+                            child: ElevatedButton(
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => NaverRouteMapScreen(
+                                      points: widget.package.routePoints,
+                                      totalDays: widget.package.totalDays,
+                                    ),
+                                  ),
+                                );
+                              },
+                              child: Text('상세 경로 보기'),
                             ),
                           ),
                         ],
@@ -522,7 +576,7 @@ class _PackageDetailScreenState extends State<PackageDetailScreen> {
                       ),
                     ),
 
-// 여행 코스 목록 표시
+                  // 여행 코스 목록 표시
                   if (widget.package.routePoints.isNotEmpty) ...[
                     SizedBox(height: 16.h),
                     ListView.builder(
@@ -533,9 +587,11 @@ class _PackageDetailScreenState extends State<PackageDetailScreen> {
                         final point = widget.package.routePoints[index];
                         return ListTile(
                           leading: Icon(
-                            point.type == PointType.hotel ? Icons.hotel :
-                            point.type == PointType.restaurant ? Icons.restaurant :
-                            Icons.photo_camera,
+                            point.type == PointType.hotel
+                                ? Icons.hotel
+                                : point.type == PointType.restaurant
+                                    ? Icons.restaurant
+                                    : Icons.photo_camera,
                             color: Colors.blue,
                           ),
                           title: Text('${index + 1}. ${point.name}'),
@@ -570,7 +626,8 @@ class _PackageDetailScreenState extends State<PackageDetailScreen> {
                               widget.package.descriptionImages[index],
                               width: double.infinity,
                               fit: BoxFit.cover,
-                              loadingBuilder: (context, child, loadingProgress) {
+                              loadingBuilder:
+                                  (context, child, loadingProgress) {
                                 if (loadingProgress == null) return child;
                                 return Container(
                                   height: 200.h,
@@ -578,10 +635,14 @@ class _PackageDetailScreenState extends State<PackageDetailScreen> {
                                   color: Colors.grey[200],
                                   child: Center(
                                     child: CircularProgressIndicator(
-                                      value: loadingProgress.expectedTotalBytes != null
-                                          ? loadingProgress.cumulativeBytesLoaded /
-                                          loadingProgress.expectedTotalBytes!
-                                          : null,
+                                      value:
+                                          loadingProgress.expectedTotalBytes !=
+                                                  null
+                                              ? loadingProgress
+                                                      .cumulativeBytesLoaded /
+                                                  loadingProgress
+                                                      .expectedTotalBytes!
+                                              : null,
                                     ),
                                   ),
                                 );
@@ -671,18 +732,20 @@ class _PackageDetailScreenState extends State<PackageDetailScreen> {
     return Consumer<ReviewProvider>(
       builder: (context, reviewProvider, _) {
         final totalReviewCount = reviewProvider.totalReviewCount;
-        final totalAverageRating = reviewProvider.totalAverageRating;  // 전체 평균 별점 사용
+        final totalAverageRating =
+            reviewProvider.totalAverageRating; // 전체 평균 별점 사용
 
         return TextButton(
           onPressed: () {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (_) => ReviewDetailScreen(package: widget.package),
+                builder: (_) => NaverRouteMapScreen(
+                  points: widget.package.routePoints,
+                  totalDays: widget.package.totalDays,
+                ),
               ),
-            ).then((_) {
-              reviewProvider.loadPreviewReviews(widget.package.id);
-            });
+            );
           },
           child: Row(
             mainAxisSize: MainAxisSize.min,
@@ -703,7 +766,7 @@ class _PackageDetailScreenState extends State<PackageDetailScreen> {
               ),
               SizedBox(width: 4.w),
               Text(
-                totalAverageRating.toStringAsFixed(1),  // 전체 평균 별점 표시
+                totalAverageRating.toStringAsFixed(1), // 전체 평균 별점 표시
                 style: TextStyle(
                   fontSize: 16.sp,
                   fontWeight: FontWeight.bold,

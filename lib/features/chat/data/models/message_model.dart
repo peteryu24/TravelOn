@@ -9,6 +9,7 @@ class MessageModel {
   String? profileImageUrl;
   String? imageUrl;
   Map<String, dynamic>? sharedUser;
+  Map<String, dynamic>? sharedPackage;
 
   MessageModel({
     required this.id,
@@ -18,6 +19,7 @@ class MessageModel {
     this.profileImageUrl,
     this.imageUrl,
     this.sharedUser,
+    this.sharedPackage,
   });
 
   factory MessageModel.fromDocument(DocumentSnapshot doc) {
@@ -31,6 +33,7 @@ class MessageModel {
       profileImageUrl: data?['profileImageUrl'],
       imageUrl: data?['imageUrl'],
       sharedUser: data?['sharedUser'],
+      sharedPackage: data?['sharedPackage'],
     );
   }
 
@@ -42,6 +45,7 @@ class MessageModel {
       'profileImageUrl': profileImageUrl,
       'imageUrl': imageUrl,
       if (sharedUser != null) 'sharedUser': sharedUser,
+      if (sharedPackage != null) 'sharedPackage': sharedPackage,
     };
   }
 
@@ -53,6 +57,7 @@ class MessageModel {
       profileImageUrl: profileImageUrl,
       imageUrl: imageUrl,
       sharedUser: sharedUser,
+      sharedPackage: sharedPackage,
     );
   }
 }

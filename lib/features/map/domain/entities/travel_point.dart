@@ -14,6 +14,7 @@ class TravelPoint {
   final String address;
   final String description;
   final int order;
+  final int day;  // day 필드 추가
 
   TravelPoint({
     required this.id,
@@ -23,6 +24,7 @@ class TravelPoint {
     required this.address,
     required this.description,
     required this.order,
+    required this.day,  // day 매개변수 추가
   });
 
   Map<String, dynamic> toJson() => {
@@ -34,6 +36,7 @@ class TravelPoint {
     'address': address,
     'description': description,
     'order': order,
+    'day': day,  // day 추가
   };
 
   factory TravelPoint.fromJson(Map<String, dynamic> json) {
@@ -51,10 +54,11 @@ class TravelPoint {
       address: json['address'] as String,
       description: json['description'] as String,
       order: json['order'] as int,
+      day: (json['day'] as int?) ?? 0,  // 기본값 설정
     );
   }
 
-  // 복사본 생성 메서드
+  // 복사본 생성 메서드 수정
   TravelPoint copyWith({
     String? id,
     String? name,
@@ -63,6 +67,7 @@ class TravelPoint {
     String? address,
     String? description,
     int? order,
+    int? day,  // day 매개변수 추가
   }) {
     return TravelPoint(
       id: id ?? this.id,
@@ -72,6 +77,7 @@ class TravelPoint {
       address: address ?? this.address,
       description: description ?? this.description,
       order: order ?? this.order,
+      day: day ?? this.day,  // day 복사
     );
   }
 }

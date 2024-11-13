@@ -1,4 +1,3 @@
-// lib/features/search/domain/entities/travel_package.dart
 import 'package:travel_on_final/features/map/domain/entities/travel_point.dart';
 
 class TravelPackage {
@@ -14,12 +13,13 @@ class TravelPackage {
   final int minParticipants;
   final int maxParticipants;
   final int nights;
+  final int totalDays;  // 필드 추가
   final List<int> departureDays;
   List<String> likedBy;
   int likesCount;
   final double averageRating;
   final int reviewCount;
-  final List<TravelPoint> routePoints;  // 추가
+  final List<TravelPoint> routePoints;
 
   TravelPackage({
     required this.id,
@@ -34,13 +34,15 @@ class TravelPackage {
     required this.minParticipants,
     required this.maxParticipants,
     required this.nights,
+    var totalDays,  // 매개변수 추가
     required this.departureDays,
     List<String>? likedBy,
     this.likesCount = 0,
     this.averageRating = 0.0,
     this.reviewCount = 0,
-    this.routePoints = const [],  // 기본값 추가
-  }) : likedBy = likedBy ?? [];
+    this.routePoints = const [],
+  })  : this.totalDays = totalDays ?? nights + 1,  // nights + 1로 기본값 설정
+        this.likedBy = likedBy ?? [];  // 쉼표로 구분, 마지막에 세미콜론
 
   Map<String, dynamic> toJson() => {
     'id': id,
@@ -55,12 +57,13 @@ class TravelPackage {
     'minParticipants': minParticipants,
     'maxParticipants': maxParticipants,
     'nights': nights,
+    'totalDays': totalDays,  // 추가
     'departureDays': departureDays,
     'likedBy': likedBy,
     'likesCount': likesCount,
     'averageRating': averageRating,
     'reviewCount': reviewCount,
-    'routePoints': routePoints.map((point) => point.toJson()).toList(),  // 추가
+    'routePoints': routePoints.map((point) => point.toJson()).toList(),
   };
 
   factory TravelPackage.fromJson(Map<String, dynamic> json) => TravelPackage(
@@ -75,7 +78,8 @@ class TravelPackage {
     guideId: json['guideId'] as String,
     minParticipants: (json['minParticipants'] as num?)?.toInt() ?? 4,
     maxParticipants: (json['maxParticipants'] as num?)?.toInt() ?? 8,
-    nights: (json['nights'] as num).toInt(),
+    nights: (json['nights'] as num?)?.toInt() ?? 0,
+    totalDays: (json['totalDays'] as num?)?.toInt() ?? 0,
     departureDays: List<int>.from(json['departureDays'] ?? []),
     likedBy: List<String>.from(json['likedBy'] ?? []),
     likesCount: (json['likesCount'] as num?)?.toInt() ?? 0,
@@ -83,7 +87,7 @@ class TravelPackage {
     reviewCount: (json['reviewCount'] as num?)?.toInt() ?? 0,
     routePoints: (json['routePoints'] as List<dynamic>?)
         ?.map((point) => TravelPoint.fromJson(point as Map<String, dynamic>))
-        .toList() ?? [],  // 추가
+        .toList() ?? [],
   );
 
   TravelPackage copyWith({
@@ -91,7 +95,8 @@ class TravelPackage {
     int? likesCount,
     double? averageRating,
     int? reviewCount,
-    List<TravelPoint>? routePoints,  // 추가
+    List<TravelPoint>? routePoints,
+    int? totalDays,  // 추가
   }) {
     return TravelPackage(
       id: id,
@@ -106,12 +111,13 @@ class TravelPackage {
       minParticipants: minParticipants,
       maxParticipants: maxParticipants,
       nights: nights,
+      totalDays: totalDays ?? this.totalDays,  // 추가
       departureDays: departureDays,
       likedBy: likedBy ?? List<String>.from(this.likedBy),
       likesCount: likesCount ?? this.likesCount,
       averageRating: averageRating ?? this.averageRating,
       reviewCount: reviewCount ?? this.reviewCount,
-      routePoints: routePoints ?? List<TravelPoint>.from(this.routePoints),  // 추가
+      routePoints: routePoints ?? List<TravelPoint>.from(this.routePoints),
     );
   }
 }
