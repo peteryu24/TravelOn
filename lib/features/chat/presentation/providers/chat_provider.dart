@@ -6,9 +6,9 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:travel_on_final/features/chat/data/models/message_model.dart';
 import 'package:travel_on_final/features/chat/domain/entities/message_entity.dart';
-import 'package:travel_on_final/features/auth/presentation/providers/auth_provider.dart';
 import 'package:travel_on_final/features/auth/data/models/user_model.dart';
 import 'package:travel_on_final/features/search/domain/entities/travel_package.dart';
+import 'package:travel_on_final/features/auth/presentation/providers/auth_provider.dart';
 import 'package:travel_on_final/core/providers/navigation_provider.dart';
 import 'package:provider/provider.dart';
 
@@ -156,13 +156,28 @@ class ChatProvider extends ChangeNotifier {
 
   // 상대방 정보 업데이트 메서드
   Future<void> updateOtherUserInfo(String chatId, String otherUserId) async {
-    final otherUserName = await _getOtherUserName(otherUserId);
-    final otherUserProfileImage = await _getOtherUserProfileImage(otherUserId);
+    try {
+      final otherUserName = await _getOtherUserName(otherUserId);
+      final otherUserProfileImage = await _getOtherUserProfileImage(otherUserId);
 
-    await _firestore.collection('chats').doc(chatId).update({
-      'usernames.$otherUserId': otherUserName,
-      'userProfileImages.$otherUserId': otherUserProfileImage,
-    });
+      final chatRef = _firestore.collection('chats').doc(chatId);
+      final chatSnapshot = await chatRef.get();
+
+      if (chatSnapshot.exists) {
+        await chatRef.update({
+          'usernames.$otherUserId': otherUserName,
+          'userProfileImages.$otherUserId': otherUserProfileImage,
+        });
+      } else {
+        debugPrint('채팅방 문서를 찾지 못하겠음: $chatId');
+      }
+    } catch (e) {
+      if (e is FirebaseException && e.code == 'not-found') {
+        debugPrint('해당 유저의 정보를 못불러옴 : $otherUserId');
+      } else {
+        debugPrint('채팅 목록 업데이트 오류: $e');
+      }
+    }
   }
 
   // 채팅방 나가기
@@ -293,6 +308,44 @@ class ChatProvider extends ChangeNotifier {
     await chatRef.update({
       'lastActivityTime': Timestamp.now(),
       'lastMessage': '패키지 정보가 공유되었습니다.',
+    });
+
+    notifyListeners();
+  }
+
+  // 장소 정보 메시지 보내기
+  Future<void> sendLocationMessage({
+    required String chatId,
+    required String otherUserId,
+    required BuildContext context,
+    required String title,
+    required String address,
+    required double latitude,
+    required double longitude,
+  }) async {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    if (authProvider.currentUser == null) return;
+
+    await _ensureChatRoomExists(chatId, context, otherUserId);
+    final chatRef = _firestore.collection('chats').doc(chatId);
+
+    await chatRef.collection('messages').add({
+      'text': '위치 정보',
+      'uId': authProvider.currentUser!.id,
+      'username': authProvider.currentUser!.name,
+      'createdAt': Timestamp.now(),
+      'profileImageUrl': authProvider.currentUser!.profileImageUrl,
+      'location': {
+        'title': title,
+        'address': address,
+        'latitude': latitude,
+        'longitude': longitude,
+      },
+    });
+
+    await chatRef.update({
+      'lastActivityTime': Timestamp.now(),
+      'lastMessage': '위치 정보가 공유되었습니다.',
     });
 
     notifyListeners();

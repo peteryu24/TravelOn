@@ -8,6 +8,7 @@ class MessageEntity {
   final String? imageUrl;
   final Map<String, dynamic>? sharedUser;
   final Map<String, dynamic>? sharedPackage;
+  final Map<String, dynamic>? location;
 
   MessageEntity({
     required this.text,
@@ -17,5 +18,6 @@ class MessageEntity {
     this.imageUrl,
     this.sharedUser,
     this.sharedPackage,
+    this.location,
   });
 }
