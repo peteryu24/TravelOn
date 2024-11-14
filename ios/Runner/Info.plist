@@ -88,5 +88,15 @@
                 </array>
             </dict>
         </array>
+
+        <key>CFBundleURLTypes</key>
+        <array>
+            <dict>
+                <key>CFBundleURLSchemes</key>
+                <array>
+                    <string>app-1-828007872799-ios-26950953dfd5ddc9e6582a</string>
+                </array>
+            </dict>
+        </array>
     </dict>
 </plist>
