@@ -9,6 +9,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:travel_on_final/features/search/presentation/providers/travel_provider.dart';
 import 'package:travel_on_final/features/auth/domain/usecases/reset_password_usecase.dart';
 import 'package:travel_on_final/features/chat/presentation/providers/chat_provider.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 
 class AuthProvider with ChangeNotifier {
   final FirebaseAuth _auth;
@@ -354,6 +355,55 @@ class AuthProvider with ChangeNotifier {
       notifyListeners();
     } catch (e) {
       print('Google 로그인 실패: $e');
+      rethrow;
+    }
+  }
+
+  Future<void> signInWithGithub(BuildContext context) async {
+    try {
+      // GitHub 제공자 생성
+      final githubProvider = GithubAuthProvider();
+
+      // 플랫폼에 따라 다른 로그인 메서드 사용
+      final UserCredential userCredential;
+      if (kIsWeb) {
+        userCredential = await _auth.signInWithPopup(githubProvider);
+      } else {
+        userCredential = await _auth.signInWithProvider(githubProvider);
+      }
+
+      // Firestore에 사용자 정보 저장 또는 업데이트
+      final userDoc = await _firestore
+          .collection('users')
+          .doc(userCredential.user!.uid)
+          .get();
+
+      if (!userDoc.exists) {
+        // 새 사용자인 경우 Firestore에 정보 저장
+        final newUser = {
+          'id': userCredential.user!.uid,
+          'name': userCredential.user!.displayName ?? '',
+          'email': userCredential.user!.email ?? '',
+          'profileImageUrl': userCredential.user!.photoURL ?? '',
+          'isGuide': false,
+          'likedPackages': [],
+          'introduction': '',
+        };
+
+        await _firestore
+            .collection('users')
+            .doc(userCredential.user!.uid)
+            .set(newUser);
+
+        _currentUser = UserModel.fromJson(newUser);
+      } else {
+        // 기존 사용자인 경우 정보 로드
+        await _fetchUserData(userCredential.user!.uid);
+      }
+
+      notifyListeners();
+    } catch (e) {
+      print('GitHub 로그인 실패: $e');
       rethrow;
     }
   }
