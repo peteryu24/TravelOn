@@ -133,17 +133,29 @@ class MessageBubble extends StatelessWidget {
               mapType: NMapType.basic,
             ),
             onMapReady: (controller) {
-              controller.addOverlay(NMarker(
-                id: 'shared-location',
-                position: NLatLng(latitude, longitude),
-              ));
+              try {
+                controller.addOverlay(NMarker(
+                  id: 'shared-location',
+                  position: NLatLng(latitude, longitude),
+                ));
+              } catch (e) {
+                print('오류 발생: ${e.toString()}');
+              }
             },
           ),
         ),
         SizedBox(height: 8.h),
         ElevatedButton(
           onPressed: () async {
-            // 수정할 예정
+            final url =
+                'https://map.naver.com/v5/search/${Uri.encodeComponent(title)}?c=$longitude,$latitude,15,0,0,0,d';
+            if (await canLaunch(url)) {
+              await launch(url);
+            } else {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('지도를 열 수 없습니다.')),
+              );
+            }
           },
           child: Text('자세히 보기'),
         ),
