@@ -143,6 +143,7 @@ class MessageBubble extends StatelessWidget {
         SizedBox(height: 8.h),
         ElevatedButton(
           onPressed: () async {
+            // 수정할 예정
           },
           child: Text('자세히 보기'),
         ),
