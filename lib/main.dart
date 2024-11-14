@@ -17,7 +17,8 @@ import 'package:travel_on_final/firebase_options.dart';
 // Providers
 import 'package:provider/provider.dart';
 import 'package:travel_on_final/core/providers/navigation_provider.dart';
-import 'package:travel_on_final/features/auth/presentation/providers/auth_provider.dart' as app;
+import 'package:travel_on_final/features/auth/presentation/providers/auth_provider.dart'
+    as app;
 import 'package:travel_on_final/features/chat/presentation/providers/chat_provider.dart';
 import 'package:travel_on_final/features/guide/presentation/provider/guide_ranking_provider.dart';
 import 'package:travel_on_final/features/home/presentation/providers/home_provider.dart';
@@ -41,6 +42,8 @@ import 'package:travel_on_final/features/gallery/data/repositories/gallery_repos
 // Router
 import 'package:travel_on_final/route.dart';
 
+import 'package:kakao_flutter_sdk_common/kakao_flutter_sdk_common.dart';
+
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -55,6 +58,12 @@ Future<void> main() async {
   // Firebase 초기화
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
+  );
+
+  // 카카오 SDK 초기화
+  KakaoSdk.init(
+    nativeAppKey: dotenv.env['KAKAO_NATIVE_APP_KEY'] ?? '',
+    javaScriptAppKey: dotenv.env['KAKAO_JAVASCRIPT_KEY'] ?? '',
   );
 
   // FCM 초기화 및 권한 설정
@@ -137,7 +146,8 @@ class MyApp extends StatelessWidget {
           ),
         ),
         ChangeNotifierProvider(
-          create: (context) => GalleryProvider(context.read<GalleryRepository>()),
+          create: (context) =>
+              GalleryProvider(context.read<GalleryRepository>()),
         ),
         ChangeNotifierProvider(
           create: (_) => GuideRankingProvider(FirebaseFirestore.instance),

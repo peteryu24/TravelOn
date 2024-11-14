@@ -230,15 +230,34 @@ class _LoginScreenState extends State<LoginScreen> {
                 _buildSocialButton(
                   iconWidget: ClipOval(
                     child: Image.asset(
-                      'assets/images/apple_light.png',
-                      width: 120.sp,
-                      height: 120.sp,
+                      'assets/images/github_light.png',
+                      width: 34.sp,
+                      height: 34.sp,
                       fit: BoxFit.cover,
                     ),
                   ),
-                  color: Colors.black,
-                  onPressed: () {
-                    // Apple 로그인 구현
+                  color: Colors.white,
+                  onPressed: () async {
+                    try {
+                      final authProvider =
+                          Provider.of<AuthProvider>(context, listen: false);
+                      await authProvider.signInWithGithub(context);
+
+                      if (authProvider.isAuthenticated) {
+                        if (!mounted) return;
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                              content: Text(
+                                  '${authProvider.currentUser!.name}님 환영합니다.')),
+                        );
+                        context.go('/');
+                      }
+                    } catch (e) {
+                      if (!mounted) return;
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('GitHub 로그인에 실패했습니다.')),
+                      );
+                    }
                   },
                 ),
                 SizedBox(width: 20.w),
@@ -267,8 +286,27 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ),
                   color: const Color(0xFFFEE500),
-                  onPressed: () {
-                    // Kakao 로그인 구현
+                  onPressed: () async {
+                    try {
+                      final authProvider =
+                          Provider.of<AuthProvider>(context, listen: false);
+                      await authProvider.signInWithKakao(context);
+
+                      if (authProvider.isAuthenticated) {
+                        if (!mounted) return;
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                              content: Text(
+                                  '${authProvider.currentUser!.name}님 환영합니다.')),
+                        );
+                        context.go('/');
+                      }
+                    } catch (e) {
+                      if (!mounted) return;
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('카카오 로그인에 실패했습니다.')),
+                      );
+                    }
                   },
                 ),
               ],

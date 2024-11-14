@@ -105,16 +105,18 @@ class ReviewProvider extends ChangeNotifier {
       if (snapshot.docs.isEmpty) {
         _hasMore = false;
       } else {
-        final newReviews = snapshot.docs.map((doc) => Review(
-          id: doc.id,
-          packageId: doc['packageId'],
-          userId: doc['userId'],
-          userName: doc['userName'],
-          rating: (doc['rating'] as num).toDouble(),
-          content: doc['content'],
-          createdAt: (doc['createdAt'] as Timestamp).toDate(),
-          reservationId: doc['reservationId'],
-        )).toList();
+        final newReviews = snapshot.docs
+            .map((doc) => Review(
+                  id: doc.id,
+                  packageId: doc['packageId'],
+                  userId: doc['userId'],
+                  userName: doc['userName'],
+                  rating: (doc['rating'] as num).toDouble(),
+                  content: doc['content'],
+                  createdAt: (doc['createdAt'] as Timestamp).toDate(),
+                  reservationId: doc['reservationId'],
+                ))
+            .toList();
 
         _lastDocument = snapshot.docs.last;
         _reviews.addAll(newReviews);
@@ -125,7 +127,6 @@ class ReviewProvider extends ChangeNotifier {
 
       // print('Loaded reviews: ${_reviews.length}'); // 디버깅용
       // print('Has more: $_hasMore'); // 디버깅용
-
     } catch (e) {
       _error = e.toString();
       print('Error loading reviews: $e');
@@ -155,8 +156,8 @@ class ReviewProvider extends ChangeNotifier {
         reservationId: reservationId,
       );
 
-      await _repository.addReview(review);  // ReviewRepositoryImpl의 addReview 호출
-      await loadInitialReviews(packageId);  // 리뷰 목록 새로고침
+      await _repository.addReview(review); // ReviewRepositoryImpl의 addReview 호출
+      await loadInitialReviews(packageId); // 리뷰 목록 새로고침
 
       notifyListeners();
     } catch (e) {
@@ -165,11 +166,13 @@ class ReviewProvider extends ChangeNotifier {
       rethrow;
     }
   }
+
   Future<bool> canUserAddReview(String userId, String packageId) async {
-    print('canUserAddReview called with userId: $userId, packageId: $packageId');  // 로그 추가
+    print(
+        'canUserAddReview called with userId: $userId, packageId: $packageId'); // 로그 추가
     try {
       final result = await _repository.canUserReview(userId, packageId);
-      print('canUserAddReview result: $result');  // 로그 추가
+      print('canUserAddReview result: $result'); // 로그 추가
       return result;
     } catch (e) {
       print('Error in canUserAddReview: $e');
@@ -192,17 +195,18 @@ class ReviewProvider extends ChangeNotifier {
           .limit(5)
           .get();
 
-      _reviews = snapshot.docs.map((doc) => Review(
-        id: doc.id,
-        packageId: doc['packageId'],
-        userId: doc['userId'],
-        userName: doc['userName'],
-        rating: (doc['rating'] as num).toDouble(),
-        content: doc['content'],
-        createdAt: (doc['createdAt'] as Timestamp).toDate(),
-        reservationId: doc['reservationId'],
-      )).toList();
-
+      _reviews = snapshot.docs
+          .map((doc) => Review(
+                id: doc.id,
+                packageId: doc['packageId'],
+                userId: doc['userId'],
+                userName: doc['userName'],
+                rating: (doc['rating'] as num).toDouble(),
+                content: doc['content'],
+                createdAt: (doc['createdAt'] as Timestamp).toDate(),
+                reservationId: doc['reservationId'],
+              ))
+          .toList();
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -220,7 +224,8 @@ class ReviewProvider extends ChangeNotifier {
   Future<String?> checkReviewStatus(String userId, String packageId) async {
     try {
       // 예약 확인
-      final hasApprovedReservation = await _repository.canUserReview(userId, packageId);
+      final hasApprovedReservation =
+          await _repository.canUserReview(userId, packageId);
       if (!hasApprovedReservation) {
         return '예약 승인된 사용자만 리뷰를 작성할 수 있습니다.';
       }
@@ -258,8 +263,8 @@ class ReviewProvider extends ChangeNotifier {
   Future<void> updateReview({
     required String reviewId,
     required String packageId,
-    required String userId,    // userId 추가
-    required String userName,  // userName 추가
+    required String userId, // userId 추가
+    required String userName, // userName 추가
     required double rating,
     required String content,
   }) async {
@@ -267,8 +272,8 @@ class ReviewProvider extends ChangeNotifier {
       final updatedReview = Review(
         id: reviewId,
         packageId: packageId,
-        userId: userId,       // 파라미터로 받은 userId 사용
-        userName: userName,   // 파라미터로 받은 userName 사용
+        userId: userId, // 파라미터로 받은 userId 사용
+        userName: userName, // 파라미터로 받은 userName 사용
         rating: rating,
         content: content,
         createdAt: DateTime.now(),

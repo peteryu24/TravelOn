@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/services.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:provider/provider.dart';
 import 'package:travel_on_final/features/auth/data/models/user_model.dart';
@@ -9,6 +10,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:travel_on_final/features/search/presentation/providers/travel_provider.dart';
 import 'package:travel_on_final/features/auth/domain/usecases/reset_password_usecase.dart';
 import 'package:travel_on_final/features/chat/presentation/providers/chat_provider.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:kakao_flutter_sdk_user/kakao_flutter_sdk_user.dart' as kakao;
 
 class AuthProvider with ChangeNotifier {
   final FirebaseAuth _auth;
@@ -354,6 +357,143 @@ class AuthProvider with ChangeNotifier {
       notifyListeners();
     } catch (e) {
       print('Google 로그인 실패: $e');
+      rethrow;
+    }
+  }
+
+  Future<void> signInWithGithub(BuildContext context) async {
+    try {
+      // GitHub 제공자 생성
+      final githubProvider = GithubAuthProvider();
+
+      // 플랫폼에 따라 다른 로그인 메서드 사용
+      final UserCredential userCredential;
+      if (kIsWeb) {
+        userCredential = await _auth.signInWithPopup(githubProvider);
+      } else {
+        userCredential = await _auth.signInWithProvider(githubProvider);
+      }
+
+      // Firestore에 사용자 정보 저장 또는 업데이트
+      final userDoc = await _firestore
+          .collection('users')
+          .doc(userCredential.user!.uid)
+          .get();
+
+      if (!userDoc.exists) {
+        // 새 사용자인 경우 Firestore에 정보 저장
+        final newUser = {
+          'id': userCredential.user!.uid,
+          'name': userCredential.user!.displayName ?? '',
+          'email': userCredential.user!.email ?? '',
+          'profileImageUrl': userCredential.user!.photoURL ?? '',
+          'isGuide': false,
+          'likedPackages': [],
+          'introduction': '',
+        };
+
+        await _firestore
+            .collection('users')
+            .doc(userCredential.user!.uid)
+            .set(newUser);
+
+        _currentUser = UserModel.fromJson(newUser);
+      } else {
+        // 기존 사용자인 경우 정보 로드
+        await _fetchUserData(userCredential.user!.uid);
+      }
+
+      notifyListeners();
+    } catch (e) {
+      print('GitHub 로그인 실패: $e');
+      rethrow;
+    }
+  }
+
+  Future<void> signInWithKakao(BuildContext context) async {
+    try {
+      // 카카오톡 설치 여부 확인
+      if (await kakao.isKakaoTalkInstalled()) {
+        try {
+          final token = await kakao.UserApi.instance.loginWithKakaoTalk();
+          await _signInWithKakaoToken(token, context);
+        } catch (error) {
+          if (error is PlatformException && error.code == 'CANCELED') {
+            return;
+          }
+          // 카카오톡 로그인 실패 시 카카오계정으로 로그인 시도
+          try {
+            final token = await kakao.UserApi.instance.loginWithKakaoAccount();
+            await _signInWithKakaoToken(token, context);
+          } catch (error) {
+            print('카카오계정으로 로그인 실패 $error');
+            rethrow;
+          }
+        }
+      } else {
+        try {
+          final token = await kakao.UserApi.instance.loginWithKakaoAccount();
+          await _signInWithKakaoToken(token, context);
+        } catch (error) {
+          print('카카오계정으로 로그인 실패 $error');
+          rethrow;
+        }
+      }
+    } catch (e) {
+      print('카카오 로그인 실패: $e');
+      rethrow;
+    }
+  }
+
+  Future<void> _signInWithKakaoToken(
+      kakao.OAuthToken token, BuildContext context) async {
+    try {
+      // 카카오 사용자 정보 가져오기
+      final kakaoUser = await kakao.UserApi.instance.me();
+
+      // Firebase 인증
+      final provider = OAuthProvider('oidc.kakao.com');
+      final credential = provider.credential(
+        idToken: token.idToken,
+        accessToken: token.accessToken,
+      );
+
+      // Firebase로 로그인
+      final userCredential = await _auth.signInWithCredential(credential);
+
+      // Firestore에서 사용자 정보 확인
+      final userDoc = await _firestore
+          .collection('users')
+          .doc(userCredential.user!.uid)
+          .get();
+
+      if (!userDoc.exists) {
+        // 새 사용자인 경우 Firestore에 정보 저장
+        final newUser = {
+          'id': userCredential.user!.uid,
+          'name': kakaoUser.kakaoAccount?.profile?.nickname ?? '',
+          'email': kakaoUser.kakaoAccount?.email ?? '',
+          'profileImageUrl':
+              kakaoUser.kakaoAccount?.profile?.profileImageUrl ?? '',
+          'isGuide': false,
+          'likedPackages': [],
+          'introduction': '',
+        };
+
+        await _firestore
+            .collection('users')
+            .doc(userCredential.user!.uid)
+            .set(newUser);
+
+        _currentUser = UserModel.fromJson(newUser);
+      } else {
+        // 기존 사용자인 경우 정보 로드
+        await _fetchUserData(userCredential.user!.uid);
+      }
+
+      notifyListeners();
+    } catch (e) {
+      print('Firebase 인증 실패: $e');
       rethrow;
     }
   }
