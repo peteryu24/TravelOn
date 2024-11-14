@@ -98,6 +98,10 @@ class BottomSheetWidget {
                     backgroundColor: Color(0xFF03C75A),
                     onTap: () {
                       Navigator.pop(context);
+                      context.push(
+                        '/map-search',
+                        extra: {'chatId': chatId, 'otherUserId': otherUserId},
+                      );
                     },
                   ),
                 ],

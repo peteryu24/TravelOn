@@ -7,6 +7,8 @@ import 'package:travel_on_final/features/chat/domain/usecases/create_chat_id.dar
 import 'package:travel_on_final/features/map/domain/entities/travel_point.dart';
 import 'package:travel_on_final/features/search/domain/entities/travel_package.dart';
 import 'package:go_router/go_router.dart';
+import 'package:flutter_naver_map/flutter_naver_map.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class MessageBubble extends StatelessWidget {
   final MessageEntity message;
@@ -70,25 +72,80 @@ class MessageBubble extends StatelessWidget {
               ),
               padding: EdgeInsets.symmetric(vertical: 10.h, horizontal: 16.w),
               margin: EdgeInsets.symmetric(vertical: 4.h, horizontal: 8.w),
-              child: isPackageMessage
-                  ? _buildPackageDetails(context, message.sharedPackage!)
-                  : (message.sharedUser != null
-                      ? _buildUserDetails(context, message.sharedUser!)
-                      : (message.imageUrl != null && message.imageUrl!.isNotEmpty
-                          ? CachedNetworkImage(
-                              imageUrl: message.imageUrl!,
-                              placeholder: (context, url) => CircularProgressIndicator(),
-                              errorWidget: (context, url, error) => Icon(Icons.error),
-                            )
-                          : Text(
-                              message.text,
-                              style: TextStyle(
-                                color: isMe ? Colors.black : Colors.black,
-                                fontSize: 14.sp,
-                              ),
-                            ))),
+              child: message.location != null
+                  ? _buildLocationDetails(context, message.location!)
+                  : isPackageMessage
+                      ? _buildPackageDetails(context, message.sharedPackage!)
+                      : (message.sharedUser != null
+                          ? _buildUserDetails(context, message.sharedUser!)
+                          : (message.imageUrl != null && message.imageUrl!.isNotEmpty
+                              ? CachedNetworkImage(
+                                  imageUrl: message.imageUrl!,
+                                  placeholder: (context, url) => CircularProgressIndicator(),
+                                  errorWidget: (context, url, error) => Icon(Icons.error),
+                                )
+                              : Text(
+                                  message.text,
+                                  style: TextStyle(
+                                    color: isMe ? Colors.black : Colors.black,
+                                    fontSize: 14.sp,
+                                  ),
+                                ))),
             ),
           ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildLocationDetails(BuildContext context, Map<String, dynamic> location) {
+    final title = location['title'] ?? '위치 정보';
+    final address = location['address'] ?? '주소 정보 없음';
+    final latitude = location['latitude'] ?? 0.0;
+    final longitude = location['longitude'] ?? 0.0;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Text(
+          title,
+          style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.bold),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+        ),
+        SizedBox(height: 4.h),
+        Text(
+          address,
+          style: TextStyle(fontSize: 14.sp),
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
+        ),
+        SizedBox(height: 8.h),
+        Container(
+          width: 250.w,
+          height: 150.h,
+          child: NaverMap(
+            options: NaverMapViewOptions(
+              initialCameraPosition: NCameraPosition(
+                target: NLatLng(latitude, longitude),
+                zoom: 16,
+              ),
+              mapType: NMapType.basic,
+            ),
+            onMapReady: (controller) {
+              controller.addOverlay(NMarker(
+                id: 'shared-location',
+                position: NLatLng(latitude, longitude),
+              ));
+            },
+          ),
+        ),
+        SizedBox(height: 8.h),
+        ElevatedButton(
+          onPressed: () async {
+            // 수정할 예정
+          },
+          child: Text('자세히 보기'),
         ),
       ],
     );

@@ -12,11 +12,16 @@ import 'package:travel_on_final/core/presentation/widgets/scaffold_with_bottom_n
 // chat
 import 'package:travel_on_final/features/chat/presentation/screens/chat_list_screen.dart';
 import 'package:travel_on_final/features/chat/presentation/screens/chat_screen.dart';
-import 'package:travel_on_final/features/guide/presentation/screens/guide_packages_screen.dart';
-import 'package:travel_on_final/features/guide/presentation/screens/guide_ranking_screen.dart';
+import 'package:travel_on_final/features/chat/presentation/widgets/map_detail_widget.dart';
+// chat // search
 import 'package:travel_on_final/features/chat/presentation/screens/search/guide_search_screen.dart';
 import 'package:travel_on_final/features/chat/presentation/screens/search/user_search_screen.dart';
 import 'package:travel_on_final/features/chat/presentation/screens/search/package_search_screen.dart';
+import 'package:travel_on_final/features/chat/presentation/screens/search/map_search_screen.dart';
+import 'package:travel_on_final/features/map/domain/entities/travel_point.dart';
+// guide
+import 'package:travel_on_final/features/guide/presentation/screens/guide_packages_screen.dart';
+import 'package:travel_on_final/features/guide/presentation/screens/guide_ranking_screen.dart';
 // reservation
 import 'package:travel_on_final/features/reservation/presentation/screens/reservation_calendar_screen.dart';
 // search
@@ -177,7 +182,29 @@ final goRouter = GoRouter(
             otherUserId: extraData['otherUserId'],
           );
         } else {
-          return HomeScreen();
+          return Scaffold(
+            body: Center(
+              child: Text('필요한 정보가 없습니다.'),
+            ),
+          );
+        }
+      },
+    ),
+    GoRoute(
+      path: '/map-search',
+      builder: (context, state) {
+        final extraData = state.extra as Map<String, dynamic>?;
+        if (extraData != null && extraData.containsKey('chatId') && extraData.containsKey('otherUserId')) {
+          return MapSearchScreen(
+            chatId: extraData['chatId'],
+            otherUserId: extraData['otherUserId'],
+          );
+        } else {
+          return Scaffold(
+            body: Center(
+              child: Text('필요한 정보가 없습니다.'),
+            ),
+          );
         }
       },
     ),
