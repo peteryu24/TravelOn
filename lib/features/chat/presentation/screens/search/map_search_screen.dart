@@ -27,6 +27,12 @@ class _MapSearchScreenState extends State<MapSearchScreen> {
   List<dynamic> _searchResults = [];
   bool _isLoading = false;
 
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
   Future<void> _searchPlaces(String query) async {
     if (query.trim().isEmpty) return;
 
