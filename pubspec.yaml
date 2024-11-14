@@ -39,6 +39,7 @@ dependencies:
   flutter_local_notifications: ^18.0.1
   timeago: ^3.7.0
   google_sign_in: ^6.2.2
+  kakao_flutter_sdk_user: ^1.9.6
 
 dev_dependencies:
   flutter_test:

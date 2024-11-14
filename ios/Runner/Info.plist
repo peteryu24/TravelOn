@@ -71,32 +71,16 @@
                 <key>CFBundleURLSchemes</key>
                 <array>
                     <string>com.googleusercontent.apps.828007872799-ahi2t2qi532qc0403hrbrlcjgapurevl</string>
+                    <string>travel-on</string>
+                    <string>app-1-828007872799-ios-26950953dfd5ddc9e6582a</string>
+                    <string>kakao12491cb75f4e11db817483f51d4bc0d3</string>
                 </array>
             </dict>
         </array>
         <key>LSApplicationQueriesSchemes</key>
         <array>
             <string>nmap</string>      <!-- 네이버 지도 -->
-        </array>
-
-        <key>CFBundleURLTypes</key>
-        <array>
-            <dict>
-                <key>CFBundleURLSchemes</key>
-                <array>
-                    <string>travel-on</string>  <!-- 앱의 URL 스킴 -->
-                </array>
-            </dict>
-        </array>
-
-        <key>CFBundleURLTypes</key>
-        <array>
-            <dict>
-                <key>CFBundleURLSchemes</key>
-                <array>
-                    <string>app-1-828007872799-ios-26950953dfd5ddc9e6582a</string>
-                </array>
-            </dict>
+            <string>kakaokompassauth</string>      <!-- 카카오톡으로 로그인 -->
         </array>
     </dict>
 </plist>

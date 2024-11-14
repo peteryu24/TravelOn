@@ -42,6 +42,8 @@ import 'package:travel_on_final/features/gallery/data/repositories/gallery_repos
 // Router
 import 'package:travel_on_final/route.dart';
 
+import 'package:kakao_flutter_sdk_common/kakao_flutter_sdk_common.dart';
+
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -56,6 +58,12 @@ Future<void> main() async {
   // Firebase 초기화
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
+  );
+
+  // 카카오 SDK 초기화
+  KakaoSdk.init(
+    nativeAppKey: dotenv.env['KAKAO_NATIVE_APP_KEY'] ?? '',
+    javaScriptAppKey: dotenv.env['KAKAO_JAVASCRIPT_KEY'] ?? '',
   );
 
   // FCM 초기화 및 권한 설정

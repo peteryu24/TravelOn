@@ -286,8 +286,27 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ),
                   color: const Color(0xFFFEE500),
-                  onPressed: () {
-                    // Kakao 로그인 구현
+                  onPressed: () async {
+                    try {
+                      final authProvider =
+                          Provider.of<AuthProvider>(context, listen: false);
+                      await authProvider.signInWithKakao(context);
+
+                      if (authProvider.isAuthenticated) {
+                        if (!mounted) return;
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                              content: Text(
+                                  '${authProvider.currentUser!.name}님 환영합니다.')),
+                        );
+                        context.go('/');
+                      }
+                    } catch (e) {
+                      if (!mounted) return;
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('카카오 로그인에 실패했습니다.')),
+                      );
+                    }
                   },
                 ),
               ],
