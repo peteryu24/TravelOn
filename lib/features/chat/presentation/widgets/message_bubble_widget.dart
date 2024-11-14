@@ -1,3 +1,4 @@
+import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -94,8 +95,9 @@ class MessageBubble extends StatelessWidget {
   }
 
   Widget _buildPackageDetails(BuildContext context, Map<String, dynamic> package) {
+    final formattedPrice = NumberFormat('#,###').format(package['price'].toInt());
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         if (package['mainImage'] != null)
           ClipRRect(
@@ -120,9 +122,46 @@ class MessageBubble extends StatelessWidget {
           style: TextStyle(fontSize: 20.sp, fontWeight: FontWeight.bold),
           maxLines: 2,
           overflow: TextOverflow.ellipsis,
+          textAlign: TextAlign.center,
         ),
-        Text('가격: ${package['price']}원', style: TextStyle(fontSize: 16.sp, color: Colors.blue)),
-        Text('가이드: ${package['guideName']}', style: TextStyle(fontSize: 14.sp, color: Colors.black)),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            Padding(
+              padding: EdgeInsets.only(right: 5.w),
+              child:
+                Text(
+                  '₩$formattedPrice',
+                  style: TextStyle(
+                    fontSize: 18.sp,
+                    color: Colors.blueAccent,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+            ),
+          ],
+        ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            Padding(
+              padding: EdgeInsets.only(right: 5.w),
+              child:
+                Text(
+                  '${package['guideName']}',
+                  style: TextStyle(fontSize: 16.sp, color: Colors.black, fontWeight: FontWeight.bold),
+                ),
+            ),
+            Padding(
+              padding: EdgeInsets.only(right: 5.w),
+              child:
+                Text(
+                  '가이드',
+                  style: TextStyle(fontSize: 14.sp, color: Colors.black, fontWeight: FontWeight.bold),
+                ),
+            ),
+          ],
+        ),
         SizedBox(height: 8.h),
         Text(
           package['description'] ?? '설명 없음',

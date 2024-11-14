@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
@@ -77,63 +78,61 @@ class _ChatScreenState extends State<ChatScreen> {
               padding: EdgeInsets.symmetric(vertical: 8.h, horizontal: 12.w),
               child: Row(
                 children: [
-                  Container(
-                    decoration: BoxDecoration(
-                      border: Border.all(color: Colors.blue, width: 1.5.w),
-                      shape: BoxShape.rectangle,
-                      borderRadius: BorderRadius.circular(8.r),
-                    ),
-                    child: IconButton(
-                      icon: Icon(Icons.add, color: Colors.blue, size: 24.w),
-                      onPressed: () {
-                        _bottomSheetWidget.showBottomSheetMenu(
-                          parentContext: context,
-                          chatId: widget.chatId,
-                          userId: Provider.of<AuthProvider>(context, listen: false).currentUser!.id,
-                          otherUserId: otherUserId!,
-                          currentUserProfileImage: Provider.of<AuthProvider>(context, listen: false).currentUser!.profileImageUrl ?? '',
-                          username: Provider.of<AuthProvider>(context, listen: false).currentUser!.name,
-                        );
-                      },
-                    ),
-                  ),
-                  SizedBox(width: 8.w),
                   Expanded(
-                    child: TextField(
-                      controller: messageController,
-                      onChanged: (value) {
-                        setState(() {
-                          isMessageEntered = value.isNotEmpty;
-                        });
-                      },
-                      decoration: InputDecoration(
-                        hintText: '메시지를 입력하세요...',
-                        fillColor: Colors.transparent,
-                        filled: true,
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(20.r),
-                          borderSide: BorderSide(color: Colors.blue, width: 1.5.w),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(20.r),
-                          borderSide: BorderSide(color: Colors.blue.shade800, width: 1.5.w),
-                        ),
-                        contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.blue, width: 1.5.w),
+                        borderRadius: BorderRadius.circular(16.r),
+                      ),
+                      child: Row(
+                        children: [
+                          IconButton(
+                            icon: Icon(Icons.add, color: Colors.blue, size: 24.w),
+                            onPressed: () {
+                              _bottomSheetWidget.showBottomSheetMenu(
+                                parentContext: context,
+                                chatId: widget.chatId,
+                                userId: Provider.of<AuthProvider>(context, listen: false).currentUser!.id,
+                                otherUserId: otherUserId!,
+                                currentUserProfileImage: Provider.of<AuthProvider>(context, listen: false).currentUser!.profileImageUrl ?? '',
+                                username: Provider.of<AuthProvider>(context, listen: false).currentUser!.name,
+                              );
+                            },
+                          ),
+                          Expanded(
+                            child: TextField(
+                              controller: messageController,
+                              onChanged: (value) {
+                                setState(() {
+                                  isMessageEntered = value.isNotEmpty;
+                                });
+                              },
+                              decoration: InputDecoration(
+                                hintText: '메시지를 입력하세요...',
+                                border: InputBorder.none,
+                                contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ),
                   SizedBox(width: 8.w),
                   Container(
                     decoration: BoxDecoration(
+                      color: isMessageEntered ? Colors.blue : Colors.white,
                       border: Border.all(color: Colors.blue, width: 1.5.w),
-                      shape: BoxShape.rectangle,
-                      borderRadius: BorderRadius.circular(8.r),
+                      borderRadius: BorderRadius.circular(16.r),
                     ),
                     child: IconButton(
-                      icon: Icon(
-                        Icons.send,
-                        color: isMessageEntered ? Colors.blue : Colors.grey,
-                        size: 24.w,
+                      icon: Transform.rotate(
+                        angle: 0,
+                        child: Icon(
+                          Icons.airplanemode_active,
+                          color: isMessageEntered ? Colors.white : Colors.grey,
+                          size: 27.w,
+                        ),
                       ),
                       onPressed: isMessageEntered
                           ? () {
