@@ -148,16 +148,16 @@ class MessageBubble extends StatelessWidget {
               padding: EdgeInsets.only(right: 5.w),
               child:
                 Text(
-                  '${package['guideName']}',
-                  style: TextStyle(fontSize: 16.sp, color: Colors.black, fontWeight: FontWeight.bold),
+                  '가이드',
+                  style: TextStyle(fontSize: 14.sp, color: Colors.black, fontWeight: FontWeight.bold),
                 ),
             ),
             Padding(
               padding: EdgeInsets.only(right: 5.w),
               child:
                 Text(
-                  '가이드',
-                  style: TextStyle(fontSize: 14.sp, color: Colors.black, fontWeight: FontWeight.bold),
+                  '${package['guideName']}',
+                  style: TextStyle(fontSize: 16.sp, color: Colors.black, fontWeight: FontWeight.bold),
                 ),
             ),
           ],
