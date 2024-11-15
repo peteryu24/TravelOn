@@ -54,6 +54,16 @@
     "chat": "Chat",
     "mypage": "My Page"
   },
+  "weather regions": {
+    "seoul": "Seoul",
+    "busan": "Busan",
+    "daegu": "Daegu",
+    "incheon": "Incheon",
+    "gwangju": "Gwangju",
+    "deajeon": "Deajeon",
+    "ulsan": "Ulsan",
+    "jeju": "Jeju Island"
+  },
   "regions": {
     "seoul": "Seoul",
     "incheon_gyeonggi": "Incheon/Gyeonggi",
@@ -64,6 +74,7 @@
     "jeonbuk": "Jeonbuk",
     "busan_gyeongnam": "Busan/Gyeongnam",
     "daegu_gyeongbuk": "Daegu/Gyeongbuk",
+    "Ulsan": "Ulsan",
     "jeju": "Jeju Island",
     "all": "All"
   },
@@ -83,5 +94,151 @@
     "success": "Success",
     "failed": "Failed",
     "notice": "Notice"
+  },
+  "search": {
+    "title": "Travel Packages",
+    "hint": "Search by package title or description...",
+    "result_count": "Search Results: {count}",
+    "selected_region": "Selected Region: {region}",
+    "region": "Region: {region}"
+  },
+  "sort": {
+    "latest": "Latest",
+    "price_high": "Highest Price",
+    "price_low": "Lowest Price",
+    "popular": "Popular",
+    "high_rating": "Highest Rating",
+    "most_reviews": "Most Reviews"
+  },
+  "package_detail": {
+    "title": "Package Details",
+    "guide": "Guide: {name}",
+    "participants": "Available Spots: {min} ~ {max} people",
+    "participants_unknown": "Available Spots: No information",
+    "price": "₩ {price} per person",
+    "booking_closed": "Booking is closed for today",
+    "description": "Description",
+    "course": "Travel Course",
+    "no_course": "No travel course registered",
+    "view_route": "View Detailed Route",
+    "images": "Detailed Images",
+    "location_info": {
+      "details": "Details",
+      "view_map": "View on Map",
+      "map_error": "Cannot open map"
+    },
+    "booking": {
+      "book_now": "Book Now",
+      "closed": "Booking Closed Today"
+    }
+  },
+  "review": {
+    "count": "Reviews({count})"
+  },
+  "profile": {
+    "title": "My Page",
+    "default_user": "User",
+    "guide": {
+      "section_title": "Guide Features",
+      "create_package": "Create Package",
+      "create_package_desc": "Register a new travel package",
+      "manage_reservations": "Manage Reservations",
+      "manage_reservations_desc": "Manage reservations for your packages",
+      "manage_packages": "Manage Packages",
+      "manage_packages_desc": "Edit or delete your registered packages",
+      "certification": "Guide Certification",
+      "certification_desc": "Get certified as a guide"
+    },
+    "user": {
+      "reservations_title": "Reservation Management",
+      "my_reservations": "My Reservations",
+      "my_reservations_desc": "Check your package reservations",
+      "liked_packages": "Liked Packages",
+      "liked_packages_desc": "Check your favorite packages"
+    },
+    "logout": "Logout",
+    "logout_failed": "Logout failed: {error}"
+  },
+  "package_form": {
+    "title": "Register New Package",
+    "main_image": {
+      "add": "Add Main Image"
+    },
+    "package_title": {
+      "label": "Package Title",
+      "hint": "ex: Seoul City Tour",
+      "error": "Please enter a title"
+    },
+    "region": {
+      "label": "Region"
+    },
+    "price": {
+      "label": "Price",
+      "hint": "ex: 50000",
+      "error": {
+        "empty": "Please enter a price",
+        "invalid": "Please enter a valid number"
+      }
+    },
+    "nights": {
+      "label": "Nights",
+      "format": "{nights}N{days}D"
+    },
+    "departure_days": {
+      "label": "Departure Days",
+      "error": "Please select departure days",
+      "days": {
+        "mon": "Mon",
+        "tue": "Tue",
+        "wed": "Wed",
+        "thu": "Thu",
+        "fri": "Fri",
+        "sat": "Sat",
+        "sun": "Sun"
+      }
+    },
+    "participants": {
+      "min": {
+        "label": "Minimum Participants",
+        "hint": "ex: 2",
+        "error": {
+          "empty": "Please enter minimum participants",
+          "invalid": "Please enter a valid number",
+          "greater_than_max": "Minimum cannot be greater than maximum"
+        }
+      },
+      "max": {
+        "label": "Maximum Participants",
+        "hint": "ex: 10",
+        "error": {
+          "empty": "Please enter maximum participants",
+          "invalid": "Please enter a valid number"
+        }
+      }
+    },
+    "description": {
+      "label": "Package Description",
+      "hint": "Enter detailed description of the package",
+      "error": "Please enter a description",
+      "images": {
+        "label": "Description Images",
+        "add": "Add"
+      }
+    },
+    "route": {
+      "label": "Travel Route"
+    },
+    "submit": "Register Package",
+    "places": {
+      "hotel": "Hotel",
+      "restaurant": "Restaurant",
+      "attraction": "Attraction"
+    },
+    "route_editor": {
+      "day": "{day} Day"
+    },
+    "travel_route": {
+      "title": "Travel Route"
+    }
   }
 }

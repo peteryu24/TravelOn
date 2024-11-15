@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_naver_map/flutter_naver_map.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -180,7 +181,7 @@ class _PackageDetailScreenState extends State<PackageDetailScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('패키지 상세'),
+        title: Text('package_detail.title'.tr()),
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -300,7 +301,9 @@ class _PackageDetailScreenState extends State<PackageDetailScreen> {
                                   const Icon(Icons.person, color: Colors.black),
                                   SizedBox(width: 8.w),
                                   Text(
-                                    '가이드 : ${widget.package.guideName}',
+                                    'package_detail.guide'.tr(namedArgs: {
+                                      'name': widget.package.guideName
+                                    }),
                                     style: const TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.bold,
@@ -336,8 +339,14 @@ class _PackageDetailScreenState extends State<PackageDetailScreen> {
                             Text(
                               widget.package.minParticipants != null &&
                                       widget.package.maxParticipants != null
-                                  ? '예약 가능 인원: ${widget.package.minParticipants}명 ~ ${widget.package.maxParticipants}명'
-                                  : '예약 가능 인원: 정보 없음',
+                                  ? 'package_detail.participants'
+                                      .tr(namedArgs: {
+                                      'min': widget.package.minParticipants
+                                          .toString(),
+                                      'max': widget.package.maxParticipants
+                                          .toString(),
+                                    })
+                                  : 'package_detail.participants_unknown'.tr(),
                               style: TextStyle(
                                 fontSize: 16.sp,
                                 color: _isAvailable ? Colors.black : Colors.red,
@@ -351,7 +360,10 @@ class _PackageDetailScreenState extends State<PackageDetailScreen> {
                           children: [
                             SizedBox(width: 8.h),
                             Text(
-                              '1인 ${_priceFormat.format(widget.package.price.toInt())}원',
+                              'package_detail.price'.tr(namedArgs: {
+                                'price': _priceFormat
+                                    .format(widget.package.price.toInt())
+                              }),
                               style: TextStyle(
                                 fontSize: 16.sp,
                                 fontWeight: FontWeight.bold,
@@ -377,7 +389,7 @@ class _PackageDetailScreenState extends State<PackageDetailScreen> {
                           Icon(Icons.info_outline, color: Colors.red),
                           SizedBox(width: 8.w),
                           Text(
-                            '오늘은 예약이 마감되었습니다',
+                            'package_detail.booking_closed'.tr(),
                             style: TextStyle(
                               color: Colors.red,
                               fontWeight: FontWeight.bold,
@@ -391,7 +403,7 @@ class _PackageDetailScreenState extends State<PackageDetailScreen> {
 
                   // 설명
                   Text(
-                    '상세 설명',
+                    'package_detail.description'.tr(),
                     style: TextStyle(
                       fontSize: 18.sp,
                       fontWeight: FontWeight.bold,
@@ -408,7 +420,7 @@ class _PackageDetailScreenState extends State<PackageDetailScreen> {
 
                   SizedBox(height: 24.h),
                   Text(
-                    '여행 코스',
+                    'package_detail.course'.tr(),
                     style: TextStyle(
                       fontSize: 18.sp,
                       fontWeight: FontWeight.bold,
@@ -558,7 +570,7 @@ class _PackageDetailScreenState extends State<PackageDetailScreen> {
                                   ),
                                 );
                               },
-                              child: Text('상세 경로 보기'),
+                              child: Text('package_detail.view_route'.tr()),
                             ),
                           ),
                         ],
@@ -569,7 +581,7 @@ class _PackageDetailScreenState extends State<PackageDetailScreen> {
                       height: 100.h,
                       alignment: Alignment.center,
                       child: Text(
-                        '등록된 여행 코스가 없습니다',
+                        'package_detail.no_course'.tr(),
                         style: TextStyle(
                           color: Colors.grey[600],
                           fontSize: 16.sp,
@@ -601,9 +613,11 @@ class _PackageDetailScreenState extends State<PackageDetailScreen> {
                               ),
                               child: Center(
                                 child: Icon(
-                                  point.type == PointType.hotel ? Icons.hotel :
-                                  point.type == PointType.restaurant ? Icons.restaurant :
-                                  Icons.photo_camera,
+                                  point.type == PointType.hotel
+                                      ? Icons.hotel
+                                      : point.type == PointType.restaurant
+                                          ? Icons.restaurant
+                                          : Icons.photo_camera,
                                   color: Colors.blue,
                                 ),
                               ),
@@ -641,7 +655,7 @@ class _PackageDetailScreenState extends State<PackageDetailScreen> {
                   if (widget.package.descriptionImages.isNotEmpty) ...[
                     SizedBox(height: 24.h),
                     Text(
-                      '상세 이미지',
+                      'package_detail.images'.tr(),
                       style: TextStyle(
                         fontSize: 18.sp,
                         fontWeight: FontWeight.bold,
@@ -722,14 +736,16 @@ class _PackageDetailScreenState extends State<PackageDetailScreen> {
         ),
         child: ElevatedButton(
           onPressed: _isAvailable
-              ? () => context.push('/reservation/${widget.package.id}', extra: widget.package)
+              ? () => context.push('/reservation/${widget.package.id}',
+                  extra: widget.package)
               : null,
           style: ElevatedButton.styleFrom(
             padding: const EdgeInsets.symmetric(vertical: 16),
           ),
           child: Text(
-            _isAvailable ? '예약하기' : '오늘은 예약 마감',
-            style: const TextStyle(fontSize: 16),
+            _isAvailable
+                ? 'package_detail.booking.book_now'.tr()
+                : 'package_detail.booking.closed'.tr(),
           ),
         ),
       ),
@@ -737,30 +753,7 @@ class _PackageDetailScreenState extends State<PackageDetailScreen> {
   }
 
   String _getRegionText(String region) {
-    switch (region) {
-      case 'seoul':
-        return '서울';
-      case 'incheon_gyeonggi':
-        return '인천/경기';
-      case 'gangwon':
-        return '강원';
-      case 'daejeon_chungnam':
-        return '대전/충남';
-      case 'chungbuk':
-        return '충북';
-      case 'gwangju_jeonnam':
-        return '광주/전남';
-      case 'jeonbuk':
-        return '전북';
-      case 'busan_gyeongnam':
-        return '부산/경남';
-      case 'daegu_gyeongbuk':
-        return '대구/경북';
-      case 'jeju':
-        return '제주도';
-      default:
-        return '전체';
-    }
+    return 'regions.$region'.tr();
   }
 
   Widget _buildReviewSection() {
@@ -784,7 +777,7 @@ class _PackageDetailScreenState extends State<PackageDetailScreen> {
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                '리뷰($totalReviewCount)',
+                'review.count'.tr(namedArgs: {'count': totalReviewCount.toString()}),
                 style: TextStyle(
                   fontSize: 18.sp,
                   fontWeight: FontWeight.bold,
@@ -890,13 +883,13 @@ class _PackageDetailScreenState extends State<PackageDetailScreen> {
                                 id: 'detail_marker',
                                 position: point.location,
                               )..setCaption(
-                                NOverlayCaption(
-                                  text: point.name,
-                                  textSize: 14,
-                                  color: Colors.blue,
-                                  haloColor: Colors.white,
+                                  NOverlayCaption(
+                                    text: point.name,
+                                    textSize: 14,
+                                    color: Colors.blue,
+                                    haloColor: Colors.white,
+                                  ),
                                 ),
-                              ),
                             );
                           },
                         ),
@@ -913,9 +906,11 @@ class _PackageDetailScreenState extends State<PackageDetailScreen> {
                           Row(
                             children: [
                               Icon(
-                                point.type == PointType.hotel ? Icons.hotel :
-                                point.type == PointType.restaurant ? Icons.restaurant :
-                                Icons.photo_camera,
+                                point.type == PointType.hotel
+                                    ? Icons.hotel
+                                    : point.type == PointType.restaurant
+                                        ? Icons.restaurant
+                                        : Icons.photo_camera,
                                 color: Colors.blue,
                                 size: 28.sp,
                               ),
@@ -942,7 +937,8 @@ class _PackageDetailScreenState extends State<PackageDetailScreen> {
                             ),
                             child: Row(
                               children: [
-                                Icon(Icons.location_on,
+                                Icon(
+                                  Icons.location_on,
                                   color: Colors.blue,
                                   size: 20.sp,
                                 ),
@@ -972,7 +968,7 @@ class _PackageDetailScreenState extends State<PackageDetailScreen> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    '상세 정보',
+                                    'package_detail.location_info.details'.tr(),
                                     style: TextStyle(
                                       fontSize: 16.sp,
                                       fontWeight: FontWeight.bold,
@@ -999,7 +995,7 @@ class _PackageDetailScreenState extends State<PackageDetailScreen> {
                           ElevatedButton.icon(
                             onPressed: () => _openInNaverMap(point),
                             icon: const Icon(Icons.map),
-                            label: const Text('지도에서 보기'),
+                            label: Text('package_detail.location_info.view_map'.tr()),
                             style: ElevatedButton.styleFrom(
                               minimumSize: Size(double.infinity, 48.h),
                               backgroundColor: Colors.green,
@@ -1020,7 +1016,8 @@ class _PackageDetailScreenState extends State<PackageDetailScreen> {
   }
 
   Future<void> _openInNaverMap(TravelPoint point) async {
-    final webUrl = 'https://map.naver.com/v5/search/${Uri.encodeComponent(point.name)}?c=${point.location.longitude},${point.location.latitude},15,0,0,0,dh';
+    final webUrl =
+        'https://map.naver.com/v5/search/${Uri.encodeComponent(point.name)}?c=${point.location.longitude},${point.location.latitude},15,0,0,0,dh';
 
     try {
       // 웹 URL을 바로 시도
@@ -1030,7 +1027,9 @@ class _PackageDetailScreenState extends State<PackageDetailScreen> {
       )) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('지도를 열 수 없습니다.')),
+            SnackBar(
+              content: Text('package_detail.location_info.map_error'.tr()),
+            ),
           );
         }
       }
@@ -1038,7 +1037,9 @@ class _PackageDetailScreenState extends State<PackageDetailScreen> {
       print('Error launching URL: $e');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('지도를 열 수 없습니다.')),
+          SnackBar(
+            content: Text('package_detail.location_info.map_error'.tr()),
+          ),
         );
       }
     }

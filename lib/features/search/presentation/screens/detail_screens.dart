@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
@@ -18,30 +19,7 @@ class _DetailScreenState extends State<DetailScreen> {
   bool _isSearching = false;
 
   String _getRegionText(String region) {
-    switch (region) {
-      case 'seoul':
-        return '서울';
-      case 'incheon_gyeonggi':
-        return '인천/경기';
-      case 'gangwon':
-        return '강원';
-      case 'daejeon_chungnam':
-        return '대전/충남';
-      case 'chungbuk':
-        return '충북';
-      case 'gwangju_jeonnam':
-        return '광주/전남';
-      case 'jeonbuk':
-        return '전북';
-      case 'busan_gyeongnam':
-        return '부산/경남';
-      case 'daegu_gyeongbuk':
-        return '대구/경북';
-      case 'jeju':
-        return '제주도';
-      default:
-        return '전체';
-    }
+    return 'regions.$region'.tr();
   }
 
   @override
@@ -80,7 +58,7 @@ class _DetailScreenState extends State<DetailScreen> {
       controller: _searchController,
       autofocus: true,
       decoration: InputDecoration(
-        hintText: '패키지 제목이나 설명으로 검색...',
+        hintText: 'search.hint'.tr(),
         border: InputBorder.none,
         hintStyle: TextStyle(color: Colors.grey[400]),
         contentPadding: EdgeInsets.symmetric(horizontal: 16.w),
@@ -100,10 +78,7 @@ class _DetailScreenState extends State<DetailScreen> {
     );
   }
 
-  // AppBar 타이틀 위젯
-  Widget _buildTitle() {
-    return _isSearching ? _buildSearchField() : const Text('여행 패키지');
-  }
+
 
   // AppBar 액션 버튼들
   List<Widget> _buildActions() {
@@ -143,7 +118,7 @@ class _DetailScreenState extends State<DetailScreen> {
             child: Row(
               children: [
                 Text(
-                  '검색 결과: $matchCount개',
+                  'search.result_count'.tr(args: [matchCount.toString()]),
                   style: TextStyle(
                     fontSize: 14.sp,
                     color: Colors.grey,
@@ -152,7 +127,7 @@ class _DetailScreenState extends State<DetailScreen> {
                 const Spacer(),
                 if (provider.selectedRegion != 'all')
                   Text(
-                    '지역: ${_getRegionText(provider.selectedRegion)}',
+                    'search.region'.tr(args: [_getRegionText(provider.selectedRegion)]),
                     style: TextStyle(
                       fontSize: 14.sp,
                       color: Colors.grey,
@@ -168,7 +143,7 @@ class _DetailScreenState extends State<DetailScreen> {
             padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
             color: Colors.grey[100],
             child: Text(
-              '선택된 지역: ${_getRegionText(provider.selectedRegion)}',
+              'search.selected_region'.tr(args: [_getRegionText(provider.selectedRegion)]),
               style: TextStyle(
                 fontSize: 14.sp,
                 color: Colors.grey,
@@ -196,8 +171,8 @@ class _DetailScreenState extends State<DetailScreen> {
           onPressed: _stopSearch,
         )
             : null,
-        title: _isSearching ? _buildSearchField() : const Text(
-          '여행 패키지',
+        title: Text(
+          'search.title'.tr(), // 이 부분이 "패키지 검색" 등으로 나오도록 translation 파일 확인 필요
           style: TextStyle(
             color: Colors.black,
           ),
@@ -233,19 +208,19 @@ class _DetailScreenState extends State<DetailScreen> {
   String _getSortText(SortOption option) {
     switch (option) {
       case SortOption.latest:
-        return '최신순';
+        return 'sort.latest'.tr();
       case SortOption.priceHigh:
-        return '가격 높은순';
+        return 'sort.price_high'.tr();
       case SortOption.priceLow:
-        return '가격 낮은순';
+        return 'sort.price_low'.tr();
       case SortOption.popular:
-        return '인기순';
+        return 'sort.popular'.tr();
       case SortOption.highRating:
-        return '별점 높은순';
+        return 'sort.high_rating'.tr();
       case SortOption.mostReviews:
-        return '리뷰 많은순';
+        return 'sort.most_reviews'.tr();
       default:
-        return '기본순';
+        return 'sort.latest'.tr();
     }
   }
 
@@ -280,7 +255,7 @@ class _DetailScreenState extends State<DetailScreen> {
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             ListTile(
-                              title: const Text('최신순'),
+                              title: Text('sort.latest'.tr().replaceAll('sort.', '')), // 'sort.' 제거
                               trailing: provider.currentSort == SortOption.latest
                                   ? Icon(Icons.check, color: Colors.blue)
                                   : null,
@@ -290,7 +265,7 @@ class _DetailScreenState extends State<DetailScreen> {
                               },
                             ),
                             ListTile(
-                              title: const Text('인기순'),
+                              title: Text('sort.popular'.tr().replaceAll('sort.', '')),
                               trailing: provider.currentSort == SortOption.popular
                                   ? Icon(Icons.check, color: Colors.blue)
                                   : null,
@@ -300,7 +275,7 @@ class _DetailScreenState extends State<DetailScreen> {
                               },
                             ),
                             ListTile(
-                              title: const Text('가격 낮은순'),
+                              title: Text('sort.price_low'.tr().replaceAll('sort.', '')),
                               trailing: provider.currentSort == SortOption.priceLow
                                   ? Icon(Icons.check, color: Colors.blue)
                                   : null,
@@ -310,7 +285,7 @@ class _DetailScreenState extends State<DetailScreen> {
                               },
                             ),
                             ListTile(
-                              title: const Text('가격 높은순'),
+                              title: Text('sort.price_high'.tr().replaceAll('sort.', '')),
                               trailing: provider.currentSort == SortOption.priceHigh
                                   ? Icon(Icons.check, color: Colors.blue)
                                   : null,
@@ -320,7 +295,7 @@ class _DetailScreenState extends State<DetailScreen> {
                               },
                             ),
                             ListTile(
-                              title: const Text('별점 높은순'),
+                              title: Text('sort.high_rating'.tr().replaceAll('sort.', '')),
                               trailing: provider.currentSort == SortOption.highRating
                                   ? Icon(Icons.check, color: Colors.blue)
                                   : null,
@@ -330,7 +305,7 @@ class _DetailScreenState extends State<DetailScreen> {
                               },
                             ),
                             ListTile(
-                              title: const Text('리뷰 많은순'),
+                              title: Text('sort.most_reviews'.tr().replaceAll('sort.', '')),
                               trailing: provider.currentSort == SortOption.mostReviews
                                   ? Icon(Icons.check, color: Colors.blue)
                                   : null,
@@ -356,7 +331,7 @@ class _DetailScreenState extends State<DetailScreen> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
-                        _getSortText(provider.currentSort),
+                        _getSortText(provider.currentSort).replaceAll('sort.', ''),
                         style: TextStyle(
                           color: Colors.black,
                           fontSize: 14.sp,
