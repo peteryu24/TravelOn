@@ -767,17 +767,15 @@ class _PackageDetailScreenState extends State<PackageDetailScreen> {
     return Consumer<ReviewProvider>(
       builder: (context, reviewProvider, _) {
         final totalReviewCount = reviewProvider.totalReviewCount;
-        final totalAverageRating =
-            reviewProvider.totalAverageRating; // 전체 평균 별점 사용
+        final totalAverageRating = reviewProvider.totalAverageRating;
 
         return TextButton(
           onPressed: () {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (_) => NaverRouteMapScreen(
-                  points: widget.package.routePoints,
-                  totalDays: widget.package.totalDays,
+                builder: (_) => ReviewDetailScreen(
+                  package: widget.package, // TravelPackage 전체를 전달
                 ),
               ),
             );
@@ -801,7 +799,7 @@ class _PackageDetailScreenState extends State<PackageDetailScreen> {
               ),
               SizedBox(width: 4.w),
               Text(
-                totalAverageRating.toStringAsFixed(1), // 전체 평균 별점 표시
+                totalAverageRating.toStringAsFixed(1),
                 style: TextStyle(
                   fontSize: 16.sp,
                   fontWeight: FontWeight.bold,

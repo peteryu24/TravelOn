@@ -1,0 +1,87 @@
+{
+  "app": {
+    "name": "TravelOn"
+  },
+  "login": {
+    "title": "로그인",
+    "email": "이메일",
+    "password": "비밀번호",
+    "save_info": "로그인 정보 저장",
+    "signup": "회원가입",
+    "reset_password": "비밀번호 재설정",
+    "login_button": "로그인",
+    "or": "또는",
+    "sns_login": "SNS 계정으로 로그인",
+    "welcome": "{name}님 환영합니다!",
+    "login_failed": "로그인에 실패했습니다. 다시 시도해주세요.",
+    "google_failed": "Google 로그인에 실패했습니다.",
+    "github_failed": "GitHub 로그인에 실패했습니다.",
+    "kakao_failed": "카카오 로그인에 실패했습니다."
+  },
+  "home": {
+    "next_trip": {
+      "greeting": "{name}님,",
+      "countdown": "{title}까지\nD-{days} 남았습니다!",
+      "today": "즐거운 {title} 되세요!",
+      "no_trips": "예정된 여행이 없습니다"
+    },
+    "weather": {
+      "current": "현재 날씨",
+      "temperature": "{temp}°",
+      "wind_speed": "{speed}m/s",
+      "conditions": {
+        "rain": "비",
+        "rain_snow": "비/눈",
+        "snow": "눈",
+        "shower": "소나기",
+        "clear": "맑음",
+        "cloudy": "구름많음",
+        "overcast": "흐림"
+      }
+    },
+    "popular_courses": "지금 인기있는 여행코스는?",
+    "view_more": "더보기"
+  },
+  "menu": {
+    "travel_tips": "여행꿀팁",
+    "guide_ranking": "가이드랭킹",
+    "recommended_places": "추천장소",
+    "travel_gallery": "여행갤러리"
+  },
+  "navigation": {
+    "home": "홈",
+    "packages": "여행상품",
+    "chat": "채팅",
+    "mypage": "마이페이지"
+  },
+  "regions": {
+    "seoul": "서울",
+    "incheon_gyeonggi": "인천/경기",
+    "gangwon": "강원",
+    "daejeon_chungnam": "대전/충남",
+    "chungbuk": "충북",
+    "gwangju_jeonnam": "광주/전남",
+    "jeonbuk": "전북",
+    "busan_gyeongnam": "부산/경남",
+    "daegu_gyeongbuk": "대구/경북",
+    "jeju": "제주도",
+    "all": "전체"
+  },
+  "common": {
+    "guest": "게스트",
+    "see_more": "더보기",
+    "confirm": "확인",
+    "cancel": "취소",
+    "save": "저장",
+    "delete": "삭제",
+    "edit": "수정",
+    "back": "뒤로",
+    "close": "닫기",
+    "loading": "로딩중...",
+    "error": "오류가 발생했습니다",
+    "retry": "다시 시도",
+    "success": "성공",
+    "failed": "실패",
+    "notice": "알림"
+  }
+}

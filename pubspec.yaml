@@ -21,6 +21,7 @@ dependencies:
   flutter_naver_map: ^1.3.0+1
   http: ^1.2.2
   url_launcher: ^6.3.1
+  easy_localization: ^3.0.7
 
   flutter_screenutil: ^5.9.3
   cached_network_image: ^3.4.1
@@ -63,3 +64,4 @@ flutter:
     - assets/images/logo/kakaotalk.png
     - assets/images/logo/apple.png
     - .env
+    - assets/translations/

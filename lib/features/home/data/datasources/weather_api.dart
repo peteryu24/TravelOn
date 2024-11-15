@@ -1,4 +1,5 @@
 // lib/features/home/data/datasources/weather_api.dart
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -11,15 +12,15 @@ class WeatherApi {
   // 환경변수에서 인코딩된 API 키 가져오기
   static String get apiKey => dotenv.env['WEATHER_API_KEY'] ?? '';
 
-  static const cities = {
-    '서울': {'nx': 60, 'ny': 127},
-    '부산': {'nx': 98, 'ny': 76},
-    '대구': {'nx': 89, 'ny': 90},
-    '인천': {'nx': 55, 'ny': 124},
-    '광주': {'nx': 58, 'ny': 74},
-    '대전': {'nx': 67, 'ny': 100},
-    '울산': {'nx': 102, 'ny': 84},
-    '제주': {'nx': 52, 'ny': 38},
+  static final cities = {
+    'regions.seoul'.tr(): {'nx': 60, 'ny': 127},
+    'regions.busan_gyeongnam'.tr(): {'nx': 98, 'ny': 76},
+    'regions.daegu_gyeongbuk'.tr(): {'nx': 89, 'ny': 90},
+    'regions.incheon_gyeonggi'.tr(): {'nx': 55, 'ny': 124},
+    'regions.gwangju_jeonnam'.tr(): {'nx': 58, 'ny': 74},
+    'regions.daejeon_chungnam'.tr(): {'nx': 67, 'ny': 100},
+    'regions.seoul'.tr(): {'nx': 102, 'ny': 84}, // 울산
+    'regions.jeju'.tr(): {'nx': 52, 'ny': 38},
   };
 
   Future<List<WeatherModel>> getCurrentWeather() async {
@@ -104,28 +105,28 @@ class WeatherApi {
   }
 
   String _getDetailedCondition(String pty, String sky) {
-    // 먼저 강수형태 체크
+    // 강수형태 체크
     switch (pty) {
       case '1':
-        return '비';
+        return 'home.weather.conditions.rain'.tr();
       case '2':
-        return '비/눈';
+        return 'home.weather.conditions.rain_snow'.tr();
       case '3':
-        return '눈';
+        return 'home.weather.conditions.snow'.tr();
       case '4':
-        return '소나기';
+        return 'home.weather.conditions.shower'.tr();
     }
 
-    // 강수가 없을 경우 하늘상태 체크
+    // 하늘상태 체크
     switch (sky) {
       case '1':
-        return '맑음';
+        return 'home.weather.conditions.clear'.tr();
       case '3':
-        return '구름많음';
+        return 'home.weather.conditions.cloudy'.tr();
       case '4':
-        return '흐림';
+        return 'home.weather.conditions.overcast'.tr();
       default:
-        return '맑음';
+        return 'home.weather.conditions.clear'.tr();
     }
   }
 }
