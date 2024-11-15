@@ -1,0 +1,87 @@
+{
+  "app": {
+    "name": "TravelOn"
+  },
+  "login": {
+    "title": "Login",
+    "email": "Email",
+    "password": "Password",
+    "save_info": "Save Login Info",
+    "signup": "Sign Up",
+    "reset_password": "Reset Password",
+    "login_button": "Login",
+    "or": "OR",
+    "sns_login": "Login with SNS",
+    "welcome": "Welcome, {name}!",
+    "login_failed": "Login failed. Please try again.",
+    "google_failed": "Google login failed.",
+    "github_failed": "GitHub login failed.",
+    "kakao_failed": "Kakao login failed."
+  },
+  "home": {
+    "next_trip": {
+      "greeting": "Hi, {name}",
+      "countdown": "D-{days} until {title}!",
+      "today": "Enjoy your {title}!",
+      "no_trips": "No upcoming trips"
+    },
+    "weather": {
+      "current": "Current Weather",
+      "temperature": "{temp}°",
+      "wind_speed": "{speed}m/s",
+      "conditions": {
+        "rain": "Rain",
+        "rain_snow": "Rain/Snow",
+        "snow": "Snow",
+        "shower": "Shower",
+        "clear": "Clear",
+        "cloudy": "Cloudy",
+        "overcast": "Overcast"
+      }
+    },
+    "popular_courses": "Popular Travel Courses",
+    "view_more": "View More"
+  },
+  "menu": {
+    "travel_tips": "Travel Tips",
+    "guide_ranking": "Guide Ranking",
+    "recommended_places": "Recommended Places",
+    "travel_gallery": "Travel Gallery"
+  },
+  "navigation": {
+    "home": "Home",
+    "packages": "Packages",
+    "chat": "Chat",
+    "mypage": "My Page"
+  },
+  "regions": {
+    "seoul": "Seoul",
+    "incheon_gyeonggi": "Incheon/Gyeonggi",
+    "gangwon": "Gangwon",
+    "daejeon_chungnam": "Daejeon/Chungnam",
+    "chungbuk": "Chungbuk",
+    "gwangju_jeonnam": "Gwangju/Jeonnam",
+    "jeonbuk": "Jeonbuk",
+    "busan_gyeongnam": "Busan/Gyeongnam",
+    "daegu_gyeongbuk": "Daegu/Gyeongbuk",
+    "jeju": "Jeju Island",
+    "all": "All"
+  },
+  "common": {
+    "guest": "Guest",
+    "see_more": "See More",
+    "confirm": "Confirm",
+    "cancel": "Cancel",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "back": "Back",
+    "close": "Close",
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "retry": "Retry",
+    "success": "Success",
+    "failed": "Failed",
+    "notice": "Notice"
+  }
+}
