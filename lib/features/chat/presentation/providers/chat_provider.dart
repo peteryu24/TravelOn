@@ -156,28 +156,13 @@ class ChatProvider extends ChangeNotifier {
 
   // 상대방 정보 업데이트 메서드
   Future<void> updateOtherUserInfo(String chatId, String otherUserId) async {
-    try {
-      final otherUserName = await _getOtherUserName(otherUserId);
-      final otherUserProfileImage = await _getOtherUserProfileImage(otherUserId);
+    final otherUserName = await _getOtherUserName(otherUserId);
+    final otherUserProfileImage = await _getOtherUserProfileImage(otherUserId);
 
-      final chatRef = _firestore.collection('chats').doc(chatId);
-      final chatSnapshot = await chatRef.get();
-
-      if (chatSnapshot.exists) {
-        await chatRef.update({
-          'usernames.$otherUserId': otherUserName,
-          'userProfileImages.$otherUserId': otherUserProfileImage,
-        });
-      } else {
-        debugPrint('채팅방 문서를 찾지 못하겠음: $chatId');
-      }
-    } catch (e) {
-      if (e is FirebaseException && e.code == 'not-found') {
-        debugPrint('해당 유저의 정보를 못불러옴 : $otherUserId');
-      } else {
-        debugPrint('채팅 목록 업데이트 오류: $e');
-      }
-    }
+    await _firestore.collection('chats').doc(chatId).update({
+      'usernames.$otherUserId': otherUserName,
+      'userProfileImages.$otherUserId': otherUserProfileImage,
+    });
   }
 
   // 채팅방 나가기
