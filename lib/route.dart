@@ -33,7 +33,7 @@ import 'package:travel_on_final/features/search/presentation/screens/package_det
 // home
 import 'package:travel_on_final/features/home/presentation/screens/home_screen.dart';
 // profile
-import 'package:travel_on_final/features/profile/presentation/screens/profile_screen.dart';
+import 'package:travel_on_final/features/profile/presentation/screens/my_profile_screen.dart';
 import 'package:travel_on_final/features/profile/presentation/screens/edit_packages_screen.dart';
 import 'package:travel_on_final/features/profile/presentation/screens/guide_certification_screen.dart';
 import 'package:travel_on_final/features/profile/presentation/screens/guide_reservation_screen.dart';
