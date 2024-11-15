@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-
-import 'package:flutter/material.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class RegionFilter extends StatelessWidget {
   final Function(String) onRegionChanged;
@@ -16,49 +15,49 @@ class RegionFilter extends StatelessWidget {
       icon: const Icon(Icons.filter_list),
       onSelected: onRegionChanged,
       itemBuilder: (BuildContext context) => [
-        const PopupMenuItem<String>(
+        PopupMenuItem<String>(
           value: 'all',
-          child: Text('전체'),
+          child: Text('regions.all'.tr()),
         ),
-        const PopupMenuItem<String>(
+        PopupMenuItem<String>(
           value: 'seoul',
-          child: Text('서울'),
+          child: Text('regions.seoul'.tr()),
         ),
-        const PopupMenuItem<String>(
+        PopupMenuItem<String>(
           value: 'incheon_gyeonggi',
-          child: Text('인천/경기'),
+          child: Text('regions.incheon_gyeonggi'.tr()),
         ),
-        const PopupMenuItem<String>(
+        PopupMenuItem<String>(
           value: 'gangwon',
-          child: Text('강원'),
+          child: Text('regions.gangwon'.tr()),
         ),
-        const PopupMenuItem<String>(
+        PopupMenuItem<String>(
           value: 'daejeon_chungnam',
-          child: Text('대전/충남'),
+          child: Text('regions.daejeon_chungnam'.tr()),
         ),
-        const PopupMenuItem<String>(
+        PopupMenuItem<String>(
           value: 'chungbuk',
-          child: Text('충북'),
+          child: Text('regions.chungbuk'.tr()),
         ),
-        const PopupMenuItem<String>(
+        PopupMenuItem<String>(
           value: 'gwangju_jeonnam',
-          child: Text('광주/전남'),
+          child: Text('regions.gwangju_jeonnam'.tr()),
         ),
-        const PopupMenuItem<String>(
+        PopupMenuItem<String>(
           value: 'jeonbuk',
-          child: Text('전북'),
+          child: Text('regions.jeonbuk'.tr()),
         ),
-        const PopupMenuItem<String>(
+        PopupMenuItem<String>(
           value: 'busan_gyeongnam',
-          child: Text('부산/경남'),
+          child: Text('regions.busan_gyeongnam'.tr()),
         ),
-        const PopupMenuItem<String>(
+        PopupMenuItem<String>(
           value: 'daegu_gyeongbuk',
-          child: Text('대구/경북'),
+          child: Text('regions.daegu_gyeongbuk'.tr()),
         ),
-        const PopupMenuItem<String>(
+        PopupMenuItem<String>(
           value: 'jeju',
-          child: Text('제주도'),
+          child: Text('regions.jeju'.tr()),
         ),
       ],
     );

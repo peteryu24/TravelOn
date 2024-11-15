@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:travel_on_final/core/providers/navigation_provider.dart';
 
 class CustomBottomNavigationBar extends StatelessWidget {
@@ -27,13 +28,13 @@ class CustomBottomNavigationBar extends StatelessWidget {
         fontSize: 12,
       ),
       items: <BottomNavigationBarItem>[
-        const BottomNavigationBarItem(
-          icon: Icon(CupertinoIcons.house_alt_fill),
-          label: '홈',
+        BottomNavigationBarItem(
+          icon: const Icon(CupertinoIcons.house_alt_fill),
+          label: 'navigation.home'.tr(),
         ),
-        const BottomNavigationBarItem(
-          icon: Icon(CupertinoIcons.compass_fill),
-          label: '여행상품',
+        BottomNavigationBarItem(
+          icon: const Icon(CupertinoIcons.compass_fill),
+          label: 'navigation.packages'.tr(),
         ),
         BottomNavigationBarItem(
           icon: Stack(
@@ -53,11 +54,11 @@ class CustomBottomNavigationBar extends StatelessWidget {
                 ),
             ],
           ),
-          label: '채팅',
+          label: 'navigation.chat'.tr(),
         ),
-        const BottomNavigationBarItem(
-          icon: Icon(CupertinoIcons.person_crop_circle_fill),
-          label: '마이페이지',
+        BottomNavigationBarItem(
+          icon: const Icon(CupertinoIcons.person_crop_circle_fill),
+          label: 'navigation.mypage'.tr(),
         ),
       ],
       currentIndex: selectedIndex,

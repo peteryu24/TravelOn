@@ -54,6 +54,16 @@
     "chat": "채팅",
     "mypage": "마이페이지"
   },
+  "weather regions": {
+    "seoul": "서울",
+    "busan": "부산",
+    "daegu": "대구",
+    "incheon": "인천",
+    "gwangju": "광주",
+    "deajeon": "대전",
+    "ulsan": "울산",
+    "jeju": "제주도"
+  },
   "regions": {
     "seoul": "서울",
     "incheon_gyeonggi": "인천/경기",
@@ -64,6 +74,7 @@
     "jeonbuk": "전북",
     "busan_gyeongnam": "부산/경남",
     "daegu_gyeongbuk": "대구/경북",
+    "Ulsan": "울산",
     "jeju": "제주도",
     "all": "전체"
   },
@@ -83,5 +94,151 @@
     "success": "성공",
     "failed": "실패",
     "notice": "알림"
+  },
+  "search": {
+    "title": "여행 패키지",
+    "hint": "패키지 제목이나 설명으로 검색...",
+    "result_count": "검색 결과: {count}개",
+    "selected_region": "선택된 지역: {region}",
+    "region": "지역: {region}"
+  },
+  "sort": {
+    "latest": "최신순",
+    "price_high": "가격 높은순",
+    "price_low": "가격 낮은순",
+    "popular": "인기순",
+    "high_rating": "별점 높은순",
+    "most_reviews": "리뷰 많은순"
+  },
+  "package_detail": {
+    "title": "패키지 상세",
+    "guide": "가이드: {name}",
+    "participants": "예약 가능 인원: {min}명 ~ {max}명",
+    "participants_unknown": "예약 가능 인원: 정보 없음",
+    "price": "1인 {price}원",
+    "booking_closed": "오늘은 예약이 마감되었습니다",
+    "description": "상세 설명",
+    "course": "여행 코스",
+    "no_course": "등록된 여행 코스가 없습니다",
+    "view_route": "상세 경로 보기",
+    "images": "상세 이미지",
+    "location_info": {
+      "details": "상세 정보",
+      "view_map": "지도에서 보기",
+      "map_error": "지도를 열 수 없습니다"
+    },
+    "booking": {
+      "book_now": "예약하기",
+      "closed": "오늘은 예약 마감"
+    }
+  },
+  "review": {
+    "count": "리뷰({count})"
+  },
+  "profile": {
+    "title": "마이페이지",
+    "default_user": "사용자",
+    "guide": {
+      "section_title": "가이드 기능",
+      "create_package": "나만의 패키지 만들기",
+      "create_package_desc": "새로운 여행 패키지를 등록합니다",
+      "manage_reservations": "내 패키지 예약 관리",
+      "manage_reservations_desc": "등록한 패키지의 예약을 관리합니다",
+      "manage_packages": "내 패키지 관리",
+      "manage_packages_desc": "등록한 패키지를 수정하거나 삭제합니다",
+      "certification": "가이드 인증",
+      "certification_desc": "가이드 인증을 진행하세요"
+    },
+    "user": {
+      "reservations_title": "예약 관리",
+      "my_reservations": "내 예약 내역",
+      "my_reservations_desc": "예약한 패키지를 확인합니다",
+      "liked_packages": "찜한 패키지",
+      "liked_packages_desc": "관심있는 패키지를 확인합니다"
+    },
+    "logout": "로그아웃",
+    "logout_failed": "로그아웃 실패: {error}"
+  },
+  "package_form": {
+    "title": "새 패키지 등록",
+    "main_image": {
+      "add": "메인 이미지 추가"
+    },
+    "package_title": {
+      "label": "패키지 제목",
+      "hint": "예: 서울 시티 투어",
+      "error": "제목을 입력해주세요"
+    },
+    "region": {
+      "label": "지역"
+    },
+    "price": {
+      "label": "가격",
+      "hint": "예: 50000",
+      "error": {
+        "empty": "가격을 입력해주세요",
+        "invalid": "유효한 숫자를 입력해주세요"
+      }
+    },
+    "nights": {
+      "label": "박 수",
+      "format": "{nights}박{days}일"
+    },
+    "departure_days": {
+      "label": "출발 요일",
+      "error": "출발 요일을 선택해주세요",
+      "days": {
+        "mon": "월",
+        "tue": "화",
+        "wed": "수",
+        "thu": "목",
+        "fri": "금",
+        "sat": "토",
+        "sun": "일"
+      }
+    },
+    "participants": {
+      "min": {
+        "label": "최소 인원",
+        "hint": "예: 2",
+        "error": {
+          "empty": "최소 인원을 입력해주세요",
+          "invalid": "유효한 인원 수를 입력해주세요",
+          "greater_than_max": "최소 인원이 최대 인원보다 클 수 없습니다"
+        }
+      },
+      "max": {
+        "label": "최대 인원",
+        "hint": "예: 10",
+        "error": {
+          "empty": "최대 인원을 입력해주세요",
+          "invalid": "유효한 인원 수를 입력해주세요"
+        }
+      }
+    },
+    "description": {
+      "label": "패키지 설명",
+      "hint": "패키지에 대한 상세 설명을 입력해주세요",
+      "error": "설명을 입력해주세요",
+      "images": {
+        "label": "설명 이미지",
+        "add": "추가"
+      }
+    },
+    "route": {
+      "label": "여행 코스"
+    },
+    "submit": "패키지 등록",
+    "places": {
+      "hotel": "숙소",
+      "restaurant": "식당",
+      "attraction": "관광지"
+    },
+    "route_editor": {
+      "day": "{day}일차"
+    },
+    "travel_route": {
+      "title": "여행 코스"
+    }
   }
 }

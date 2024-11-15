@@ -60,7 +60,6 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
         actions: [
-          // 알림 아이콘
           Stack(
             children: [
               IconButton(
@@ -103,45 +102,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 },
               ),
             ],
-          ),
-          // 언어 선택 아이콘
-          IconButton(
-            icon: const Icon(Icons.language),
-            onPressed: () {
-              showDialog(
-                context: context,
-                builder: (context) {
-                  return AlertDialog(
-                    title: Text('common.select_language'.tr()),
-                    content: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        ListTile(
-                          title: const Text('한국어'),
-                          onTap: () {
-                            context.setLocale(const Locale('ko', 'KR'));
-                            Navigator.pop(context);
-                          },
-                          trailing: context.locale == const Locale('ko', 'KR')
-                              ? const Icon(Icons.check, color: Colors.blue)
-                              : null,
-                        ),
-                        ListTile(
-                          title: const Text('English'),
-                          onTap: () {
-                            context.setLocale(const Locale('en', 'US'));
-                            Navigator.pop(context);
-                          },
-                          trailing: context.locale == const Locale('en', 'US')
-                              ? const Icon(Icons.check, color: Colors.blue)
-                              : null,
-                        ),
-                      ],
-                    ),
-                  );
-                },
-              );
-            },
           ),
         ],
       ),

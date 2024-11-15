@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
+import 'package:easy_localization/easy_localization.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
 import '../widgets/profile_dialogs.dart';
 
@@ -18,7 +19,7 @@ class ProfileScreen extends StatelessWidget {
         scrolledUnderElevation: 0,
         elevation: 0,
         centerTitle: true,
-        title: const Text('마이페이지'),
+        title: Text('profile.title'.tr()),
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -39,11 +40,11 @@ class ProfileScreen extends StatelessWidget {
                             radius: 30,
                             backgroundColor: Colors.grey[200],
                             backgroundImage: user?.profileImageUrl != null &&
-                                    user!.profileImageUrl!.isNotEmpty
+                                user!.profileImageUrl!.isNotEmpty
                                 ? NetworkImage(user.profileImageUrl!)
                                 : const AssetImage(
-                                        'assets/images/default_profile.png')
-                                    as ImageProvider,
+                                'assets/images/default_profile.png')
+                            as ImageProvider,
                           ),
                           const SizedBox(width: 16),
                           Expanded(
@@ -51,7 +52,7 @@ class ProfileScreen extends StatelessWidget {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  user?.name ?? '사용자',
+                                  user?.name ?? 'profile.default_user'.tr(),
                                   style: const TextStyle(
                                     fontSize: 20,
                                     fontWeight: FontWeight.bold,
@@ -73,11 +74,11 @@ class ProfileScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 24),
 
-                // 가이드 기능 섹션 (가이드인 경우에만 표시)
+                // 가이드 기능 섹션
                 if (user?.isGuide == true) ...[
-                  const Text(
-                    '가이드 기능',
-                    style: TextStyle(
+                  Text(
+                    'profile.guide.section_title'.tr(),
+                    style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ),
@@ -88,57 +89,51 @@ class ProfileScreen extends StatelessWidget {
                       children: [
                         ListTile(
                           leading: const Icon(Icons.add_box),
-                          title: const Text('나만의 패키지 만들기'),
-                          subtitle: const Text('새로운 여행 패키지를 등록합니다'),
+                          title: Text('profile.guide.create_package'.tr()),
+                          subtitle: Text('profile.guide.create_package_desc'.tr()),
                           trailing: const Icon(Icons.chevron_right),
-                          onTap: () {
-                            context.push('/add-package');
-                          },
+                          onTap: () => context.push('/add-package'),
                         ),
                         const Divider(height: 1),
                         ListTile(
                           leading: const Icon(Icons.calendar_today),
-                          title: const Text('내 패키지 예약 관리'),
-                          subtitle: const Text('등록한 패키지의 예약을 관리합니다'),
+                          title: Text('profile.guide.manage_reservations'.tr()),
+                          subtitle: Text('profile.guide.manage_reservations_desc'.tr()),
                           trailing: const Icon(Icons.chevron_right),
-                          onTap: () {
-                            context.push('/reservations/guide');
-                          },
+                          onTap: () => context.push('/reservations/guide'),
                         ),
                         const Divider(height: 1),
                         ListTile(
                           leading: const Icon(Icons.list_alt),
-                          title: const Text('내 패키지 관리'),
-                          subtitle: const Text('등록한 패키지를 수정하거나 삭제합니다'),
+                          title: Text('profile.guide.manage_packages'.tr()),
+                          subtitle: Text('profile.guide.manage_packages_desc'.tr()),
                           trailing: const Icon(Icons.chevron_right),
-                          onTap: () {
-                            context.push('/my-packages');
-                          },
+                          onTap: () => context.push('/my-packages'),
                         ),
                       ],
                     ),
                   ),
                 ],
 
-                // 가이드가 아닌 경우 가이드 인증 메뉴 표시
+                // 가이드 인증 메뉴
                 if (user?.isGuide != true) ...[
                   const SizedBox(height: 24),
                   Card(
                     child: ListTile(
                       leading: const Icon(Icons.verified_user),
-                      title: const Text('가이드 인증'),
-                      subtitle: const Text('가이드 인증을 진행하세요'),
+                      title: Text('profile.guide.certification'.tr()),
+                      subtitle: Text('profile.guide.certification_desc'.tr()),
                       trailing: const Icon(Icons.chevron_right),
                       onTap: () => context.push('/guide-certification'),
                     ),
                   ),
                 ],
 
-                // 일반 사용자 기능 섹션
+                // 예약 관리 섹션
                 const SizedBox(height: 24),
-                const Text(
-                  '예약 관리',
-                  style: TextStyle(
+                Text(
+                  'profile.user.reservations_title'.tr(),
+                  style: const TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
                   ),
@@ -147,28 +142,20 @@ class ProfileScreen extends StatelessWidget {
                 Card(
                   child: ListTile(
                     leading: const Icon(Icons.bookmark),
-                    title: const Text('내 예약 내역'),
-                    subtitle: const Text('예약한 패키지를 확인합니다'),
+                    title: Text('profile.user.my_reservations'.tr()),
+                    subtitle: Text('profile.user.my_reservations_desc'.tr()),
                     trailing: const Icon(Icons.chevron_right),
-                    onTap: () {
-                      context.push('/reservations/customer');
-                    },
+                    onTap: () => context.push('/reservations/customer'),
                   ),
                 ),
 
                 Card(
-                  child: Column(
-                    children: [
-                      ListTile(
-                        leading: const Icon(Icons.favorite),
-                        title: const Text('찜한 패키지'),
-                        subtitle: const Text('관심있는 패키지를 확인합니다'),
-                        trailing: const Icon(Icons.chevron_right),
-                        onTap: () {
-                          context.push('/liked-packages');
-                        },
-                      ),
-                    ],
+                  child: ListTile(
+                    leading: const Icon(Icons.favorite),
+                    title: Text('profile.user.liked_packages'.tr()),
+                    subtitle: Text('profile.user.liked_packages_desc'.tr()),
+                    trailing: const Icon(Icons.chevron_right),
+                    onTap: () => context.push('/liked-packages'),
                   ),
                 ),
 
@@ -180,13 +167,15 @@ class ProfileScreen extends StatelessWidget {
                     child: ElevatedButton(
                       onPressed: () async {
                         try {
-                          await Provider.of<AuthProvider>(context, listen: false).logout(context);
+                          await Provider.of<AuthProvider>(context, listen: false)
+                              .logout(context);
                           context.go('/login');
                         } catch (e) {
-                          print('로그아웃 실패: $e');
+                          print('profile.logout_failed'
+                              .tr(args: [e.toString()]));
                         }
                       },
-                      child: Text("로그아웃"),
+                      child: Text('profile.logout'.tr()),
                     ),
                   ),
                 ),
