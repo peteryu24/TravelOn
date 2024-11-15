@@ -391,4 +391,46 @@ class TravelProvider extends ChangeNotifier {
           package.guideName.toLowerCase().contains(lowerQuery);
     }).toList();
   }
+
+  Future<Map<String, dynamic>> getGuideReviewStats(String guideId) async {
+    try {
+      final packagesSnapshot = await _firestore
+          .collection('packages')
+          .where('guideId', isEqualTo: guideId)
+          .get();
+
+      if (packagesSnapshot.docs.isEmpty) {
+        return {'totalReviews': 0, 'averageRating': 0.0};
+      }
+
+      int totalReviews = 0;
+      double totalRatingSum = 0.0;
+
+      for (var packageDoc in packagesSnapshot.docs) {
+        final packageId = packageDoc.id;
+        final reviewsSnapshot = await _firestore
+            .collection('reviews')
+            .where('packageId', isEqualTo: packageId)
+            .get();
+
+        totalReviews += reviewsSnapshot.docs.length;
+
+        for (var reviewDoc in reviewsSnapshot.docs) {
+          totalRatingSum += (reviewDoc['rating'] as num).toDouble();
+        }
+      }
+
+      double averageRating = totalReviews > 0
+          ? (totalRatingSum / totalReviews)
+          : 0.0;
+
+      return {
+        'totalReviews': totalReviews,
+        'averageRating': averageRating,
+      };
+    } catch (e) {
+      print('Error getting guide review stats: $e');
+      return {'totalReviews': 0, 'averageRating': 0.0};
+    }
+  }
 }

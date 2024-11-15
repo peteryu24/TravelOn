@@ -120,18 +120,21 @@ class _UserSearchScreenState extends State<UserSearchScreen> {
                 itemCount: _searchResults.length,
                 itemBuilder: (context, index) {
                   final user = _searchResults[index];
-                  return ListTile(
-                    leading: CircleAvatar(
-                      radius: 20.r,
-                      backgroundImage: user.profileImageUrl != null && user.profileImageUrl!.isNotEmpty
-                          ? CachedNetworkImageProvider(user.profileImageUrl!)
-                          : AssetImage('assets/images/default_profile.png') as ImageProvider,
-                    ),
-                    title: Text(user.name ?? '이름 없음'),
-                    subtitle: Text(user.email ?? '이메일 없음'),
-                    trailing: IconButton(
-                      icon: Icon(Icons.share),
-                      onPressed: () => _showPreview(user),
+                  return Card(
+                    margin: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+                    child: ListTile(
+                      leading: CircleAvatar(
+                        radius: 20.r,
+                        backgroundImage: user.profileImageUrl != null && user.profileImageUrl!.isNotEmpty
+                            ? CachedNetworkImageProvider(user.profileImageUrl!)
+                            : AssetImage('assets/images/default_profile.png') as ImageProvider,
+                      ),
+                      title: Text(user.name ?? '이름 없음'),
+                      subtitle: Text(user.email ?? '이메일 없음'),
+                      trailing: IconButton(
+                        icon: Icon(Icons.share, color: Colors.blue),
+                        onPressed: () => _showPreview(user),
+                      ),
                     ),
                   );
                 },

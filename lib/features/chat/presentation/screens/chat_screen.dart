@@ -52,7 +52,27 @@ class _ChatScreenState extends State<ChatScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text("${otherUserName}님과의 대화"),
+        title: RichText(
+          text: TextSpan(
+            children: [
+              TextSpan(
+                text: "$otherUserName ",
+                style: TextStyle(
+                  fontSize: 20.sp,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.blueAccent,
+                ),
+              ),
+              TextSpan(
+                text: "님과의 대화",
+                style: TextStyle(
+                  fontSize: 16.sp,
+                  color: Colors.black,
+                ),
+              ),
+            ],
+          ),
+        ),
         scrolledUnderElevation: 0,
       ),
       body: SafeArea(

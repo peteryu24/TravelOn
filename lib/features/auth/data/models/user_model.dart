@@ -6,6 +6,7 @@ class UserModel extends User {
   final String name;
   final String email;
   final String? profileImageUrl;
+  final String? backgroundImageUrl;
   final bool isGuide;
   final String? gender;
   final DateTime? birthDate;
@@ -17,6 +18,7 @@ class UserModel extends User {
     required this.name,
     required this.email,
     this.profileImageUrl,
+    this.backgroundImageUrl,
     this.isGuide = false,
     this.gender,
     this.birthDate,
@@ -32,6 +34,7 @@ class UserModel extends User {
       name: json['name'] as String,
       email: json['email'] as String,
       profileImageUrl: json['profileImageUrl'] as String?,
+      backgroundImageUrl: json['backgroundImageUrl'] as String?,
       isGuide: json['isGuide'] as bool? ?? false,
       gender: json['gender'] as String?,
       birthDate: json['birthDate'] != null 
@@ -49,6 +52,7 @@ class UserModel extends User {
       'name': name,
       'email': email,
       'profileImageUrl': profileImageUrl,
+      'backgroundImageUrl': backgroundImageUrl,
       'isGuide': isGuide,
       'gender': gender,
       'birthDate': birthDate?.toIso8601String(),
@@ -63,6 +67,7 @@ class UserModel extends User {
     String? name,
     String? email,
     String? profileImageUrl,
+    String? backgroundImageUrl,
     bool? isGuide,
     String? gender,
     DateTime? birthDate,
@@ -74,6 +79,7 @@ class UserModel extends User {
       name: name ?? this.name,
       email: email ?? this.email,
       profileImageUrl: profileImageUrl ?? this.profileImageUrl,
+      backgroundImageUrl: backgroundImageUrl ?? this.backgroundImageUrl,
       isGuide: isGuide ?? this.isGuide,
       gender: gender ?? this.gender,
       birthDate: birthDate ?? this.birthDate,

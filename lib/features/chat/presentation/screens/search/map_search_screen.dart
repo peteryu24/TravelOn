@@ -161,15 +161,23 @@ class _MapSearchScreenState extends State<MapSearchScreen> {
                         day: 1,
                       );
 
-                      return ListTile(
-                        leading: Icon(
-                          type == PointType.hotel ? Icons.hotel :
-                          type == PointType.restaurant ? Icons.restaurant :
-                          Icons.photo_camera,
+                      return Card(
+                        margin: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+                        child: ListTile(
+                          leading: Icon(
+                            type == PointType.hotel
+                                ? Icons.hotel
+                                : type == PointType.restaurant
+                                    ? Icons.restaurant
+                                    : Icons.photo_camera,
+                          ),
+                          title: Text(title),
+                          subtitle: Text(place['address'] ?? ''),
+                          trailing: IconButton(
+                            icon: Icon(Icons.share, color: Colors.blue),
+                            onPressed: () => _showMapDetailDialog(context, location),
+                          ),
                         ),
-                        title: Text(title),
-                        subtitle: Text(place['address'] ?? ''),
-                        onTap: () => _showMapDetailDialog(context, location),
                       );
                     },
                   ),

@@ -291,7 +291,7 @@ class MessageBubble extends StatelessWidget {
 
   Widget _buildUserDetails(BuildContext context, Map<String, dynamic> user) {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         CircleAvatar(
           backgroundImage: user['profileImageUrl'] != null && user['profileImageUrl'].isNotEmpty
@@ -350,7 +350,12 @@ class MessageBubble extends StatelessWidget {
                   padding: EdgeInsets.symmetric(vertical: 8.h),
                 ),
                 onPressed: () {
-                  // 프로필 보기 기능 추가 예정
+                  if (user['id'] is String && (user['id'] as String).isNotEmpty) {
+                    final userId = user['id'] as String;
+                    context.push('/user-profile/${user['id']}');
+                  } else {
+                    print('유효하지 않은 ID입니다.');
+                  }
                 },
                 child: Text(
                   '프로필 보기',
