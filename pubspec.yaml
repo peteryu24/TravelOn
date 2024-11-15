@@ -65,3 +65,4 @@ flutter:
     - assets/images/logo/apple.png
     - .env
     - assets/translations/
+    - test/assets/translations/
