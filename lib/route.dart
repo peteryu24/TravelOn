@@ -12,13 +12,13 @@ import 'package:travel_on_final/core/presentation/widgets/scaffold_with_bottom_n
 // chat
 import 'package:travel_on_final/features/chat/presentation/screens/chat_list_screen.dart';
 import 'package:travel_on_final/features/chat/presentation/screens/chat_screen.dart';
-import 'package:travel_on_final/features/chat/presentation/widgets/map_detail_widget.dart';
+
 // chat // search
 import 'package:travel_on_final/features/chat/presentation/screens/search/guide_search_screen.dart';
 import 'package:travel_on_final/features/chat/presentation/screens/search/user_search_screen.dart';
 import 'package:travel_on_final/features/chat/presentation/screens/search/package_search_screen.dart';
 import 'package:travel_on_final/features/chat/presentation/screens/search/map_search_screen.dart';
-import 'package:travel_on_final/features/map/domain/entities/travel_point.dart';
+
 // guide
 import 'package:travel_on_final/features/guide/presentation/screens/guide_packages_screen.dart';
 import 'package:travel_on_final/features/guide/presentation/screens/guide_ranking_screen.dart';
@@ -71,7 +71,10 @@ final goRouter = GoRouter(
       path: '/package-detail/:id',
       builder: (context, state) {
         final package = state.extra as TravelPackage;
-        return PackageDetailScreen(package: package, totalDays: 1,);
+        return PackageDetailScreen(
+          package: package,
+          totalDays: 1,
+        );
       },
     ),
     GoRoute(
@@ -166,7 +169,7 @@ final goRouter = GoRouter(
         final chatId = extra?['chatId'] as String?;
         final otherUserId = extra?['otherUserId'] as String?;
         if (chatId == null || otherUserId == null) {
-          return Scaffold(
+          return const Scaffold(
             body: Center(
               child: Text('필요한 정보가 없습니다.'),
             ),
@@ -180,13 +183,15 @@ final goRouter = GoRouter(
       builder: (context, state) {
         final extraData = state.extra as Map<String, dynamic>?;
 
-        if (extraData != null && extraData.containsKey('chatId') && extraData.containsKey('otherUserId')) {
+        if (extraData != null &&
+            extraData.containsKey('chatId') &&
+            extraData.containsKey('otherUserId')) {
           return PackageSearchScreen(
             chatId: extraData['chatId'],
             otherUserId: extraData['otherUserId'],
           );
         } else {
-          return Scaffold(
+          return const Scaffold(
             body: Center(
               child: Text('필요한 정보가 없습니다.'),
             ),
@@ -198,13 +203,15 @@ final goRouter = GoRouter(
       path: '/map-search',
       builder: (context, state) {
         final extraData = state.extra as Map<String, dynamic>?;
-        if (extraData != null && extraData.containsKey('chatId') && extraData.containsKey('otherUserId')) {
+        if (extraData != null &&
+            extraData.containsKey('chatId') &&
+            extraData.containsKey('otherUserId')) {
           return MapSearchScreen(
             chatId: extraData['chatId'],
             otherUserId: extraData['otherUserId'],
           );
         } else {
-          return Scaffold(
+          return const Scaffold(
             body: Center(
               child: Text('필요한 정보가 없습니다.'),
             ),
@@ -302,7 +309,10 @@ final goRouter = GoRouter(
             ),
           );
         }
-        return PackageDetailScreen(package: package, totalDays: 1,);
+        return PackageDetailScreen(
+          package: package,
+          totalDays: 1,
+        );
       },
     ),
     // 기존 라우트 목록에 추가
