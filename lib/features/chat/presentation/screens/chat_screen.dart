@@ -10,7 +10,7 @@ import 'package:travel_on_final/features/chat/presentation/widgets/bottom_sheet_
 class ChatScreen extends StatefulWidget {
   final String chatId;
 
-  ChatScreen({required this.chatId});
+  const ChatScreen({super.key, required this.chatId});
 
   @override
   _ChatScreenState createState() => _ChatScreenState();
@@ -28,16 +28,38 @@ class _ChatScreenState extends State<ChatScreen> {
     super.initState();
 
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    final userIds = widget.chatId.split('_');
-    otherUserId = userIds.first == authProvider.currentUser!.id ? userIds.last : userIds.first;
+    final chatProvider = Provider.of<ChatProvider>(context, listen: false);
 
-    Provider.of<ChatProvider>(context, listen: false).fetchOtherUserInfo(otherUserId!).then((name) {
-      setState(() {
-        otherUserName = "$name";
-      });
+    final userIds = widget.chatId.split('_');
+    otherUserId = userIds.first == authProvider.currentUser!.id
+        ? userIds.last
+        : userIds.first;
+
+    // 채팅방 존재 여부 확인 및 생성
+    chatProvider
+        .ensureChatRoomExists(
+      widget.chatId,
+      context,
+      otherUserId!,
+    )
+        .then((_) {
+      // 채팅방 생성 후 메시지 구독 시작
+      chatProvider.startListeningToMessages(widget.chatId);
+
+      // 읽음 처리
+      chatProvider.resetUnreadCount(
+        widget.chatId,
+        authProvider.currentUser!.id,
+      );
     });
 
-    Provider.of<ChatProvider>(context, listen: false).startListeningToMessages(widget.chatId);
+    chatProvider.fetchOtherUserInfo(otherUserId!).then((name) {
+      if (mounted) {
+        setState(() {
+          otherUserName = name;
+        });
+      }
+    });
   }
 
   @override
@@ -84,12 +106,18 @@ class _ChatScreenState extends State<ChatScreen> {
                 itemCount: chatProvider.messages.length,
                 itemBuilder: (ctx, index) {
                   final message = chatProvider.messages[index];
-                  final isMe = message.uId == Provider.of<AuthProvider>(context, listen: false).currentUser!.id;
+                  final isMe = message.uId ==
+                      Provider.of<AuthProvider>(context, listen: false)
+                          .currentUser!
+                          .id;
                   return MessageBubble(
                     message: message,
                     isMe: isMe,
                     otherUserName: otherUserName,
-                    currentUserId: Provider.of<AuthProvider>(context, listen: false).currentUser!.id,
+                    currentUserId:
+                        Provider.of<AuthProvider>(context, listen: false)
+                            .currentUser!
+                            .id,
                   );
                 },
               ),
@@ -107,15 +135,27 @@ class _ChatScreenState extends State<ChatScreen> {
                       child: Row(
                         children: [
                           IconButton(
-                            icon: Icon(Icons.add, color: Colors.blue, size: 24.w),
+                            icon:
+                                Icon(Icons.add, color: Colors.blue, size: 24.w),
                             onPressed: () {
                               _bottomSheetWidget.showBottomSheetMenu(
                                 parentContext: context,
                                 chatId: widget.chatId,
-                                userId: Provider.of<AuthProvider>(context, listen: false).currentUser!.id,
+                                userId: Provider.of<AuthProvider>(context,
+                                        listen: false)
+                                    .currentUser!
+                                    .id,
                                 otherUserId: otherUserId!,
-                                currentUserProfileImage: Provider.of<AuthProvider>(context, listen: false).currentUser!.profileImageUrl ?? '',
-                                username: Provider.of<AuthProvider>(context, listen: false).currentUser!.name,
+                                currentUserProfileImage:
+                                    Provider.of<AuthProvider>(context,
+                                                listen: false)
+                                            .currentUser!
+                                            .profileImageUrl ??
+                                        '',
+                                username: Provider.of<AuthProvider>(context,
+                                        listen: false)
+                                    .currentUser!
+                                    .name,
                               );
                             },
                           ),
@@ -130,7 +170,8 @@ class _ChatScreenState extends State<ChatScreen> {
                               decoration: InputDecoration(
                                 hintText: '메시지를 입력하세요...',
                                 border: InputBorder.none,
-                                contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),
+                                contentPadding: EdgeInsets.symmetric(
+                                    horizontal: 16.w, vertical: 10.h),
                               ),
                             ),
                           ),
