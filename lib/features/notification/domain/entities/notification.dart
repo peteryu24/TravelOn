@@ -7,6 +7,7 @@ class NotificationEntity {
   final DateTime createdAt;
   final bool isRead;
   final String? reservationId;
+  final String? chatId;
 
   NotificationEntity({
     required this.id,
@@ -17,6 +18,7 @@ class NotificationEntity {
     required this.createdAt,
     required this.isRead,
     this.reservationId,
+    this.chatId,
   });
 
   NotificationEntity copyWith({
@@ -28,6 +30,7 @@ class NotificationEntity {
     DateTime? createdAt,
     bool? isRead,
     String? reservationId,
+    String? chatId,
   }) {
     return NotificationEntity(
       id: id ?? this.id,
@@ -38,6 +41,7 @@ class NotificationEntity {
       createdAt: createdAt ?? this.createdAt,
       isRead: isRead ?? this.isRead,
       reservationId: reservationId ?? this.reservationId,
+      chatId: chatId ?? this.chatId,
     );
   }
 }

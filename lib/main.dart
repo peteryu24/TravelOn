@@ -166,7 +166,8 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(
           create: (context) => NotificationProvider(
             FirebaseFirestore.instance,
-            context.read<FirebaseMessaging>(),
+            FirebaseMessaging.instance,
+            context.read<NavigationProvider>(), // NavigationProvider 주입
           ),
         ),
       ],

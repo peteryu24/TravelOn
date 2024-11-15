@@ -27,18 +27,28 @@ class ChatProvider extends ChangeNotifier {
 
   // 메시지 수신 및 구독
   void startListeningToMessages(String chatId) {
-    _messageSubscription = _firestore
-        .collection('chats')
-        .doc(chatId)
-        .collection('messages')
-        .orderBy('createdAt', descending: true)
-        .snapshots()
-        .listen((querySnapshot) {
-      _messages = querySnapshot.docs
-          .map((doc) => MessageModel.fromDocument(doc).toEntity())
-          .toList();
+    try {
+      _messageSubscription = _firestore
+          .collection('chats')
+          .doc(chatId)
+          .collection('messages')
+          .orderBy('createdAt', descending: true)
+          .snapshots()
+          .listen((querySnapshot) {
+        _messages = querySnapshot.docs
+            .map((doc) => MessageModel.fromDocument(doc).toEntity())
+            .toList();
+        notifyListeners();
+      }, onError: (error) {
+        print('Error listening to messages: $error');
+        _messages = [];
+        notifyListeners();
+      });
+    } catch (e) {
+      print('Error starting message listener: $e');
+      _messages = [];
       notifyListeners();
-    });
+    }
   }
 
   // 채팅방 구독 중지 메서드 추가
@@ -66,28 +76,40 @@ class ChatProvider extends ChangeNotifier {
   }
 
   // 채팅방 생성 확인 및 생성
-  Future<void> _ensureChatRoomExists(String chatId, BuildContext context, String otherUserId) async {
+  Future<void> _ensureChatRoomExists(
+      String chatId, BuildContext context, String otherUserId) async {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     DocumentReference chatRef = _firestore.collection('chats').doc(chatId);
-    DocumentSnapshot chatSnapshot = await chatRef.get();
 
-    if (!chatSnapshot.exists && authProvider.currentUser != null) {
-      String otherUserName = await _getOtherUserName(otherUserId);
-      String otherUserProfileImage = await _getOtherUserProfileImage(otherUserId);
+    try {
+      DocumentSnapshot chatSnapshot = await chatRef.get();
 
-      await chatRef.set({
-        'participants': [authProvider.currentUser!.id, otherUserId],
-        'lastActivityTime': Timestamp.now(),
-        'lastMessage': '',
-        'usernames': {
-          authProvider.currentUser!.id: authProvider.currentUser!.name,
-          otherUserId: otherUserName,
-        },
-        'userProfileImages': {
-          authProvider.currentUser!.id: authProvider.currentUser!.profileImageUrl,
-          otherUserId: otherUserProfileImage,
-        }
-      });
+      if (!chatSnapshot.exists && authProvider.currentUser != null) {
+        String otherUserName = await _getOtherUserName(otherUserId);
+        String otherUserProfileImage =
+            await _getOtherUserProfileImage(otherUserId);
+
+        await chatRef.set({
+          'participants': [authProvider.currentUser!.id, otherUserId],
+          'lastActivityTime': Timestamp.now(),
+          'lastMessage': '',
+          'usernames': {
+            authProvider.currentUser!.id: authProvider.currentUser!.name,
+            otherUserId: otherUserName,
+          },
+          'userProfileImages': {
+            authProvider.currentUser!.id:
+                authProvider.currentUser!.profileImageUrl,
+            otherUserId: otherUserProfileImage,
+          },
+          'unreadCount': {
+            authProvider.currentUser!.id: 0,
+            otherUserId: 0,
+          }
+        });
+      }
+    } catch (e) {
+      print('Error ensuring chat room exists: $e');
     }
   }
 
@@ -129,24 +151,42 @@ class ChatProvider extends ChangeNotifier {
       'lastMessage': imageFile != null ? '[Image]' : text,
     });
 
+    await incrementUnreadCount(chatId, otherUserId);
+
+    await _firestore.collection('notifications').add({
+      'userId': otherUserId,
+      'title': '새로운 메시지',
+      'message':
+          '${authProvider.currentUser!.name}님이 메시지를 보냈습니다: ${imageFile != null ? '[Image]' : text}',
+      'type': 'chat_message',
+      'chatId': chatId,
+      'createdAt': Timestamp.now(),
+      'isRead': false,
+    });
+
     notifyListeners();
   }
 
   // Firestore에서 사용자 이름 가져오기
   Future<String> _getOtherUserName(String uid) async {
-    DocumentSnapshot userSnapshot = await _firestore.collection('users').doc(uid).get();
-    return userSnapshot.exists ? userSnapshot['name'] ?? 'Unknown User' : 'Unknown User';
+    DocumentSnapshot userSnapshot =
+        await _firestore.collection('users').doc(uid).get();
+    return userSnapshot.exists
+        ? userSnapshot['name'] ?? 'Unknown User'
+        : 'Unknown User';
   }
 
   // Firestore에서 사용자 프로필 이미지 가져오기
   Future<String> _getOtherUserProfileImage(String uid) async {
-    DocumentSnapshot userSnapshot = await _firestore.collection('users').doc(uid).get();
+    DocumentSnapshot userSnapshot =
+        await _firestore.collection('users').doc(uid).get();
     return userSnapshot.exists ? userSnapshot['profileImageUrl'] ?? '' : '';
   }
 
   // 상대방 유저 정보 갖고오기
   Future<String> fetchOtherUserInfo(String otherUserId) async {
-    DocumentSnapshot userSnapshot = await _firestore.collection('users').doc(otherUserId).get();
+    DocumentSnapshot userSnapshot =
+        await _firestore.collection('users').doc(otherUserId).get();
     if (userSnapshot.exists) {
       final otherUserName = userSnapshot['name'] ?? 'Unknown User';
       return otherUserName;
@@ -185,7 +225,7 @@ class ChatProvider extends ChangeNotifier {
 
   /////////////////////////////////////////////////////////////
   /// 안읽은 메세지 관련 메서드
-  
+
   // 읽지 않은 메시지 수 증가
   Future<void> incrementUnreadCount(String chatId, String otherUserId) async {
     final chatRef = _firestore.collection('chats').doc(chatId);
@@ -214,7 +254,7 @@ class ChatProvider extends ChangeNotifier {
         .get();
 
     for (var doc in snapshot.docs) {
-      final data = doc.data() as Map<String, dynamic>;
+      final data = doc.data();
       final count = (data['unreadCount']?[userId] ?? 0) as int;
       totalUnread += count;
     }
@@ -224,7 +264,7 @@ class ChatProvider extends ChangeNotifier {
 
   ///////////////////////////////////////////////////////
   /// 사용자 정보 공유 관련 메서드
-  
+
   // 사용자 정보를 상대방에게 메시지로 전송하는 메서드
   Future<void> sendUserDetailsMessage({
     required String chatId,
@@ -260,7 +300,7 @@ class ChatProvider extends ChangeNotifier {
 
     notifyListeners();
   }
-  
+
   // 패키지 정보를 상대방에게 전송하는 메서드
   Future<void> sendPackageDetailsMessage({
     required String chatId,
@@ -334,5 +374,10 @@ class ChatProvider extends ChangeNotifier {
     });
 
     notifyListeners();
+  }
+
+  Future<void> ensureChatRoomExists(
+      String chatId, BuildContext context, String otherUserId) async {
+    await _ensureChatRoomExists(chatId, context, otherUserId);
   }
 }
