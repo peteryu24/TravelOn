@@ -41,6 +41,10 @@ import 'package:travel_on_final/features/profile/presentation/screens/liked_pack
 import 'package:travel_on_final/features/profile/presentation/screens/my_packages_screen.dart';
 import 'package:travel_on_final/features/profile/presentation/screens/reservation_screen.dart';
 import 'package:travel_on_final/features/profile/presentation/screens/profile_edit_screen.dart';
+// profile // user
+import 'package:travel_on_final/features/profile/presentation/screens/user/user_profile_screen.dart';
+import 'package:travel_on_final/features/profile/presentation/screens/user/user_package_screen.dart';
+import 'package:travel_on_final/features/profile/presentation/screens/user/user_review_screen.dart';
 // gallery
 import 'package:travel_on_final/features/gallery/presentation/screens/travel_gallery_screen.dart';
 import 'package:travel_on_final/features/gallery/presentation/screens/add_gallery_post_screen.dart';
@@ -208,9 +212,31 @@ final goRouter = GoRouter(
         }
       },
     ),
+    // profile 관련 코드
+    GoRoute(
+      path: '/user-profile/:userId',
+      builder: (context, state) {
+        final userId = state.pathParameters['userId']!;
+        return UserProfileScreen(userId: userId);
+      },
+    ),
     GoRoute(
       path: '/profile/edit',
       builder: (context, state) => ProfileEditScreen(),
+    ),
+    GoRoute(
+      path: '/user-packages/:userId',
+      builder: (context, state) {
+        final userId = state.pathParameters['userId']!;
+        return UserPackageScreen(userId: userId);
+      },
+    ),
+    GoRoute(
+      path: '/user-reviews/:userId',
+      builder: (context, state) {
+        final userId = state.pathParameters['userId']!;
+        return UserReviewScreen(userId: userId);
+      },
     ),
     ////////////////////////////////////////////////////////////////////////////////////
     //                ↓↓↓ 바텀 내비게이션 바가 필요한 화면 라우팅 ↓↓↓                    //

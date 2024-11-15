@@ -68,6 +68,7 @@ class AuthProvider with ChangeNotifier {
         'name': name,
         'email': email,
         'profileImageUrl': '',
+        'backgroundImageUrl': '',
         'isGuide': false,
         'likedPackages': [],
         'introduction': '',
@@ -112,6 +113,22 @@ class AuthProvider with ChangeNotifier {
     } catch (e) {
       print('로그아웃 에러: $e');
       rethrow;
+    }
+  }
+
+  // userId를 받아서 Firestore에서 해당 유저 정보를 가져오는 메서드
+  Future<UserModel?> getUserById(String userId) async {
+    try {
+      final userDoc = await _firestore.collection('users').doc(userId).get();
+      if (userDoc.exists) {
+        return UserModel.fromJson(userDoc.data()!);
+      } else {
+        print('유저를 찾을 수 없습니다.');
+        return null;
+      }
+    } catch (e) {
+      print('getUserById 에러: $e');
+      return null;
     }
   }
 
@@ -187,6 +204,7 @@ class AuthProvider with ChangeNotifier {
     String? gender,
     DateTime? birthDate,
     String? profileImageUrl,
+    String? backgroundImageUrl,
     String? introduction,
   }) async {
     if (_currentUser == null) throw '로그인이 필요합니다';
@@ -194,23 +212,33 @@ class AuthProvider with ChangeNotifier {
     try {
       final userRef = _firestore.collection('users').doc(_currentUser!.id);
 
-      String? imageUrl;
-      if (profileImageUrl != null && File(profileImageUrl).existsSync()) {
-        // 새로운 프로필 이미지 업로드
-        final ref =
-            _storage.ref().child('user_profiles/${_currentUser!.id}.jpg');
+      String? profileImageUrlUpdated;
+      if (profileImageUrl != null && profileImageUrl.isNotEmpty && File(profileImageUrl).existsSync()) {
+        final ref = _storage.ref().child('user_profiles/${_currentUser!.id}_profile.jpg');
         await ref.putFile(File(profileImageUrl));
-        imageUrl = await ref.getDownloadURL();
+        profileImageUrlUpdated = await ref.getDownloadURL();
       } else {
-        // 기존 프로필 이미지 URL 유지
-        imageUrl = _currentUser!.profileImageUrl;
+        profileImageUrlUpdated = _currentUser!.profileImageUrl;
+      }
+
+      String? backgroundImageUrlUpdated;
+      if (backgroundImageUrl != null && backgroundImageUrl.isNotEmpty && File(backgroundImageUrl).existsSync()) {
+        final ref = _storage.ref().child('user_profiles/${_currentUser!.id}_background.jpg');
+        await ref.putFile(File(backgroundImageUrl));
+        backgroundImageUrlUpdated = await ref.getDownloadURL();
+      } else if (backgroundImageUrl == null) {
+        await userRef.update({'backgroundImageUrl': FieldValue.delete()});
+        backgroundImageUrlUpdated = null;
+      } else {
+        backgroundImageUrlUpdated = _currentUser!.backgroundImageUrl;
       }
 
       await userRef.update({
         'name': name,
         'gender': gender,
         'birthDate': birthDate != null ? Timestamp.fromDate(birthDate) : null,
-        'profileImageUrl': imageUrl,
+        'profileImageUrl': profileImageUrlUpdated,
+        'backgroundImageUrl': backgroundImageUrlUpdated,
         'introduction': introduction,
       });
 
@@ -218,7 +246,8 @@ class AuthProvider with ChangeNotifier {
         name: name,
         gender: gender,
         birthDate: birthDate,
-        profileImageUrl: imageUrl,
+        profileImageUrl: profileImageUrlUpdated,
+        backgroundImageUrl: backgroundImageUrlUpdated,
         introduction: introduction,
       );
 

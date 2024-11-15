@@ -137,29 +137,29 @@ class MockAuthProvider extends _i1.Mock implements _i2.AuthProvider {
         returnValue: _i3.Future<bool>.value(false),
       ) as _i3.Future<bool>);
 
-  @override
-  _i3.Future<void> updateUserProfile({
-    required String? name,
-    String? gender,
-    DateTime? birthDate,
-    String? profileImageUrl,
-    String? introduction,
-  }) =>
-      (super.noSuchMethod(
-        Invocation.method(
-          #updateUserProfile,
-          [],
-          {
-            #name: name,
-            #gender: gender,
-            #birthDate: birthDate,
-            #profileImageUrl: profileImageUrl,
-            #introduction: introduction,
-          },
-        ),
-        returnValue: _i3.Future<void>.value(),
-        returnValueForMissingStub: _i3.Future<void>.value(),
-      ) as _i3.Future<void>);
+  // @override
+  // _i3.Future<void> updateUserProfile({
+  //   required String? name,
+  //   String? gender,
+  //   DateTime? birthDate,
+  //   String? profileImageUrl,
+  //   String? introduction,
+  // }) =>
+  //     (super.noSuchMethod(
+  //       Invocation.method(
+  //         #updateUserProfile,
+  //         [],
+  //         {
+  //           #name: name,
+  //           #gender: gender,
+  //           #birthDate: birthDate,
+  //           #profileImageUrl: profileImageUrl,
+  //           #introduction: introduction,
+  //         },
+  //       ),
+  //       returnValue: _i3.Future<void>.value(),
+  //       returnValueForMissingStub: _i3.Future<void>.value(),
+  //     ) as _i3.Future<void>);
 
   @override
   _i3.Future<void> resetPassword(String? email) => (super.noSuchMethod(

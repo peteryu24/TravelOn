@@ -111,42 +111,47 @@ class _PlaceSearchScreenState extends State<PlaceSearchScreen> {
                 final title = place['title'].toString().replaceAll(RegExp(r'<[^>]*>'), '');
                 final type = _determinePointType(place['category'] ?? '');
 
-                return ListTile(
-                  leading: Icon(
-                    type == PointType.hotel ? Icons.hotel :
-                    type == PointType.restaurant ? Icons.restaurant :
-                    Icons.photo_camera,
-                  ),
-                  title: Text(title),
-                  subtitle: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(place['address'] ?? ''),
-                      if (place['category'] != null)
-                        Text(
-                          place['category'],
-                          style: TextStyle(color: Colors.grey[600], fontSize: 12),
+                return Card(
+                  margin: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+                  child: ListTile(
+                    leading: Icon(
+                      type == PointType.hotel
+                          ? Icons.hotel
+                          : type == PointType.restaurant
+                              ? Icons.restaurant
+                              : Icons.photo_camera,
+                    ),
+                    title: Text(title),
+                    subtitle: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(place['address'] ?? ''),
+                        if (place['category'] != null)
+                          Text(
+                            place['category'],
+                            style: TextStyle(color: Colors.grey[600], fontSize: 12.sp),
+                          ),
+                      ],
+                    ),
+                    isThreeLine: true,
+                    onTap: () {
+                      final newPoint = TravelPoint(
+                        id: UniqueKey().toString(),
+                        name: title,
+                        type: type,
+                        location: NLatLng(
+                          double.parse(place['mapy']) / 10000000,
+                          double.parse(place['mapx']) / 10000000,
                         ),
-                    ],
-                  ),
-                  isThreeLine: true,
-                  onTap: () {
-                    final newPoint = TravelPoint(
-                      id: UniqueKey().toString(),
-                      name: title,
-                      type: type,
-                      location: NLatLng(
-                        double.parse(place['mapy']) / 10000000,
-                        double.parse(place['mapx']) / 10000000,
-                      ),
-                      address: place['address'] ?? '',
-                      description: place['description'] ?? '',
-                      order: widget.selectedPoints.length,
-                      day: 1,
-                    );
+                        address: place['address'] ?? '',
+                        description: place['description'] ?? '',
+                        order: widget.selectedPoints.length,
+                        day: 1,
+                      );
 
-                    Navigator.pop(context, newPoint);
-                  },
+                      Navigator.pop(context, newPoint);
+                    },
+                  ),
                 );
               },
             ),
