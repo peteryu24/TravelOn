@@ -92,9 +92,8 @@ class _LoginScreenState extends State<LoginScreen> {
           await _saveCredentialsToPrefs();
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(
-                'login.welcome${authProvider.currentUser!.name}'),
-              ),
+              content: Text('login.welcome${authProvider.currentUser!.name}'),
+            ),
           );
           context.go('/');
         } else {
@@ -193,14 +192,15 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               child: _isLoading
                   ? SizedBox(
-                width: 20.w,
-                height: 20.w,
-                child: const CircularProgressIndicator(color: Colors.white),
-              )
+                      width: 20.w,
+                      height: 20.w,
+                      child:
+                          const CircularProgressIndicator(color: Colors.white),
+                    )
                   : Text(
-                'login.login_button'.tr(),
-                style: TextStyle(color: Colors.white, fontSize: 14.sp),
-              ),
+                      'login.login_button'.tr(),
+                      style: TextStyle(color: Colors.white, fontSize: 14.sp),
+                    ),
             ),
             SizedBox(height: 10.h),
             _buildDivider(),
@@ -257,12 +257,12 @@ class _LoginScreenState extends State<LoginScreen> {
           color: Colors.white,
           onPressed: _handleGithubSignIn,
         ),
-        SizedBox(width: 20.w),
-        _buildSocialButton(
-          iconWidget: _buildSocialIcon('naver_light.png', 40),
-          color: const Color(0xFF03C75A),
-          onPressed: () {}, // Naver login implementation
-        ),
+        // SizedBox(width: 20.w),
+        // _buildSocialButton(
+        //   iconWidget: _buildSocialIcon('naver_light.png', 40),
+        //   color: const Color(0xFF03C75A),
+        //   onPressed: () {}, // Naver login implementation
+        // ),
         SizedBox(width: 20.w),
         _buildSocialButton(
           iconWidget: _buildSocialIcon('kakao_light.png', 100),
@@ -318,8 +318,7 @@ class _LoginScreenState extends State<LoginScreen> {
       if (authProvider.isAuthenticated && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(
-                'login.welcome${authProvider.currentUser!.name}'),
+            content: Text('login.welcome${authProvider.currentUser!.name}'),
           ),
         );
         context.go('/');
@@ -341,8 +340,7 @@ class _LoginScreenState extends State<LoginScreen> {
       if (authProvider.isAuthenticated && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(
-                'login.welcome${authProvider.currentUser!.name}'),
+            content: Text('login.welcome${authProvider.currentUser!.name}'),
           ),
         );
         context.go('/');
@@ -364,8 +362,7 @@ class _LoginScreenState extends State<LoginScreen> {
       if (authProvider.isAuthenticated && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(
-                'login.welcome${authProvider.currentUser!.name}'),
+            content: Text('login.welcome${authProvider.currentUser!.name}'),
           ),
         );
         context.go('/');
