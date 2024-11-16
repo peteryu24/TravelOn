@@ -17,6 +17,7 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
   DateTime? _birthDate;
   String? _profileImageUrl;
   File? _selectedImageFile;
+  bool _isNameValid = true;
 
   @override
   void initState() {
@@ -61,10 +62,25 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
     }
   }
 
+  void _validateName() {
+    setState(() {
+      _isNameValid = _nameController.text.length >= 2 && _nameController.text.length <= 8;
+    });
+  }
+
   void _saveProfile() async {
+    _validateName();
+
+    if (!_isNameValid) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('이름은 2글자 이상 8글자 이하로 설정해야 합니다.')),
+      );
+      return;
+    }
+
     if (_nameController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('이름은 비어 있을 수 없습니다')),
+        SnackBar(content: Text('이름은 비어 있을 수 없습니다.')),
       );
       return;
     }
@@ -80,7 +96,7 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
       Navigator.pop(context);
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('프로필 업데이트에 실패했습니다')),
+        SnackBar(content: Text('프로필 업데이트에 실패했습니다.')),
       );
     }
   }
@@ -116,10 +132,12 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
               ),
               child: TextField(
                 controller: _nameController,
+                onChanged: (_) => _validateName(),
                 decoration: InputDecoration(
                   labelText: '이름',
                   labelStyle: TextStyle(color: Colors.blue),
                   border: InputBorder.none,
+                  errorText: !_isNameValid ? '이름은 2글자 이상 8글자 이하여야 합니다.' : null,
                 ),
               ),
             ),
@@ -232,7 +250,7 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
             ),
             SizedBox(height: 24),
             ElevatedButton(
-              onPressed: _saveProfile,
+              onPressed: _isNameValid ? _saveProfile : null,
               child: Text('저장'),
             ),
           ],
