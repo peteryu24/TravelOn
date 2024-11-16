@@ -17,138 +17,135 @@ class MessageBubble extends StatelessWidget {
   final String currentUserId;
 
   const MessageBubble({
+    Key? key,
     required this.message,
     required this.isMe,
     required this.otherUserName,
     required this.currentUserId,
-  });
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     final isPackageMessage = message.sharedPackage != null;
 
-    return Column(
-      crossAxisAlignment: isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
-      children: [
-        if (!isMe)
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
-            child: Row(
-              children: [
-                CircleAvatar(
-                  backgroundImage: message.profileImageUrl != null && message.profileImageUrl!.isNotEmpty
-                      ? CachedNetworkImageProvider(message.profileImageUrl!)
-                      : AssetImage('assets/images/default_profile.png') as ImageProvider,
-                  radius: 15.r,
+    return RepaintBoundary(
+      child: Column(
+        crossAxisAlignment: isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+        children: [
+          if (!isMe)
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
+              child: Row(
+                children: [
+                  CircleAvatar(
+                    backgroundImage: message.profileImageUrl != null && message.profileImageUrl!.isNotEmpty
+                        ? CachedNetworkImageProvider(message.profileImageUrl!)
+                        : AssetImage('assets/images/default_profile.png') as ImageProvider,
+                    radius: 15.r,
+                  ),
+                  SizedBox(width: 8.w),
+                  Text(
+                    otherUserName,
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.grey[700],
+                      fontSize: 14.sp,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          Row(
+            mainAxisAlignment: isMe ? MainAxisAlignment.end : MainAxisAlignment.start,
+            children: <Widget>[
+              Container(
+                constraints: BoxConstraints(
+                  maxWidth: isPackageMessage
+                      ? MediaQuery.of(context).size.width * 0.8
+                      : MediaQuery.of(context).size.width * 0.6,
                 ),
-                SizedBox(width: 8.w),
-                Text(
-                  otherUserName,
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: Colors.grey[700],
-                    fontSize: 14.sp,
+                decoration: BoxDecoration(
+                  color: isMe ? Colors.blue.shade100 : Colors.grey[200],
+                  borderRadius: BorderRadius.circular(12.r),
+                  border: Border.all(
+                    color: Colors.grey.shade300,
+                    width: 1.0,
                   ),
                 ),
-              ],
-            ),
+                padding: EdgeInsets.symmetric(vertical: 10.h, horizontal: 16.w),
+                margin: EdgeInsets.symmetric(vertical: 4.h, horizontal: 8.w),
+                child: message.location != null
+                    ? _buildLocationDetails(context, message.location!)
+                    : isPackageMessage
+                        ? _buildPackageDetails(context, message.sharedPackage!)
+                        : (message.sharedUser != null
+                            ? _buildUserDetails(context, message.sharedUser!)
+                            : (message.imageUrl != null && message.imageUrl!.isNotEmpty
+                                ? CachedNetworkImage(
+                                    imageUrl: message.imageUrl!,
+                                    placeholder: (context, url) => CircularProgressIndicator(),
+                                    errorWidget: (context, url, error) => Icon(Icons.error),
+                                  )
+                                : Text(
+                                    message.text,
+                                    style: TextStyle(
+                                      color: isMe ? Colors.black : Colors.black,
+                                      fontSize: 14.sp,
+                                    ),
+                                  ))),
+              ),
+            ],
           ),
-        Row(
-          mainAxisAlignment: isMe ? MainAxisAlignment.end : MainAxisAlignment.start,
-          children: <Widget>[
-            Container(
-              constraints: BoxConstraints(
-                maxWidth: isPackageMessage
-                    ? MediaQuery.of(context).size.width * 0.8
-                    : MediaQuery.of(context).size.width * 0.6,
-              ),
-              decoration: BoxDecoration(
-                color: isMe ? Colors.blue.shade100 : Colors.grey[200],
-                borderRadius: BorderRadius.circular(12.r),
-                border: Border.all(
-                  color: Colors.grey.shade300,
-                  width: 1.0,
-                ),
-              ),
-              padding: EdgeInsets.symmetric(vertical: 10.h, horizontal: 16.w),
-              margin: EdgeInsets.symmetric(vertical: 4.h, horizontal: 8.w),
-              child: message.location != null
-                  ? _buildLocationDetails(context, message.location!)
-                  : isPackageMessage
-                      ? _buildPackageDetails(context, message.sharedPackage!)
-                      : (message.sharedUser != null
-                          ? _buildUserDetails(context, message.sharedUser!)
-                          : (message.imageUrl != null && message.imageUrl!.isNotEmpty
-                              ? CachedNetworkImage(
-                                  imageUrl: message.imageUrl!,
-                                  placeholder: (context, url) => CircularProgressIndicator(),
-                                  errorWidget: (context, url, error) => Icon(Icons.error),
-                                )
-                              : Text(
-                                  message.text,
-                                  style: TextStyle(
-                                    color: isMe ? Colors.black : Colors.black,
-                                    fontSize: 14.sp,
-                                  ),
-                                ))),
-            ),
-          ],
-        ),
-      ],
+        ],
+      ),
     );
   }
 
   Widget _buildLocationDetails(BuildContext context, Map<String, dynamic> location) {
-    final title = location['title'] ?? '위치 정보';
-    final address = location['address'] ?? '주소 정보 없음';
     final latitude = location['latitude'] ?? 0.0;
     final longitude = location['longitude'] ?? 0.0;
+
+    if (latitude == 0.0 && longitude == 0.0) {
+      return Center(child: Text('위치 정보를 불러올 수 없습니다.'));
+    }
+
+    late NaverMapController _naverMapController;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Text(
-          title,
+          location['title'] ?? '위치 정보',
           style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.bold),
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-        ),
-        SizedBox(height: 4.h),
-        Text(
-          address,
-          style: TextStyle(fontSize: 14.sp),
-          maxLines: 2,
-          overflow: TextOverflow.ellipsis,
         ),
         SizedBox(height: 8.h),
         Container(
+          key: ValueKey('${latitude}_${longitude}'),
           width: 250.w,
           height: 150.h,
-          child: NaverMap(
-            options: NaverMapViewOptions(
-              initialCameraPosition: NCameraPosition(
-                target: NLatLng(latitude, longitude),
-                zoom: 16,
+          child: RepaintBoundary(
+            child: NaverMap(
+              options: NaverMapViewOptions(
+                initialCameraPosition: NCameraPosition(
+                  target: NLatLng(latitude, longitude),
+                  zoom: 16,
+                ),
+                mapType: NMapType.basic,
               ),
-              mapType: NMapType.basic,
+              onMapReady: (controller) {
+                _naverMapController = controller; // 컨트롤러 초기화
+                _naverMapController.addOverlay(NMarker(
+                  id: 'shared-location',
+                  position: NLatLng(latitude, longitude),
+                ));
+              },
             ),
-            onMapReady: (controller) {
-              if (controller != null) {
-                try {
-                  controller.addOverlay(NMarker(
-                    id: 'shared-location',
-                    position: NLatLng(latitude, longitude),
-                  ));
-                } catch (e) {
-                  print('오류 발생: ${e.toString()}');
-                }
-              }
-            },
           ),
         ),
         SizedBox(height: 8.h),
         ElevatedButton(
           onPressed: () async {
+            // '자세히 보기' 버튼 동작
           },
           child: Text('자세히 보기'),
         ),
