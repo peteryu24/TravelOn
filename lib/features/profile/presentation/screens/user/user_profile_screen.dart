@@ -11,8 +11,6 @@ import 'package:travel_on_final/features/chat/domain/usecases/create_chat_id.dar
 import 'package:image_picker/image_picker.dart';
 import 'package:go_router/go_router.dart';
 
-// pull 하고 merge용 주석
-
 class UserProfileScreen extends StatefulWidget {
   final String userId;
 

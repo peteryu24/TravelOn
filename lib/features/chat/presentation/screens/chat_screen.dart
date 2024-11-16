@@ -19,57 +19,71 @@ class ChatScreen extends StatefulWidget {
 class _ChatScreenState extends State<ChatScreen> {
   final TextEditingController messageController = TextEditingController();
   final BottomSheetWidget _bottomSheetWidget = BottomSheetWidget();
+  ChatProvider? chatProvider;
   String? otherUserId;
   String otherUserName = "Chat";
   bool isMessageEntered = false;
+  bool isLoading = true;
 
   @override
   void initState() {
     super.initState();
+    _initializeChat();
+  }
 
-    final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    final chatProvider = Provider.of<ChatProvider>(context, listen: false);
-
-    final userIds = widget.chatId.split('_');
-    otherUserId = userIds.first == authProvider.currentUser!.id
-        ? userIds.last
-        : userIds.first;
-
-    // 채팅방 존재 여부 확인 및 생성
-    chatProvider
-        .ensureChatRoomExists(
-      widget.chatId,
-      context,
-      otherUserId!,
-    )
-        .then((_) {
-      // 채팅방 생성 후 메시지 구독 시작
-      chatProvider.startListeningToMessages(widget.chatId);
-
-      // 읽음 처리
-      chatProvider.resetUnreadCount(
-        widget.chatId,
-        authProvider.currentUser!.id,
-      );
+  Future<void> _initializeChat() async {
+    setState(() {
+      isLoading = true;
     });
 
-    chatProvider.fetchOtherUserInfo(otherUserId!).then((name) {
+    try {
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      chatProvider = Provider.of<ChatProvider>(context, listen: false);
+
+      final userIds = widget.chatId.split('_');
+      otherUserId = userIds.first == authProvider.currentUser!.id
+          ? userIds.last
+          : userIds.first;
+
+      await chatProvider!.ensureChatRoomExists(widget.chatId, context, otherUserId!);
+      chatProvider!.startListeningToMessages(widget.chatId);
+      await chatProvider!.resetUnreadCount(widget.chatId, authProvider.currentUser!.id);
+      otherUserName = await chatProvider!.fetchOtherUserInfo(otherUserId!);
+
       if (mounted) {
         setState(() {
-          otherUserName = name;
+          isLoading = false;
         });
       }
-    });
+    } catch (e) {
+      print("초기화 중 오류 발생: $e");
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+        });
+      }
+    }
   }
 
   @override
   void dispose() {
+    chatProvider?.stopListeningToMessages();
+    chatProvider = null;
     messageController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    if (isLoading) {
+      return Scaffold(
+        appBar: AppBar(title: Text("로딩 중...")),
+        body: Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+    }
+
     final chatProvider = Provider.of<ChatProvider>(context);
 
     return Scaffold(
@@ -102,22 +116,20 @@ class _ChatScreenState extends State<ChatScreen> {
           children: [
             Expanded(
               child: ListView.builder(
+                key: ValueKey(chatProvider.messages.length),
                 reverse: true,
                 itemCount: chatProvider.messages.length,
+                cacheExtent: 500.0,
                 itemBuilder: (ctx, index) {
                   final message = chatProvider.messages[index];
                   final isMe = message.uId ==
-                      Provider.of<AuthProvider>(context, listen: false)
-                          .currentUser!
-                          .id;
+                      Provider.of<AuthProvider>(context, listen: false).currentUser!.id;
                   return MessageBubble(
+                    key: ValueKey(message.createdAt),
                     message: message,
                     isMe: isMe,
                     otherUserName: otherUserName,
-                    currentUserId:
-                        Provider.of<AuthProvider>(context, listen: false)
-                            .currentUser!
-                            .id,
+                    currentUserId: Provider.of<AuthProvider>(context, listen: false).currentUser!.id,
                   );
                 },
               ),
@@ -135,27 +147,18 @@ class _ChatScreenState extends State<ChatScreen> {
                       child: Row(
                         children: [
                           IconButton(
-                            icon:
-                                Icon(Icons.add, color: Colors.blue, size: 24.w),
+                            icon: Icon(Icons.add, color: Colors.blue, size: 24.w),
                             onPressed: () {
                               _bottomSheetWidget.showBottomSheetMenu(
                                 parentContext: context,
                                 chatId: widget.chatId,
-                                userId: Provider.of<AuthProvider>(context,
-                                        listen: false)
-                                    .currentUser!
-                                    .id,
+                                userId: Provider.of<AuthProvider>(context, listen: false).currentUser!.id,
                                 otherUserId: otherUserId!,
-                                currentUserProfileImage:
-                                    Provider.of<AuthProvider>(context,
-                                                listen: false)
-                                            .currentUser!
-                                            .profileImageUrl ??
-                                        '',
-                                username: Provider.of<AuthProvider>(context,
-                                        listen: false)
-                                    .currentUser!
-                                    .name,
+                                currentUserProfileImage: Provider.of<AuthProvider>(context, listen: false)
+                                        .currentUser!
+                                        .profileImageUrl ??
+                                    '',
+                                username: Provider.of<AuthProvider>(context, listen: false).currentUser!.name,
                               );
                             },
                           ),
@@ -170,8 +173,8 @@ class _ChatScreenState extends State<ChatScreen> {
                               decoration: InputDecoration(
                                 hintText: '메시지를 입력하세요...',
                                 border: InputBorder.none,
-                                contentPadding: EdgeInsets.symmetric(
-                                    horizontal: 16.w, vertical: 10.h),
+                                contentPadding:
+                                    EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),
                               ),
                             ),
                           ),

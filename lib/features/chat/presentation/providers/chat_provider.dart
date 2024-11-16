@@ -53,8 +53,15 @@ class ChatProvider extends ChangeNotifier {
 
   // 채팅방 구독 중지 메서드 추가
   void stopListeningToMessages() {
-    _messageSubscription?.cancel();
-    _unreadCountSubscription?.cancel();
+    try {
+      _messageSubscription?.cancel();
+      _unreadCountSubscription?.cancel();
+    } catch (e) {
+      print('구독 해제 중 오류 발생: $e');
+    } finally {
+      _messageSubscription = null;
+      _unreadCountSubscription = null;
+    }
   }
 
   // 읽지 않은 메시지 수 구독
@@ -372,6 +379,15 @@ class ChatProvider extends ChangeNotifier {
       'lastActivityTime': Timestamp.now(),
       'lastMessage': '위치 정보가 공유되었습니다.',
     });
+
+    final querySnapshot = await chatRef
+        .collection('messages')
+        .orderBy('createdAt', descending: true)
+        .get();
+
+    _messages = querySnapshot.docs
+        .map((doc) => MessageModel.fromDocument(doc).toEntity())
+        .toList();
 
     notifyListeners();
   }

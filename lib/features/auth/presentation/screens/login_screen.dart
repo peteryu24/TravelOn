@@ -92,7 +92,7 @@ class _LoginScreenState extends State<LoginScreen> {
           await _saveCredentialsToPrefs();
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('login.welcome${authProvider.currentUser!.name}'),
+              content: Text('${authProvider.currentUser!.name}님 환영합니다'),
             ),
           );
           context.go('/');
@@ -318,7 +318,7 @@ class _LoginScreenState extends State<LoginScreen> {
       if (authProvider.isAuthenticated && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('login.welcome${authProvider.currentUser!.name}'),
+            content: Text('${authProvider.currentUser!.name}님 환영합니다'),
           ),
         );
         context.go('/');
@@ -340,7 +340,7 @@ class _LoginScreenState extends State<LoginScreen> {
       if (authProvider.isAuthenticated && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('login.welcome${authProvider.currentUser!.name}'),
+            content: Text('${authProvider.currentUser!.name}님 환영합니다'),
           ),
         );
         context.go('/');
@@ -362,7 +362,7 @@ class _LoginScreenState extends State<LoginScreen> {
       if (authProvider.isAuthenticated && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('login.welcome${authProvider.currentUser!.name}'),
+            content: Text('${authProvider.currentUser!.name}님 환영합니다'),
           ),
         );
         context.go('/');
