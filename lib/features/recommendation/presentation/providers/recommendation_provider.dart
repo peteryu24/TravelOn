@@ -27,10 +27,11 @@ class RecommendationProvider extends ChangeNotifier {
       // 사용자의 좋아요 목록
       final likedPackages = List<String>.from(userData['likedPackages'] ?? []);
 
-      // 사용자의 예약 이력
+      // 사용자의 예약 이력 조회
       final bookingHistory = await _firestore
-          .collection('bookings')
+          .collection('reservations')
           .where('userId', isEqualTo: userId)
+          .where('status', isEqualTo: 'approved') // 승인된 예약만 고려
           .get();
 
       // 방문한 지역 집계
@@ -108,5 +109,52 @@ class RecommendationProvider extends ChangeNotifier {
       _isLoading = false;
       notifyListeners();
     }
+  }
+
+  Future<Map<String, double>> calculateRegionPreferences(String userId) async {
+    final visitedRegions = <String, double>{};
+
+    // 1. 예약 이력 조회 (최근 1년)
+    final oneYearAgo = DateTime.now().subtract(const Duration(days: 365));
+    final bookingHistory = await _firestore
+        .collection('reservations')
+        .where('userId', isEqualTo: userId)
+        .where('status', isEqualTo: 'completed') // 완료된 예약만
+        .where('travelDate', isGreaterThan: oneYearAgo)
+        .get();
+
+    // 2. 시간 기반 가중치 계산
+    for (var booking in bookingHistory.docs) {
+      final data = booking.data();
+      final region = data['region'] as String;
+      final travelDate = (data['travelDate'] as Timestamp).toDate();
+
+      // 최근 방문일수록 높은 가중치
+      final daysSinceVisit = DateTime.now().difference(travelDate).inDays;
+      final timeWeight =
+          1.0 - (daysSinceVisit / 365); // 1년 전 방문은 0점, 최근 방문은 1점에 가까움
+
+      // 기존 가중치에 새로운 가중치 추가
+      visitedRegions[region] = (visitedRegions[region] ?? 0) + timeWeight;
+    }
+
+    // 3. 리뷰 데이터로 보정
+    final reviews = await _firestore
+        .collection('reviews')
+        .where('userId', isEqualTo: userId)
+        .get();
+
+    for (var review in reviews.docs) {
+      final data = review.data();
+      final region = data['region'] as String;
+      final rating = (data['rating'] as num).toDouble();
+
+      // 높은 평점을 준 지역에 추가 가중치
+      if (rating >= 4.0) {
+        visitedRegions[region] = (visitedRegions[region] ?? 0) + 0.5;
+      }
+    }
+
+    return visitedRegions;
   }
 }
