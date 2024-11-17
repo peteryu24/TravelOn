@@ -13,6 +13,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/providers/navigation_provider.dart';
 import '../../../../features/notification/presentation/screens/notification_center_screen.dart';
 import '../../../../features/notification/presentation/providers/notification_provider.dart';
+import '../../../../features/home/presentation/widgets/tourism_density_widget.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -105,7 +106,6 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ],
       ),
-
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
@@ -114,10 +114,8 @@ class _HomeScreenState extends State<HomeScreen> {
             children: [
               const NextTripCard(),
               SizedBox(height: 20.h),
-
               const WeatherSlider(),
-              SizedBox(height: 30.h),
-
+              SizedBox(height: 10.h),
               GridView.count(
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
@@ -128,29 +126,17 @@ class _HomeScreenState extends State<HomeScreen> {
                 childAspectRatio: 0.9, // 1.0에서 0.9로 변경하여 세로 공간 확보
                 children: [
                   _buildMenuItem(
-                      Icons.star,
-                      'menu.travel_tips'.tr(),
-                      '/travel-tips'
-                  ),
-                  _buildMenuItem(
-                      Icons.people,
-                      'menu.guide_ranking'.tr(),
-                      '/guide-ranking'
-                  ),
-                  _buildMenuItem(
-                      Icons.favorite_border,
-                      'menu.recommended_places'.tr(),
-                      '/recommended-places'
-                  ),
-                  _buildMenuItem(
-                      Icons.photo_camera,
-                      'menu.travel_gallery'.tr(),
-                      '/travel-gallery'
-                  ),
+                      Icons.star, 'menu.travel_tips'.tr(), '/travel-tips'),
+                  _buildMenuItem(Icons.people, 'menu.guide_ranking'.tr(),
+                      '/guide-ranking'),
+                  _buildMenuItem(Icons.favorite_border,
+                      'menu.recommended_places'.tr(), '/recommended-places'),
+                  _buildMenuItem(Icons.photo_camera, 'menu.travel_gallery'.tr(),
+                      '/travel-gallery'),
                 ],
               ),
-              SizedBox(height: 30.h),
-
+              // SizedBox(height: 10.h),
+              const TourismDensityWidget(),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -168,7 +154,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     child: Row(
                       children: [
                         Text(
-                          'common.see_more'.tr(),  // 여기를 확인
+                          'common.see_more'.tr(), // 여기를 확인
                           style: const TextStyle(color: Colors.blueAccent),
                         ),
                         Icon(Icons.chevron_right, color: Colors.grey.shade600),
@@ -178,7 +164,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 ],
               ),
               SizedBox(height: 10.h),
-
               Consumer<TravelProvider>(
                 builder: (context, provider, child) {
                   final popularPackages = provider.getPopularPackages();
