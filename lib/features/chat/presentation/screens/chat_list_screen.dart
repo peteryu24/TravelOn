@@ -6,6 +6,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:travel_on_final/features/chat/presentation/screens/search/guide_search_screen.dart';
 import 'package:travel_on_final/features/auth/presentation/providers/auth_provider.dart';
 import 'package:travel_on_final/features/chat/presentation/providers/chat_provider.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:travel_on_final/core/providers/navigation_provider.dart';
 
 class ChatListScreen extends StatefulWidget {
@@ -240,11 +241,24 @@ class _ChatListScreenState extends State<ChatListScreen> {
                         },
                         child: ListTile(
                           leading: CircleAvatar(
-                            backgroundImage: chatData['userProfileImages'] != null &&
-                                    chatData['userProfileImages'][otherUserId] != null &&
-                                    chatData['userProfileImages'][otherUserId].isNotEmpty
-                                ? NetworkImage(chatData['userProfileImages'][otherUserId])
-                                : const AssetImage('assets/images/default_profile.png') as ImageProvider,
+                            radius: 20,
+                            backgroundImage: (chatData['userProfileImages']?[otherUserId] == null ||
+                                    chatData['userProfileImages'][otherUserId].isEmpty)
+                                ? const AssetImage('assets/images/default_profile.png')
+                                : null,
+                            child: (chatData['userProfileImages']?[otherUserId] != null &&
+                                    chatData['userProfileImages'][otherUserId].isNotEmpty)
+                                ? CachedNetworkImage(
+                                    imageUrl: chatData['userProfileImages'][otherUserId],
+                                    placeholder: (context, url) => Center(
+                                      child: CircularProgressIndicator(strokeWidth: 2),
+                                    ),
+                                    imageBuilder: (context, imageProvider) => CircleAvatar(
+                                      backgroundImage: imageProvider,
+                                      radius: 20,
+                                    ),
+                                  )
+                                : null,
                           ),
                           title: Row(
                             children: [
@@ -254,7 +268,8 @@ class _ChatListScreenState extends State<ChatListScreen> {
                                           0,
                                           chatData['usernames'][otherUserId].length > 15
                                               ? 15
-                                              : chatData['usernames'][otherUserId].length) ?? 'Unknown User',
+                                              : chatData['usernames'][otherUserId].length) ??
+                                      'Unknown User',
                                   style: const TextStyle(fontWeight: FontWeight.bold),
                                 ),
                               ),
