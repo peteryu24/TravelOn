@@ -28,15 +28,20 @@ class TravelRepositoryImpl implements TravelRepository {
           guideId: data['guideId'] ?? '',
           minParticipants: (data['minParticipants'] as num?)?.toInt() ?? 4,
           maxParticipants: (data['maxParticipants'] as num?)?.toInt() ?? 8,
-          nights: (data['nights'] as num?)?.toInt() ?? 1,          departureDays: List<int>.from(data['departureDays'] ?? [1,2,3,4,5,6,7]),
-          reviewCount: (data['reviewCount'] as num?)?.toInt() ?? 0,
+          nights: (data['nights'] as num?)?.toInt() ?? 1,
+          departureDays:
+              List<int>.from(data['departureDays'] ?? [1, 2, 3, 4, 5, 6, 7]),
+          totalDays: (data['totalDays'] as num?)?.toInt() ?? 1,
+          rating: (data['rating'] as num?)?.toDouble() ?? 0.0,
           averageRating: (data['averageRating'] as num?)?.toDouble() ?? 0.0,
+          reviewCount: (data['reviewCount'] as num?)?.toInt() ?? 0,
           likedBy: List<String>.from(data['likedBy'] ?? []),
           likesCount: (data['likesCount'] as num?)?.toInt() ?? 0,
           routePoints: (data['routePoints'] as List<dynamic>?)
-              ?.map((point) => TravelPoint.fromJson(point as Map<String, dynamic>))
-              .toList() ?? [],
-          // routePoints 추가
+                  ?.map((point) =>
+                      TravelPoint.fromJson(point as Map<String, dynamic>))
+                  .toList() ??
+              [],
         );
       }).toList();
     } catch (e) {
@@ -90,7 +95,8 @@ class TravelRepositoryImpl implements TravelRepository {
         'departureDays': package.departureDays,
         'likedBy': [],
         'likesCount': 0,
-        'routePoints': package.routePoints.map((point) => point.toJson()).toList(),
+        'routePoints':
+            package.routePoints.map((point) => point.toJson()).toList(),
       };
 
       if (package.minParticipants <= 0) {
@@ -163,7 +169,9 @@ class TravelRepositoryImpl implements TravelRepository {
         'maxParticipants': package.maxParticipants,
         'nights': package.nights,
         'departureDays': package.departureDays,
-        'routePoints': package.routePoints.map((point) => point.toJson()).toList(),  // routePoints 추가
+        'routePoints': package.routePoints
+            .map((point) => point.toJson())
+            .toList(), // routePoints 추가
       };
 
       if (package.minParticipants <= 0) {

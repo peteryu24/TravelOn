@@ -28,6 +28,7 @@ import 'package:travel_on_final/features/reservation/presentation/providers/rese
 import 'package:travel_on_final/features/review/presentation/provider/review_provider.dart';
 import 'package:travel_on_final/features/search/presentation/providers/travel_provider.dart';
 import 'package:travel_on_final/features/gallery/presentation/providers/gallery_provider.dart';
+import 'package:travel_on_final/features/recommendation/presentation/providers/recommendation_provider.dart';
 
 // Repositories & UseCases
 import 'package:travel_on_final/features/auth/data/repositories/auth_repository_impl.dart';
@@ -99,7 +100,75 @@ Future<void> main() async {
       ],
       path: 'assets/translations',
       fallbackLocale: const Locale('ko', 'KR'),
-      child: const MyApp(),
+      child: MultiProvider(
+        providers: [
+          // Firebase 서비스 프로바이더
+          Provider<FirebaseAuth>.value(value: FirebaseAuth.instance),
+          Provider<FirebaseFirestore>.value(value: FirebaseFirestore.instance),
+          Provider<FirebaseMessaging>.value(value: FirebaseMessaging.instance),
+
+          // Repositories
+          Provider<AuthRepository>(create: (_) => AuthRepositoryImpl()),
+          Provider<GalleryRepository>(create: (_) => GalleryRepository()),
+
+          // Core Providers
+          ChangeNotifierProvider(create: (_) => NavigationProvider()),
+          ChangeNotifierProvider(create: (_) => WeatherProvider()),
+
+          // Auth 및 Travel 관련 Providers
+          ProxyProvider<FirebaseAuth, ResetPasswordUseCase>(
+            update: (_, auth, __) => ResetPasswordUseCase(auth),
+          ),
+          ChangeNotifierProvider(
+            create: (_) => TravelProvider(
+              TravelRepositoryImpl(),
+              auth: FirebaseAuth.instance,
+            ),
+          ),
+          ChangeNotifierProvider(
+            create: (context) => app.AuthProvider(
+              context.read<FirebaseAuth>(),
+              context.read<ResetPasswordUseCase>(),
+              context.read<TravelProvider>(),
+            ),
+          ),
+
+          // Feature Providers
+          ChangeNotifierProvider(
+            create: (context) =>
+                ChatProvider(context.read<NavigationProvider>()),
+          ),
+          ChangeNotifierProvider(
+            create: (_) => ReservationProvider(FirebaseFirestore.instance),
+          ),
+          ChangeNotifierProvider(
+            create: (context) => ReviewProvider(
+              ReviewRepositoryImpl(context.read<TravelProvider>()),
+            ),
+          ),
+          ChangeNotifierProvider(
+            create: (_) => HomeProvider(
+              GetNextTrip(HomeRepositoryImpl(FirebaseFirestore.instance)),
+            ),
+          ),
+          ChangeNotifierProvider(
+            create: (context) =>
+                GalleryProvider(context.read<GalleryRepository>()),
+          ),
+          ChangeNotifierProvider(
+            create: (_) => GuideRankingProvider(FirebaseFirestore.instance),
+          ),
+          ChangeNotifierProvider(
+            create: (context) => NotificationProvider(
+              FirebaseFirestore.instance,
+              FirebaseMessaging.instance,
+              context.read<NavigationProvider>(), // NavigationProvider 주입
+            ),
+          ),
+          ChangeNotifierProvider(create: (_) => RecommendationProvider()),
+        ],
+        child: const MyApp(),
+      ),
     ),
   );
 }
@@ -109,85 +178,19 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MultiProvider(
-      providers: [
-        // Firebase 서비스 프로바이더
-        Provider<FirebaseAuth>.value(value: FirebaseAuth.instance),
-        Provider<FirebaseFirestore>.value(value: FirebaseFirestore.instance),
-        Provider<FirebaseMessaging>.value(value: FirebaseMessaging.instance),
-
-        // Repositories
-        Provider<AuthRepository>(create: (_) => AuthRepositoryImpl()),
-        Provider<GalleryRepository>(create: (_) => GalleryRepository()),
-
-        // Core Providers
-        ChangeNotifierProvider(create: (_) => NavigationProvider()),
-        ChangeNotifierProvider(create: (_) => WeatherProvider()),
-
-        // Auth 및 Travel 관련 Providers
-        ProxyProvider<FirebaseAuth, ResetPasswordUseCase>(
-          update: (_, auth, __) => ResetPasswordUseCase(auth),
-        ),
-        ChangeNotifierProvider(
-          create: (_) => TravelProvider(
-            TravelRepositoryImpl(),
-            auth: FirebaseAuth.instance,
-          ),
-        ),
-        ChangeNotifierProvider(
-          create: (context) => app.AuthProvider(
-            context.read<FirebaseAuth>(),
-            context.read<ResetPasswordUseCase>(),
-            context.read<TravelProvider>(),
-          ),
-        ),
-
-        // Feature Providers
-        ChangeNotifierProvider(
-          create: (context) => ChatProvider(context.read<NavigationProvider>()),
-        ),
-        ChangeNotifierProvider(
-          create: (_) => ReservationProvider(FirebaseFirestore.instance),
-        ),
-        ChangeNotifierProvider(
-          create: (context) => ReviewProvider(
-            ReviewRepositoryImpl(context.read<TravelProvider>()),
-          ),
-        ),
-        ChangeNotifierProvider(
-          create: (_) => HomeProvider(
-            GetNextTrip(HomeRepositoryImpl(FirebaseFirestore.instance)),
-          ),
-        ),
-        ChangeNotifierProvider(
-          create: (context) =>
-              GalleryProvider(context.read<GalleryRepository>()),
-        ),
-        ChangeNotifierProvider(
-          create: (_) => GuideRankingProvider(FirebaseFirestore.instance),
-        ),
-        ChangeNotifierProvider(
-          create: (context) => NotificationProvider(
-            FirebaseFirestore.instance,
-            FirebaseMessaging.instance,
-            context.read<NavigationProvider>(), // NavigationProvider 주입
-          ),
-        ),
-      ],
-      child: ScreenUtilInit(
-        designSize: const Size(375, 812),
-        child: MaterialApp.router(
-          title: 'Travel On',
-          debugShowCheckedModeBanner: false,
-          routerConfig: goRouter,
-          localizationsDelegates: context.localizationDelegates,
-          supportedLocales: context.supportedLocales,
-          locale: context.locale,
-          theme: ThemeData(
-            primaryColor: Colors.blue,
-            colorScheme: ColorScheme.fromSwatch(primarySwatch: Colors.blue)
-                .copyWith(secondary: Colors.blueAccent),
-          ),
+    return ScreenUtilInit(
+      designSize: const Size(375, 812),
+      child: MaterialApp.router(
+        title: 'Travel On',
+        debugShowCheckedModeBanner: false,
+        routerConfig: goRouter,
+        localizationsDelegates: context.localizationDelegates,
+        supportedLocales: context.supportedLocales,
+        locale: context.locale,
+        theme: ThemeData(
+          primaryColor: Colors.blue,
+          colorScheme: ColorScheme.fromSwatch(primarySwatch: Colors.blue)
+              .copyWith(secondary: Colors.blueAccent),
         ),
       ),
     );

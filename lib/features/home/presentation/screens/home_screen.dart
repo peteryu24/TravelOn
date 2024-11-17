@@ -14,6 +14,7 @@ import '../../../../core/providers/navigation_provider.dart';
 import '../../../../features/notification/presentation/screens/notification_center_screen.dart';
 import '../../../../features/notification/presentation/providers/notification_provider.dart';
 import '../../../../features/home/presentation/widgets/tourism_density_widget.dart';
+import 'package:travel_on_final/features/recommendation/presentation/screens/recommendation_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -122,11 +123,10 @@ class _HomeScreenState extends State<HomeScreen> {
                 crossAxisCount: 4,
                 mainAxisSpacing: 15.w,
                 crossAxisSpacing: 15.w,
-                // childAspectRatio를 조정하여 2줄 텍스트가 들어갈 공간 확보
-                childAspectRatio: 0.9, // 1.0에서 0.9로 변경하여 세로 공간 확보
+                childAspectRatio: 0.9,
                 children: [
-                  _buildMenuItem(
-                      Icons.star, 'menu.travel_tips'.tr(), '/travel-tips'),
+                  _buildMenuItem(Icons.recommend,
+                      'menu.travel_recommendation'.tr(), '/recommendation'),
                   _buildMenuItem(Icons.people, 'menu.guide_ranking'.tr(),
                       '/guide-ranking'),
                   _buildMenuItem(Icons.favorite_border,

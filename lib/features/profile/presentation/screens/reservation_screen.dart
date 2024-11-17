@@ -11,10 +11,12 @@ class CustomerReservationsScreen extends StatefulWidget {
   const CustomerReservationsScreen({super.key});
 
   @override
-  State<CustomerReservationsScreen> createState() => _CustomerReservationsScreenState();
+  State<CustomerReservationsScreen> createState() =>
+      _CustomerReservationsScreenState();
 }
 
-class _CustomerReservationsScreenState extends State<CustomerReservationsScreen> with SingleTickerProviderStateMixin {
+class _CustomerReservationsScreenState extends State<CustomerReservationsScreen>
+    with SingleTickerProviderStateMixin {
   late TabController _tabController;
 
   @override
@@ -52,7 +54,7 @@ class _CustomerReservationsScreenState extends State<CustomerReservationsScreen>
       Navigator.pop(context);
 
       final package = travelProvider.packages.firstWhere(
-            (p) => p.id == packageId,
+        (p) => p.id == packageId,
         orElse: () => throw Exception('패키지를 찾을 수 없습니다'),
       );
 
@@ -102,9 +104,8 @@ class _CustomerReservationsScreenState extends State<CustomerReservationsScreen>
   }
 
   Widget _buildReservationList(ReservationProvider provider, String status) {
-    final reservations = provider.reservations
-        .where((res) => res.status == status)
-        .toList();
+    final reservations =
+        provider.reservations.where((res) => res.status == status).toList();
 
     if (reservations.isEmpty) {
       return Center(
@@ -121,7 +122,7 @@ class _CustomerReservationsScreenState extends State<CustomerReservationsScreen>
             final reservation = reservations[index];
             // 해당하는 패키지 찾기
             final package = travelProvider.packages.firstWhere(
-                  (p) => p.id == reservation.packageId,
+              (p) => p.id == reservation.packageId,
               orElse: () => TravelPackage(
                 id: reservation.packageId,
                 title: reservation.packageTitle,
@@ -131,8 +132,12 @@ class _CustomerReservationsScreenState extends State<CustomerReservationsScreen>
                 guideName: reservation.guideName,
                 guideId: reservation.guideId,
                 maxParticipants: 0,
-                nights: 1,                          // 기본값 1박
-                departureDays: [1, 2, 3, 4, 5, 6, 7], minParticipants: 1, totalDays: 1,  // 모든 요일 허용
+                minParticipants: 1,
+                nights: 1,
+                departureDays: [1, 2, 3, 4, 5, 6, 7],
+                totalDays: 1,
+                descriptionImages: [],
+                routePoints: [],
               ),
             );
 
@@ -143,7 +148,8 @@ class _CustomerReservationsScreenState extends State<CustomerReservationsScreen>
                 child: Column(
                   children: [
                     // 썸네일 이미지
-                    if (package.mainImage != null && package.mainImage!.isNotEmpty)
+                    if (package.mainImage != null &&
+                        package.mainImage!.isNotEmpty)
                       SizedBox(
                         height: 150,
                         width: double.infinity,
@@ -156,9 +162,10 @@ class _CustomerReservationsScreenState extends State<CustomerReservationsScreen>
                               color: Colors.grey[200],
                               child: Center(
                                 child: CircularProgressIndicator(
-                                  value: loadingProgress.expectedTotalBytes != null
+                                  value: loadingProgress.expectedTotalBytes !=
+                                          null
                                       ? loadingProgress.cumulativeBytesLoaded /
-                                      loadingProgress.expectedTotalBytes!
+                                          loadingProgress.expectedTotalBytes!
                                       : null,
                                 ),
                               ),
@@ -227,15 +234,20 @@ class _CustomerReservationsScreenState extends State<CustomerReservationsScreen>
                           ),
                           const SizedBox(height: 8),
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 8, vertical: 4),
                             decoration: BoxDecoration(
-                              color: status == 'pending' ? Colors.orange.shade100 : Colors.green.shade100,
+                              color: status == 'pending'
+                                  ? Colors.orange.shade100
+                                  : Colors.green.shade100,
                               borderRadius: BorderRadius.circular(4),
                             ),
                             child: Text(
                               status == 'pending' ? '승인 대기중' : '예약 확정',
                               style: TextStyle(
-                                color: status == 'pending' ? Colors.orange.shade900 : Colors.green.shade900,
+                                color: status == 'pending'
+                                    ? Colors.orange.shade900
+                                    : Colors.green.shade900,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
