@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../domain/entities/regional_spot.dart';
@@ -92,7 +93,7 @@ class RegionalSpotCard extends StatelessWidget {
           ],
         ),
         trailing: IconButton(
-          icon: const Icon(Icons.map, color: Colors.blue),
+          icon: const Icon(CupertinoIcons.placemark_fill, color: Colors.blue),
           onPressed: _launchNaverMap,
         ),
         onTap: _launchNaverMap,

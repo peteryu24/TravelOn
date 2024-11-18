@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
@@ -126,22 +127,22 @@ class _HomeScreenState extends State<HomeScreen> {
                 childAspectRatio: 0.9,
                 children: [
                   _buildMenuItem(
-                    Icons.thumb_up,
+                    CupertinoIcons.heart_fill,
                     '여행추천',
                     '/recommendation',
                   ),
                   _buildMenuItem(
-                    Icons.group,
+                    CupertinoIcons.person_3_fill,
                     '가이드랭킹',
                     '/guide-ranking',
                   ),
                   _buildMenuItem(
-                    Icons.explore,
+                    CupertinoIcons.map_pin_ellipse,
                     '지역탐방',
                     '/regional-exploration',
                   ),
                   _buildMenuItem(
-                    Icons.photo_camera,
+                    CupertinoIcons.camera_fill,
                     '여행갤러리',
                     '/travel-gallery',
                   ),
