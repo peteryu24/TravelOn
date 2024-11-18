@@ -165,12 +165,12 @@ class _NotificationTile extends StatelessWidget {
     switch (type) {
       case 'reservation_request':
         return const CircleAvatar(
-          backgroundColor: Colors.orange,
+          backgroundColor: Colors.lightBlueAccent,
           child: Icon(Icons.calendar_today, color: Colors.white),
         );
       case 'reservation_update':
         return const CircleAvatar(
-          backgroundColor: Colors.green,
+          backgroundColor: Colors.blue,
           child: Icon(Icons.check_circle, color: Colors.white),
         );
       default:
