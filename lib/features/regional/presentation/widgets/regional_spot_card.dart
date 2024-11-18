@@ -12,14 +12,17 @@ class RegionalSpotCard extends StatelessWidget {
   });
 
   void _openNaverMap(String name, String address) async {
-    // 장소명에 시/군/구 정보를 포함
+    // 주소에서 시/군/구 정보 추출
     String locationPrefix = '';
     if (address.isNotEmpty) {
-      // 주소에서 첫 번째 시/군/구 정보 추출
       final addressParts = address.split(' ');
-      if (addressParts.length >= 2) {
+      if (addressParts.length >= 3) {
+        // 시/도 + 시 + 구 형태로 검색 (예: "경기 수원시 권선구")
         locationPrefix =
-            '${addressParts[0]} ${addressParts[1]} '; // 예: "부산 동래구 "
+            '${addressParts[0]} ${addressParts[1]} ${addressParts[2]} ';
+      } else if (addressParts.length >= 2) {
+        // 시/도 + 시/군 형태로 검색
+        locationPrefix = '${addressParts[0]} ${addressParts[1]} ';
       }
     }
 
