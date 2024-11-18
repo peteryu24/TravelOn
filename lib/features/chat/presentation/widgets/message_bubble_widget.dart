@@ -8,7 +8,6 @@ import 'package:travel_on_final/features/map/domain/entities/travel_point.dart';
 import 'package:travel_on_final/features/search/domain/entities/travel_package.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_naver_map/flutter_naver_map.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class MessageBubble extends StatelessWidget {
   final MessageEntity message;
@@ -17,6 +16,7 @@ class MessageBubble extends StatelessWidget {
   final String currentUserId;
 
   const MessageBubble({
+    super.key,
     required this.message,
     required this.isMe,
     required this.otherUserName,
@@ -27,137 +27,145 @@ class MessageBubble extends StatelessWidget {
   Widget build(BuildContext context) {
     final isPackageMessage = message.sharedPackage != null;
 
-    return Column(
-      crossAxisAlignment: isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
-      children: [
-        if (!isMe)
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
-            child: Row(
-              children: [
-                CircleAvatar(
-                  backgroundImage: message.profileImageUrl != null && message.profileImageUrl!.isNotEmpty
-                      ? CachedNetworkImageProvider(message.profileImageUrl!)
-                      : AssetImage('assets/images/default_profile.png') as ImageProvider,
-                  radius: 15.r,
+    return RepaintBoundary(
+      child: Column(
+        crossAxisAlignment:
+            isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+        children: [
+          if (!isMe)
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
+              child: Row(
+                children: [
+                  CircleAvatar(
+                    backgroundImage: message.profileImageUrl != null &&
+                            message.profileImageUrl!.isNotEmpty
+                        ? CachedNetworkImageProvider(message.profileImageUrl!)
+                        : const AssetImage('assets/images/default_profile.png')
+                            as ImageProvider,
+                    radius: 15.r,
+                  ),
+                  SizedBox(width: 8.w),
+                  Text(
+                    otherUserName,
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.grey[700],
+                      fontSize: 14.sp,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          Row(
+            mainAxisAlignment:
+                isMe ? MainAxisAlignment.end : MainAxisAlignment.start,
+            children: <Widget>[
+              Container(
+                constraints: BoxConstraints(
+                  maxWidth: isPackageMessage
+                      ? MediaQuery.of(context).size.width * 0.8
+                      : MediaQuery.of(context).size.width * 0.6,
                 ),
-                SizedBox(width: 8.w),
-                Text(
-                  otherUserName,
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: Colors.grey[700],
-                    fontSize: 14.sp,
+                decoration: BoxDecoration(
+                  color: isMe ? Colors.blue.shade100 : Colors.grey[200],
+                  borderRadius: BorderRadius.circular(12.r),
+                  border: Border.all(
+                    color: Colors.grey.shade300,
+                    width: 1.0,
                   ),
                 ),
-              ],
-            ),
+                padding: EdgeInsets.symmetric(vertical: 10.h, horizontal: 16.w),
+                margin: EdgeInsets.symmetric(vertical: 4.h, horizontal: 8.w),
+                child: message.location != null
+                    ? _buildLocationDetails(context, message.location!)
+                    : isPackageMessage
+                        ? _buildPackageDetails(context, message.sharedPackage!)
+                        : (message.sharedUser != null
+                            ? _buildUserDetails(context, message.sharedUser!)
+                            : (message.imageUrl != null &&
+                                    message.imageUrl!.isNotEmpty
+                                ? CachedNetworkImage(
+                                    imageUrl: message.imageUrl!,
+                                    placeholder: (context, url) =>
+                                        const CircularProgressIndicator(),
+                                    errorWidget: (context, url, error) =>
+                                        const Icon(Icons.error),
+                                  )
+                                : Text(
+                                    message.text,
+                                    style: TextStyle(
+                                      color: isMe ? Colors.black : Colors.black,
+                                      fontSize: 14.sp,
+                                    ),
+                                  ))),
+              ),
+            ],
           ),
-        Row(
-          mainAxisAlignment: isMe ? MainAxisAlignment.end : MainAxisAlignment.start,
-          children: <Widget>[
-            Container(
-              constraints: BoxConstraints(
-                maxWidth: isPackageMessage
-                    ? MediaQuery.of(context).size.width * 0.8
-                    : MediaQuery.of(context).size.width * 0.6,
-              ),
-              decoration: BoxDecoration(
-                color: isMe ? Colors.blue.shade100 : Colors.grey[200],
-                borderRadius: BorderRadius.circular(12.r),
-                border: Border.all(
-                  color: Colors.grey.shade300,
-                  width: 1.0,
-                ),
-              ),
-              padding: EdgeInsets.symmetric(vertical: 10.h, horizontal: 16.w),
-              margin: EdgeInsets.symmetric(vertical: 4.h, horizontal: 8.w),
-              child: message.location != null
-                  ? _buildLocationDetails(context, message.location!)
-                  : isPackageMessage
-                      ? _buildPackageDetails(context, message.sharedPackage!)
-                      : (message.sharedUser != null
-                          ? _buildUserDetails(context, message.sharedUser!)
-                          : (message.imageUrl != null && message.imageUrl!.isNotEmpty
-                              ? CachedNetworkImage(
-                                  imageUrl: message.imageUrl!,
-                                  placeholder: (context, url) => CircularProgressIndicator(),
-                                  errorWidget: (context, url, error) => Icon(Icons.error),
-                                )
-                              : Text(
-                                  message.text,
-                                  style: TextStyle(
-                                    color: isMe ? Colors.black : Colors.black,
-                                    fontSize: 14.sp,
-                                  ),
-                                ))),
-            ),
-          ],
-        ),
-      ],
+        ],
+      ),
     );
   }
 
-  Widget _buildLocationDetails(BuildContext context, Map<String, dynamic> location) {
-    final title = location['title'] ?? '위치 정보';
-    final address = location['address'] ?? '주소 정보 없음';
+  Widget _buildLocationDetails(
+      BuildContext context, Map<String, dynamic> location) {
     final latitude = location['latitude'] ?? 0.0;
     final longitude = location['longitude'] ?? 0.0;
+
+    if (latitude == 0.0 && longitude == 0.0) {
+      return const Center(child: Text('위치 정보를 불러올 수 없습니다.'));
+    }
+
+    late NaverMapController naverMapController;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Text(
-          title,
+          location['title'] ?? '위치 정보',
           style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.bold),
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-        ),
-        SizedBox(height: 4.h),
-        Text(
-          address,
-          style: TextStyle(fontSize: 14.sp),
-          maxLines: 2,
-          overflow: TextOverflow.ellipsis,
         ),
         SizedBox(height: 8.h),
-        Container(
+        SizedBox(
+          key: ValueKey('${latitude}_$longitude'),
           width: 250.w,
           height: 150.h,
-          child: NaverMap(
-            options: NaverMapViewOptions(
-              initialCameraPosition: NCameraPosition(
-                target: NLatLng(latitude, longitude),
-                zoom: 16,
+          child: RepaintBoundary(
+            child: NaverMap(
+              options: NaverMapViewOptions(
+                initialCameraPosition: NCameraPosition(
+                  target: NLatLng(latitude, longitude),
+                  zoom: 16,
+                ),
+                mapType: NMapType.basic,
               ),
-              mapType: NMapType.basic,
+              onMapReady: (controller) {
+                naverMapController = controller;
+                naverMapController.addOverlay(NMarker(
+                  id: 'shared-location',
+                  position: NLatLng(latitude, longitude),
+                ));
+              },
             ),
-            onMapReady: (controller) {
-              if (controller != null) {
-                try {
-                  controller.addOverlay(NMarker(
-                    id: 'shared-location',
-                    position: NLatLng(latitude, longitude),
-                  ));
-                } catch (e) {
-                  print('오류 발생: ${e.toString()}');
-                }
-              }
-            },
           ),
         ),
         SizedBox(height: 8.h),
         ElevatedButton(
-          onPressed: () async {
+          onPressed: () {
+            final latitude = location['latitude'].toString();
+            final longitude = location['longitude'].toString();
+            context.push('/map-detail/$latitude/$longitude');
           },
-          child: Text('자세히 보기'),
+          child: const Text('자세히 보기'),
         ),
       ],
     );
   }
 
-  Widget _buildPackageDetails(BuildContext context, Map<String, dynamic> package) {
-    final formattedPrice = NumberFormat('#,###').format(package['price'].toInt());
+  Widget _buildPackageDetails(
+      BuildContext context, Map<String, dynamic> package) {
+    final formattedPrice =
+        NumberFormat('#,###').format(package['price'].toInt());
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
@@ -166,7 +174,7 @@ class MessageBubble extends StatelessWidget {
             borderRadius: BorderRadius.circular(8.r),
             child: CachedNetworkImage(
               imageUrl: package['mainImage'] ?? '',
-              placeholder: (context, url) => CircularProgressIndicator(),
+              placeholder: (context, url) => const CircularProgressIndicator(),
               errorWidget: (context, url, error) => Image.asset(
                 'assets/images/default_image.png',
                 width: 250.w,
@@ -191,15 +199,14 @@ class MessageBubble extends StatelessWidget {
           children: [
             Padding(
               padding: EdgeInsets.only(right: 5.w),
-              child:
-                Text(
-                  '₩$formattedPrice',
-                  style: TextStyle(
-                    fontSize: 18.sp,
-                    color: Colors.blueAccent,
-                    fontWeight: FontWeight.w600,
-                  ),
+              child: Text(
+                '₩$formattedPrice',
+                style: TextStyle(
+                  fontSize: 18.sp,
+                  color: Colors.blueAccent,
+                  fontWeight: FontWeight.w600,
                 ),
+              ),
             ),
           ],
         ),
@@ -208,19 +215,23 @@ class MessageBubble extends StatelessWidget {
           children: [
             Padding(
               padding: EdgeInsets.only(right: 5.w),
-              child:
-                Text(
-                  '가이드',
-                  style: TextStyle(fontSize: 14.sp, color: Colors.black, fontWeight: FontWeight.bold),
-                ),
+              child: Text(
+                '가이드',
+                style: TextStyle(
+                    fontSize: 14.sp,
+                    color: Colors.black,
+                    fontWeight: FontWeight.bold),
+              ),
             ),
             Padding(
               padding: EdgeInsets.only(right: 5.w),
-              child:
-                Text(
-                  '${package['guideName']}',
-                  style: TextStyle(fontSize: 16.sp, color: Colors.black, fontWeight: FontWeight.bold),
-                ),
+              child: Text(
+                '${package['guideName']}',
+                style: TextStyle(
+                    fontSize: 16.sp,
+                    color: Colors.black,
+                    fontWeight: FontWeight.bold),
+              ),
             ),
           ],
         ),
@@ -258,11 +269,13 @@ class MessageBubble extends StatelessWidget {
                       ? List<String>.from(package['likedBy'])
                       : [],
                   likesCount: package['likesCount'] as int? ?? 0,
-                  averageRating: (package['averageRating'] as num?)?.toDouble() ?? 0.0,
+                  rating: (package['rating'] as num?)?.toDouble() ?? 0.0,
                   reviewCount: package['reviewCount'] as int? ?? 0,
+                  totalDays: (package['totalDays'] as int?) ?? 1,
                   routePoints: package['routePoints'] is List
                       ? (package['routePoints'] as List)
-                          .map((point) => TravelPoint.fromJson(point as Map<String, dynamic>))
+                          .map((point) => TravelPoint.fromJson(
+                              point as Map<String, dynamic>))
                           .toList()
                       : [],
                 );
@@ -294,9 +307,11 @@ class MessageBubble extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         CircleAvatar(
-          backgroundImage: user['profileImageUrl'] != null && user['profileImageUrl'].isNotEmpty
+          backgroundImage: user['profileImageUrl'] != null &&
+                  user['profileImageUrl'].isNotEmpty
               ? CachedNetworkImageProvider(user['profileImageUrl'])
-              : AssetImage('assets/images/default_profile.png') as ImageProvider,
+              : const AssetImage('assets/images/default_profile.png')
+                  as ImageProvider,
           radius: 30.r,
         ),
         SizedBox(height: 8.h),
@@ -324,7 +339,9 @@ class MessageBubble extends StatelessWidget {
                   padding: EdgeInsets.symmetric(vertical: 8.h),
                 ),
                 onPressed: () {
-                  if (currentUserId.isNotEmpty && user['id'] is String && (user['id'] as String).isNotEmpty) {
+                  if (currentUserId.isNotEmpty &&
+                      user['id'] is String &&
+                      (user['id'] as String).isNotEmpty) {
                     final userId = user['id'] as String;
                     final chatId = CreateChatId().call(currentUserId, userId);
                     try {
@@ -350,7 +367,8 @@ class MessageBubble extends StatelessWidget {
                   padding: EdgeInsets.symmetric(vertical: 8.h),
                 ),
                 onPressed: () {
-                  if (user['id'] is String && (user['id'] as String).isNotEmpty) {
+                  if (user['id'] is String &&
+                      (user['id'] as String).isNotEmpty) {
                     final userId = user['id'] as String;
                     context.push('/user-profile/${user['id']}');
                   } else {

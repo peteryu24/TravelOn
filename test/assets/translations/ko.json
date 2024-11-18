@@ -1,0 +1,13 @@
+{
+  "common": {
+    "guest": "게스트"
+  },
+  "home": {
+    "next_trip": {
+      "greeting": "{name}님의",
+      "countdown": "{title}까지 D-{days} 남았습니다",
+      "today": "오늘은 {title} 여행이 있습니다",
+      "no_trips": "예정된 여행이 없습니다"
+    }
+  }
+} 

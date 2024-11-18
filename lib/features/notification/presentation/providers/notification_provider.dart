@@ -3,12 +3,14 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import '../../../../core/providers/navigation_provider.dart';
 import '../../domain/entities/notification.dart';
 
 class NotificationProvider extends ChangeNotifier {
   final FirebaseFirestore _firestore;
   final FirebaseMessaging _messaging;
   final FirebaseAuth _auth;
+  final NavigationProvider _navigationProvider;
   final List<NotificationEntity> _notifications = [];
   bool _isLoading = false;
   String? _error;
@@ -16,7 +18,8 @@ class NotificationProvider extends ChangeNotifier {
   final FlutterLocalNotificationsPlugin _flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
 
-  NotificationProvider(this._firestore, this._messaging)
+  NotificationProvider(
+      this._firestore, this._messaging, this._navigationProvider)
       : _auth = FirebaseAuth.instance {
     _initNotifications();
   }
@@ -87,8 +90,33 @@ class NotificationProvider extends ChangeNotifier {
   }
 
   Future<void> _handleForegroundMessage(RemoteMessage message) async {
-    // 로컬 알림 표시
-    await _showLocalNotification(message);
+    if (message.data['type'] == 'chat_message') {
+      // 채팅 메시지 알림일 경우 기본 알림음 사용
+      await _flutterLocalNotificationsPlugin.show(
+        DateTime.now().millisecond,
+        message.notification?.title ?? '새로운 메시지',
+        message.notification?.body,
+        const NotificationDetails(
+          android: AndroidNotificationDetails(
+            'chat_channel',
+            '채팅 알림',
+            importance: Importance.high,
+            priority: Priority.high,
+            playSound: true,
+            enableVibration: true,
+          ),
+          iOS: DarwinNotificationDetails(
+            presentSound: true,
+          ),
+        ),
+        // payload: message.data['chatId'], // 수정필요
+      );
+      // 채팅 메시지의 경우 _showLocalNotification 호출하지 않음
+    } else {
+      // 채팅 메시지가 아닌 경우에만 로컬 알림 표시
+      await _showLocalNotification(message);
+    }
+
     // 알림 목록 새로고침
     loadNotifications();
   }
@@ -148,23 +176,34 @@ class NotificationProvider extends ChangeNotifier {
       final querySnapshot = await _firestore
           .collection('notifications')
           .where('userId', isEqualTo: user.uid)
+          .where('type', isNotEqualTo: 'chat_message')
           .get();
 
       _notifications.clear();
       _notifications.addAll(
-        querySnapshot.docs.map((doc) => NotificationEntity(
-              id: doc.id,
-              userId: doc['userId'],
-              title: doc['title'],
-              message: doc['message'],
-              type: doc['type'],
-              createdAt: (doc['createdAt'] as Timestamp).toDate(),
-              isRead: doc['isRead'] ?? false,
-              reservationId: doc['reservationId'],
-            )),
+        querySnapshot.docs.map((doc) {
+          final data = doc.data();
+          return NotificationEntity(
+            id: doc.id,
+            userId: data['userId'] ?? '',
+            title: data['title'] ?? '',
+            message: data['message'] ?? '',
+            type: data['type'] ?? '',
+            createdAt: (data['createdAt'] as Timestamp).toDate(),
+            isRead: data['isRead'] ?? false,
+            reservationId: data['reservationId'],
+            chatId: data['chatId'],
+          );
+        }),
       );
 
       _notifications.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+
+      // 채팅 알림은 제외하고 일반 알림만 카운트
+      final normalUnreadCount = _notifications.where((n) => !n.isRead).length;
+
+      // NavigationProvider의 updateTotalUnreadCount 호출 제거
+      // _navigationProvider.updateTotalUnreadCount(unreadCount);
 
       _isLoading = false;
       notifyListeners();
@@ -185,6 +224,9 @@ class NotificationProvider extends ChangeNotifier {
       final index = _notifications.indexWhere((n) => n.id == notificationId);
       if (index != -1) {
         _notifications[index] = _notifications[index].copyWith(isRead: true);
+        // 읽지 않은 알림 수 업데이트
+        final unreadCount = _notifications.where((n) => !n.isRead).length;
+        _navigationProvider.updateTotalUnreadCount(unreadCount);
         notifyListeners();
       }
     } catch (e) {

@@ -25,7 +25,8 @@ class ReservationProvider extends ChangeNotifier {
     try {
       await _firestore.runTransaction((transaction) async {
         // 패키지 정보 가져오기
-        final packageDoc = await _firestore.collection('packages').doc(packageId).get();
+        final packageDoc =
+            await _firestore.collection('packages').doc(packageId).get();
         final packageData = packageDoc.data()!;
 
         // 인원 수 검증
@@ -36,7 +37,8 @@ class ReservationProvider extends ChangeNotifier {
           throw '올바르지 않은 인원 수입니다';
         }
         // 이미 예약이 있는지 확인
-        final start = DateTime(reservationDate.year, reservationDate.month, reservationDate.day);
+        final start = DateTime(
+            reservationDate.year, reservationDate.month, reservationDate.day);
         final end = start.add(const Duration(days: 1));
 
         // 예약 가능 여부 다시 확인
@@ -44,7 +46,8 @@ class ReservationProvider extends ChangeNotifier {
             .collection('reservations')
             .where('packageId', isEqualTo: packageId)
             .where('status', isEqualTo: 'approved')
-            .where('reservationDate', isGreaterThanOrEqualTo: Timestamp.fromDate(start))
+            .where('reservationDate',
+                isGreaterThanOrEqualTo: Timestamp.fromDate(start))
             .where('reservationDate', isLessThan: Timestamp.fromDate(end))
             .get();
 
@@ -65,21 +68,21 @@ class ReservationProvider extends ChangeNotifier {
           'requestedAt': Timestamp.fromDate(DateTime.now()),
           'status': 'pending',
           'price': price,
-          'participants': participants,  // 여기에서 인원 수 저장
+          'participants': participants, // 여기에서 인원 수 저장
         });
 
         // 알림 생성
         await _firestore.collection('notifications').add({
           'userId': guideId,
           'title': '새로운 예약 요청',
-          'message': '$customerName님이 $packageTitle 패키지를 예약 신청했습니다. (${participants}명)',
+          'message':
+              '$customerName님이 $packageTitle 패키지를 예약 신청했습니다. ($participants명)',
           'type': 'reservation_request',
           'reservationId': reservationRef.id,
+          'chatId': '',
           'createdAt': FieldValue.serverTimestamp(),
           'isRead': false,
         });
-
-        print('Reservation created with participants: $participants'); // 디버깅용
       });
 
       notifyListeners();
@@ -89,10 +92,12 @@ class ReservationProvider extends ChangeNotifier {
     }
   }
 
-  Future<void> updateReservationStatus(String reservationId, String status) async {
+  Future<void> updateReservationStatus(
+      String reservationId, String status) async {
     try {
       await _firestore.runTransaction((transaction) async {
-        final reservationRef = _firestore.collection('reservations').doc(reservationId);
+        final reservationRef =
+            _firestore.collection('reservations').doc(reservationId);
         final reservationDoc = await transaction.get(reservationRef);
 
         if (!reservationDoc.exists) {
@@ -116,9 +121,10 @@ class ReservationProvider extends ChangeNotifier {
           final otherReservations = await _firestore
               .collection('reservations')
               .where('packageId', isEqualTo: data['packageId'])
-              .where('reservationDate', isGreaterThanOrEqualTo: Timestamp.fromDate(start))
+              .where('reservationDate',
+                  isGreaterThanOrEqualTo: Timestamp.fromDate(start))
               .where('reservationDate', isLessThan: Timestamp.fromDate(end))
-              .where('status', isEqualTo: 'pending')  // 대기 중인 예약만
+              .where('status', isEqualTo: 'pending') // 대기 중인 예약만
               .get();
 
           // 다른 예약들 모두 거절로 변경
@@ -136,9 +142,11 @@ class ReservationProvider extends ChangeNotifier {
         transaction.set(notificationRef, {
           'userId': data['customerId'],
           'title': '예약 상태 변경',
-          'message': '${data['packageTitle']} 패키지의 예약이 ${_getStatusMessage(status)}되었습니다.',
+          'message':
+              '${data['packageTitle']} 패키지의 예약이 ${_getStatusMessage(status)}되었습니다.',
           'type': 'reservation_update',
           'reservationId': reservationId,
+          'chatId': '',
           'createdAt': FieldValue.serverTimestamp(),
           'isRead': false,
         });
@@ -172,7 +180,8 @@ class ReservationProvider extends ChangeNotifier {
           .get();
 
       _reservations = snapshot.docs
-          .map((doc) => ReservationModel.fromJson({...doc.data(), 'id': doc.id}))
+          .map(
+              (doc) => ReservationModel.fromJson({...doc.data(), 'id': doc.id}))
           .toList();
 
       notifyListeners();
@@ -185,10 +194,12 @@ class ReservationProvider extends ChangeNotifier {
   // 패키지의 현재 예약 가능 여부 확인
   Future<bool> isPackageAvailable(String packageId) async {
     try {
-      final packageDoc = await _firestore.collection('packages').doc(packageId).get();
+      final packageDoc =
+          await _firestore.collection('packages').doc(packageId).get();
       if (!packageDoc.exists) return false;
 
-      final currentParticipants = packageDoc.data()?['currentParticipants'] ?? 0;
+      final currentParticipants =
+          packageDoc.data()?['currentParticipants'] ?? 0;
       final maxParticipants = packageDoc.data()?['maxParticipants'] ?? 0;
 
       return currentParticipants < maxParticipants;
@@ -207,8 +218,9 @@ class ReservationProvider extends ChangeNotifier {
       final snapshot = await _firestore
           .collection('reservations')
           .where('packageId', isEqualTo: packageId)
-          .where('status', isEqualTo: 'approved')  // 승인된 예약만 확인
-          .where('reservationDate', isGreaterThanOrEqualTo: Timestamp.fromDate(start))
+          .where('status', isEqualTo: 'approved') // 승인된 예약만 확인
+          .where('reservationDate',
+              isGreaterThanOrEqualTo: Timestamp.fromDate(start))
           .where('reservationDate', isLessThan: Timestamp.fromDate(end))
           .get();
 
@@ -219,22 +231,26 @@ class ReservationProvider extends ChangeNotifier {
       return false;
     }
   }
+
   Future<List<ReservationModel>> getMonthReservations(
-      String packageId,
-      DateTime start,
-      DateTime end,
-      ) async {
+    String packageId,
+    DateTime start,
+    DateTime end,
+  ) async {
     try {
       final snapshot = await _firestore
           .collection('reservations')
           .where('packageId', isEqualTo: packageId)
           .where('status', isEqualTo: 'approved')
-          .where('reservationDate', isGreaterThanOrEqualTo: Timestamp.fromDate(start))
-          .where('reservationDate', isLessThan: Timestamp.fromDate(end.add(const Duration(days: 1))))
+          .where('reservationDate',
+              isGreaterThanOrEqualTo: Timestamp.fromDate(start))
+          .where('reservationDate',
+              isLessThan: Timestamp.fromDate(end.add(const Duration(days: 1))))
           .get();
 
       return snapshot.docs
-          .map((doc) => ReservationModel.fromJson({...doc.data(), 'id': doc.id}))
+          .map(
+              (doc) => ReservationModel.fromJson({...doc.data(), 'id': doc.id}))
           .toList();
     } catch (e) {
       print('Error getting month reservations: $e');

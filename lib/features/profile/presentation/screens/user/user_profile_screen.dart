@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:travel_on_final/features/auth/data/models/user_model.dart';
 import 'package:travel_on_final/features/auth/presentation/providers/auth_provider.dart';
+import 'package:travel_on_final/features/review/domain/entities/review.dart';
 import 'package:travel_on_final/features/review/presentation/provider/review_provider.dart';
 import 'package:travel_on_final/features/search/presentation/providers/travel_provider.dart';
 import 'package:travel_on_final/features/chat/domain/usecases/create_chat_id.dart';
@@ -27,8 +28,10 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
   @override
   void initState() {
     super.initState();
-    final authProvider = context.read<AuthProvider>();
-    userFuture = authProvider.getUserById(widget.userId);
+    userFuture = context.read<AuthProvider>().getUserById(widget.userId);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<ReviewProvider>().loadReviewsForUser(widget.userId);
+    });
   }
 
   Future<void> _pickBackgroundImage(UserModel user, AuthProvider authProvider) async {
@@ -95,6 +98,29 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     if (result == true) {
       await _removeBackgroundImage(user, authProvider);
     }
+  }
+
+  Future<bool> _showConfirmationDialog(BuildContext context) async {
+    final result = await showDialog<bool>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text("배경 이미지 변경"),
+          content: Text("배경 이미지를 바꾸시겠습니까?"),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: Text("취소"),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              child: Text("확인"),
+            ),
+          ],
+        );
+      },
+    );
+    return result ?? false;
   }
 
   @override
@@ -244,44 +270,6 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                                     ),
                                   ),
                                 ),
-                                if (isCurrentUser)
-                                  Container(
-                                    width: 35.w,
-                                    height: 35.h,
-                                    decoration: BoxDecoration(
-                                      color: Colors.white,
-                                      border: Border.all(color: Colors.black, width: 1),
-                                      shape: BoxShape.circle,
-                                    ),
-                                    child: IconButton(
-                                      onPressed: () {
-                                        context.push('/profile/edit');
-                                      },
-                                      icon: Icon(Icons.edit_note, color: Colors.black),
-                                      iconSize: 25.w,
-                                    ),
-                                  )
-                                else
-                                  Container(
-                                    width: 35.w,
-                                    height: 35.h,
-                                    decoration: BoxDecoration(
-                                      color: Colors.white,
-                                      border: Border.all(color: Colors.black, width: 1),
-                                      shape: BoxShape.circle,
-                                    ),
-                                    child: IconButton(
-                                      icon: Icon(Icons.chat_bubble, color: Colors.black),
-                                      iconSize: 25.w,
-                                      onPressed: () {
-                                        final currentUserId = authProvider.currentUser?.id;
-                                        if (currentUserId != null) {
-                                          final chatId = CreateChatId().call(currentUserId, user.id);
-                                          context.push('/chat/$chatId');
-                                        }
-                                      },
-                                    ),
-                                  ),
                               ],
                             ),
                           ),
@@ -309,13 +297,16 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                     ),
                     if (isCurrentUser)
                       Positioned(
-                        bottom: 20.h,
+                        top: 20.h,
                         right: 20.w,
                         child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
                             Container(
                               width: 35.w,
                               height: 35.h,
+                              margin: EdgeInsets.only(bottom: 5.h),
                               decoration: BoxDecoration(
                                 color: Colors.black.withOpacity(0.7),
                                 shape: BoxShape.circle,
@@ -333,20 +324,40 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                               Container(
                                 width: 35.w,
                                 height: 35.h,
-                                margin: EdgeInsets.only(top: 5.h),
+                                margin: EdgeInsets.only(bottom: 5.h),
+                                decoration: BoxDecoration(
+                                  color: Colors.black.withOpacity(0.7),
+                                  shape: BoxShape.circle,
+                                ),
+                                child: IconButton(
+                                  icon: Icon(Icons.edit_note, color: Colors.white),
+                                  onPressed: () {
+                                    context.push('/profile/edit');
+                                  },
+                                ),
+                              ),
+                              Container(
+                                width: 35.w,
+                                height: 35.h,
+                                margin: EdgeInsets.only(bottom: 5.h),
                                 decoration: BoxDecoration(
                                   color: Colors.black.withOpacity(0.7),
                                   shape: BoxShape.circle,
                                 ),
                                 child: IconButton(
                                   icon: Icon(Icons.edit, color: Colors.white),
-                                  onPressed: () => _pickBackgroundImage(user, authProvider),
+                                  onPressed: () async {
+                                    final shouldChange = await _showConfirmationDialog(context);
+                                    if (shouldChange) {
+                                      _pickBackgroundImage(user, authProvider);
+                                    }
+                                  },
                                 ),
                               ),
                               Container(
                                 width: 35.w,
                                 height: 35.h,
-                                margin: EdgeInsets.only(top: 5.h),
+                                margin: EdgeInsets.only(bottom: 5.h),
                                 decoration: BoxDecoration(
                                   color: Colors.black.withOpacity(0.7),
                                   shape: BoxShape.circle,
@@ -358,6 +369,29 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                               ),
                             ],
                           ],
+                        ),
+                      )
+                    else
+                      Positioned(
+                        top: 20.h,
+                        right: 20.w,
+                        child: Container(
+                          width: 35.w,
+                          height: 35.h,
+                          decoration: BoxDecoration(
+                            color: Colors.black.withOpacity(0.7),
+                            shape: BoxShape.circle,
+                          ),
+                          child: IconButton(
+                            icon: Icon(Icons.chat_bubble, color: Colors.white),
+                            onPressed: () {
+                              final currentUserId = authProvider.currentUser?.id;
+                              if (currentUserId != null) {
+                                final chatId = CreateChatId().call(currentUserId, user.id);
+                                context.push('/chat/$chatId');
+                              }
+                            },
+                          ),
                         ),
                       ),
                   ],
@@ -481,28 +515,78 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                       ),
                       TextButton(
                         onPressed: () {
-                          // '더보기' 버튼 클릭 시 user_review_screen.dart로 이동
                           context.push('/user-reviews/${user.id}');
                         },
                         child: Text("더보기"),
                       ),
                     ],
                   ),
-                  ListView.builder(
-                    itemCount: reviewProvider.reviews.length > 5
-                        ? 5
-                        : reviewProvider.reviews.length,
-                    shrinkWrap: true,
-                    physics: NeverScrollableScrollPhysics(),
-                    itemBuilder: (context, index) {
-                      final review = reviewProvider.reviews[index];
-                      return ListTile(
-                        title: Text(
-                          review.content,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        subtitle: Text("${review.rating} / 5"),
+                  Selector<ReviewProvider, List<Review>>(
+                    selector: (_, provider) => provider.userReviews.take(5).toList(),
+                    builder: (context, userReviews, child) {
+                      if (userReviews.isEmpty) {
+                        return Center(child: Text("작성한 리뷰가 없습니다."));
+                      }
+
+                      return ListView.builder(
+                        itemCount: userReviews.length,
+                        shrinkWrap: true,
+                        physics: NeverScrollableScrollPhysics(),
+                        itemBuilder: (context, index) {
+                          final review = userReviews[index];
+                          final package = context.read<TravelProvider>().packages.firstWhere(
+                                (pkg) => pkg.id == review.packageId,
+                                orElse: () => null as dynamic,
+                              );
+
+                          return Card(
+                            margin: EdgeInsets.symmetric(vertical: 8.h, horizontal: 16.w),
+                            elevation: 3,
+                            child: Padding(
+                              padding: EdgeInsets.all(12.w),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  if (package != null) ...[
+                                    Text(
+                                      "패키지: ${package.title}",
+                                      style: TextStyle(
+                                        fontSize: 14.sp,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.blueAccent,
+                                      ),
+                                    ),
+                                    SizedBox(height: 6.h),
+                                  ],
+                                  Text(
+                                    review.content,
+                                    style: TextStyle(
+                                      fontSize: 16.sp,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.black87,
+                                    ),
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                  SizedBox(height: 8.h),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        "평점: ${review.rating} / 5",
+                                        style: TextStyle(fontSize: 14.sp, color: Colors.grey),
+                                      ),
+                                      Text(
+                                        "작성일: ${DateFormat('yyyy.MM.dd').format(review.createdAt)}",
+                                        style: TextStyle(fontSize: 14.sp, color: Colors.grey),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        },
                       );
                     },
                   ),

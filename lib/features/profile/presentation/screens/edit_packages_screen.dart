@@ -8,14 +8,13 @@ import 'dart:io';
 import 'package:travel_on_final/features/search/domain/entities/travel_package.dart';
 import 'package:travel_on_final/features/search/presentation/providers/travel_provider.dart';
 
-
 class EditPackageScreen extends StatefulWidget {
   final TravelPackage package;
 
   const EditPackageScreen({
-    Key? key,
+    super.key,
     required this.package,
-  }) : super(key: key);
+  });
 
   @override
   State<EditPackageScreen> createState() => _EditPackageScreenState();
@@ -51,11 +50,15 @@ class _EditPackageScreenState extends State<EditPackageScreen> {
     super.initState();
     // 기존 패키지 데이터로 초기화
     _titleController = TextEditingController(text: widget.package.title);
-    _descriptionController = TextEditingController(text: widget.package.description);
-    _priceController = TextEditingController(text: widget.package.price.toString());
+    _descriptionController =
+        TextEditingController(text: widget.package.description);
+    _priceController =
+        TextEditingController(text: widget.package.price.toString());
     _selectedRegion = widget.package.region;
-    _maxParticipantsController = TextEditingController(text: widget.package.maxParticipants.toString());
-    _minParticipantsController = TextEditingController(text: widget.package.minParticipants.toString());
+    _maxParticipantsController =
+        TextEditingController(text: widget.package.maxParticipants.toString());
+    _minParticipantsController =
+        TextEditingController(text: widget.package.minParticipants.toString());
     _nights = widget.package.nights;
     _selectedDepartureDays.addAll(widget.package.departureDays);
     _existingDescriptionImages.addAll(widget.package.descriptionImages);
@@ -155,7 +158,8 @@ class _EditPackageScreenState extends State<EditPackageScreen> {
                   day['label'],
                   style: TextStyle(
                     color: isSelected ? Colors.white : Colors.black,
-                    fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                    fontWeight:
+                        isSelected ? FontWeight.bold : FontWeight.normal,
                   ),
                 ),
                 selected: isSelected,
@@ -206,7 +210,9 @@ class _EditPackageScreenState extends State<EditPackageScreen> {
           minParticipants: int.parse(_minParticipantsController.text),
           maxParticipants: int.parse(_maxParticipantsController.text),
           nights: _nights,
-          departureDays: _selectedDepartureDays.toList()..sort(), totalDays: 1,
+          departureDays: _selectedDepartureDays.toList()..sort(),
+          totalDays: _nights + 1,
+          routePoints: widget.package.routePoints,
         );
 
         await context.read<TravelProvider>().updatePackage(updatedPackage);
@@ -250,29 +256,29 @@ class _EditPackageScreenState extends State<EditPackageScreen> {
                     ),
                     child: _mainImage != null
                         ? ClipRRect(
-                      borderRadius: BorderRadius.circular(8),
-                      child: Image.file(
-                        _mainImage!,
-                        fit: BoxFit.cover,
-                        width: double.infinity,
-                      ),
-                    )
+                            borderRadius: BorderRadius.circular(8),
+                            child: Image.file(
+                              _mainImage!,
+                              fit: BoxFit.cover,
+                              width: double.infinity,
+                            ),
+                          )
                         : widget.package.mainImage != null
-                        ? ClipRRect(
-                      borderRadius: BorderRadius.circular(8),
-                      child: Image.network(
-                        widget.package.mainImage!,
-                        fit: BoxFit.cover,
-                        width: double.infinity,
-                      ),
-                    )
-                        : Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: const [
-                        Icon(Icons.add_photo_alternate, size: 50),
-                        Text('메인 이미지 수정'),
-                      ],
-                    ),
+                            ? ClipRRect(
+                                borderRadius: BorderRadius.circular(8),
+                                child: Image.network(
+                                  widget.package.mainImage!,
+                                  fit: BoxFit.cover,
+                                  width: double.infinity,
+                                ),
+                              )
+                            : const Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(Icons.add_photo_alternate, size: 50),
+                                  Text('메인 이미지 수정'),
+                                ],
+                              ),
                   ),
                 ),
                 const SizedBox(height: 16),
@@ -306,16 +312,21 @@ class _EditPackageScreenState extends State<EditPackageScreen> {
                       borderSide: BorderSide(color: Color(0XFF2196F3)),
                     ),
                   ),
-                  items: [
+                  items: const [
                     DropdownMenuItem(value: 'seoul', child: Text('서울')),
-                    DropdownMenuItem(value: 'incheon_gyeonggi', child: Text('인천/경기')),
+                    DropdownMenuItem(
+                        value: 'incheon_gyeonggi', child: Text('인천/경기')),
                     DropdownMenuItem(value: 'gangwon', child: Text('강원')),
-                    DropdownMenuItem(value: 'daejeon_chungnam', child: Text('대전/충남')),
+                    DropdownMenuItem(
+                        value: 'daejeon_chungnam', child: Text('대전/충남')),
                     DropdownMenuItem(value: 'chungbuk', child: Text('충북')),
-                    DropdownMenuItem(value: 'gwangju_jeonnam', child: Text('광주/전남')),
+                    DropdownMenuItem(
+                        value: 'gwangju_jeonnam', child: Text('광주/전남')),
                     DropdownMenuItem(value: 'jeonbuk', child: Text('전북')),
-                    DropdownMenuItem(value: 'busan_gyeongnam', child: Text('부산/경남')),
-                    DropdownMenuItem(value: 'daegu_gyeongbuk', child: Text('대구/경북')),
+                    DropdownMenuItem(
+                        value: 'busan_gyeongnam', child: Text('부산/경남')),
+                    DropdownMenuItem(
+                        value: 'daegu_gyeongbuk', child: Text('대구/경북')),
                     DropdownMenuItem(value: 'jeju', child: Text('제주도')),
                   ],
                   onChanged: (value) {
@@ -403,9 +414,10 @@ class _EditPackageScreenState extends State<EditPackageScreen> {
                     if (maxNumber == null || maxNumber <= 0) {
                       return '유효한 인원 수를 입력해주세요';
                     }
-                    final minNumber = int.tryParse(_minParticipantsController.text) ?? 0;
+                    final minNumber =
+                        int.tryParse(_minParticipantsController.text) ?? 0;
                     if (maxNumber < minNumber) {
-                      return '최대 인원은 최소 인원보다 작을 수 없습니다';
+                      return '최대 인원은 최�� 인원보다 작을 수 없습니다';
                     }
                     return null;
                   },
@@ -449,7 +461,10 @@ class _EditPackageScreenState extends State<EditPackageScreen> {
                       runSpacing: 8,
                       children: [
                         // 기존 이미지
-                        ..._existingDescriptionImages.asMap().entries.map((entry) {
+                        ..._existingDescriptionImages
+                            .asMap()
+                            .entries
+                            .map((entry) {
                           return Stack(
                             children: [
                               Container(
@@ -473,7 +488,9 @@ class _EditPackageScreenState extends State<EditPackageScreen> {
                                 child: IconButton(
                                   icon: const Icon(Icons.remove_circle),
                                   color: Colors.red,
-                                  onPressed: () => _removeExistingDescriptionImage(entry.key),
+                                  onPressed: () =>
+                                      _removeExistingDescriptionImage(
+                                          entry.key),
                                 ),
                               ),
                             ],
@@ -504,7 +521,8 @@ class _EditPackageScreenState extends State<EditPackageScreen> {
                                 child: IconButton(
                                   icon: const Icon(Icons.remove_circle),
                                   color: Colors.red,
-                                  onPressed: () => _removeNewDescriptionImage(entry.key),
+                                  onPressed: () =>
+                                      _removeNewDescriptionImage(entry.key),
                                 ),
                               ),
                             ],
