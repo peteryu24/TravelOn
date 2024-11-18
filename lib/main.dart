@@ -5,7 +5,6 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_naver_map/flutter_naver_map.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 // Firebase
 import 'package:firebase_core/firebase_core.dart';
@@ -47,6 +46,9 @@ import 'package:kakao_flutter_sdk_common/kakao_flutter_sdk_common.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  if (Platform.isAndroid) {
+    debugPrint('Using Skia rendering');
+  }
   await EasyLocalization.ensureInitialized();
 
   await dotenv.load(fileName: ".env");
@@ -169,7 +171,8 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(
           create: (context) => NotificationProvider(
             FirebaseFirestore.instance,
-            context.read<FirebaseMessaging>(),
+            FirebaseMessaging.instance,
+            context.read<NavigationProvider>(), // NavigationProvider 주입
           ),
         ),
       ],

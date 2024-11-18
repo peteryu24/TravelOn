@@ -10,6 +10,7 @@ class ReviewProvider extends ChangeNotifier {
   final ReviewRepository _repository;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   List<Review> _reviews = [];
+  List<Review> _userReviews = [];
   bool _isLoading = false;
   String? _error;
   bool _hasMore = true;
@@ -22,6 +23,7 @@ class ReviewProvider extends ChangeNotifier {
   ReviewProvider(this._repository);
 
   List<Review> get reviews => _reviews;
+  List<Review> get userReviews => _userReviews.isEmpty ? [] : _userReviews;
   bool get isLoading => _isLoading;
   String? get error => _error;
   bool get hasMore => _hasMore;
@@ -288,6 +290,39 @@ class ReviewProvider extends ChangeNotifier {
       _error = e.toString();
       notifyListeners();
       rethrow;
+    }
+  }
+
+  Future<List<Review>> loadReviewsForUser(String userId) async {
+    try {
+      _isLoading = true;
+
+      final snapshot = await FirebaseFirestore.instance
+          .collection('reviews')
+          .where('userId', isEqualTo: userId)
+          .get();
+
+      final reviews = snapshot.docs.map((doc) {
+        final data = doc.data();
+        return Review(
+          id: doc.id,
+          packageId: data['packageId'],
+          userId: data['userId'],
+          userName: data['userName'],
+          rating: (data['rating'] as num).toDouble(),
+          content: data['content'],
+          createdAt: (data['createdAt'] as Timestamp).toDate(),
+          reservationId: data['reservationId'],
+        );
+      }).toList();
+
+      _userReviews = reviews;
+      return reviews;
+    } catch (e) {
+      print('리뷰 불러오기 실패: $e');
+      return [];
+    } finally {
+      _isLoading = false;
     }
   }
 }
