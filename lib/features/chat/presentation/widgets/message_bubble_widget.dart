@@ -140,7 +140,7 @@ class MessageBubble extends StatelessWidget {
                 mapType: NMapType.basic,
               ),
               onMapReady: (controller) {
-                naverMapController = controller; // 컨트롤러 초기화
+                naverMapController = controller;
                 naverMapController.addOverlay(NMarker(
                   id: 'shared-location',
                   position: NLatLng(latitude, longitude),
@@ -151,8 +151,10 @@ class MessageBubble extends StatelessWidget {
         ),
         SizedBox(height: 8.h),
         ElevatedButton(
-          onPressed: () async {
-            // '자세히 보기' 버튼 동작
+          onPressed: () {
+            final latitude = location['latitude'].toString();
+            final longitude = location['longitude'].toString();
+            context.push('/map-detail/$latitude/$longitude');
           },
           child: const Text('자세히 보기'),
         ),

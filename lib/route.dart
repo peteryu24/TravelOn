@@ -31,6 +31,7 @@ import 'package:travel_on_final/features/search/presentation/providers/travel_pr
 import 'package:travel_on_final/features/search/presentation/screens/add_package_screen.dart';
 import 'package:travel_on_final/features/search/presentation/screens/detail_screens.dart';
 import 'package:travel_on_final/features/search/presentation/screens/package_detail_screen.dart';
+import 'package:travel_on_final/features/map/presentation/screens/map_detail_screen.dart';
 // home
 import 'package:travel_on_final/features/home/presentation/screens/home_screen.dart';
 // profile
@@ -218,6 +219,14 @@ final goRouter = GoRouter(
             ),
           );
         }
+      },
+    ),
+    GoRoute(
+      path: '/map-detail/:latitude/:longitude',
+      builder: (context, state) {
+        final latitude = double.parse(state.pathParameters['latitude']!);
+        final longitude = double.parse(state.pathParameters['longitude']!);
+        return MapDetailScreen(latitude: latitude, longitude: longitude);
       },
     ),
     // profile 관련 코드
