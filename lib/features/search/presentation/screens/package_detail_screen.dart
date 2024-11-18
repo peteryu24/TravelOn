@@ -251,7 +251,7 @@ class _PackageDetailScreenState extends State<PackageDetailScreen> {
                     children: [
                       Expanded(
                         child: Text(
-                          widget.package.title,
+                          widget.package.getTitle(context.locale.languageCode),
                           style: TextStyle(
                             fontSize: 24.sp,
                             fontWeight: FontWeight.bold,
@@ -411,7 +411,7 @@ class _PackageDetailScreenState extends State<PackageDetailScreen> {
                   ),
                   SizedBox(height: 8.h),
                   Text(
-                    widget.package.description,
+                    widget.package.getDescription(context.locale.languageCode),
                     style: TextStyle(
                       fontSize: 16.sp,
                       height: 1.5.h,

@@ -1,0 +1,296 @@
+{
+  "app": {
+    "name": "TravelOn"
+  },
+  "login": {
+    "title": "ログイン",
+    "email": "メールアドレス",
+    "password": "パスワード",
+    "save_info": "ログイン情報を保存",
+    "signup": "新規登録",
+    "reset_password": "パスワードをリセット",
+    "login_button": "ログイン",
+    "or": "または",
+    "sns_login": "SNSでログイン",
+    "welcome": "ようこそ、{name}様!",
+    "login_failed": "ログインに失敗しました。もう一度お試しください。",
+    "google_failed": "Googleログインに失敗しました。",
+    "github_failed": "GitHubログインに失敗しました。",
+    "kakao_failed": "Kakaoログインに失敗しました。"
+  },
+  "home": {
+    "next_trip": {
+      "greeting": "こんにちは、{name}様",
+      "countdown": "{title}まであと{days}日!",
+      "today": "{title}を楽しんでください!",
+      "no_trips": "予定された旅行はありません"
+    },
+    "weather": {
+      "current": "現在の天気",
+      "temperature": "{temp}°",
+      "wind_speed": "{speed}m/s",
+      "conditions": {
+        "rain": "雨",
+        "rain_snow": "雨/雪",
+        "snow": "雪",
+        "shower": "にわか雨",
+        "clear": "晴れ",
+        "cloudy": "曇り",
+        "overcast": "曇天"
+      }
+    },
+    "popular_courses": "人気の旅行コース",
+    "view_more": "もっと見る"
+  },
+  "menu": {
+    "travel_tips": "旅行Tips",
+    "guide_ranking": "ガイドランキング",
+    "recommended_places": "おすすめスポット",
+    "travel_gallery": "旅行ギャラリー"
+  },
+  "navigation": {
+    "home": "ホーム",
+    "packages": "パッケージ",
+    "chat": "チャット",
+    "mypage": "マイページ"
+  },
+  "weather_regions": {
+    "seoul": "ソウル",
+    "busan": "釜山",
+    "daegu": "大邱",
+    "incheon": "仁川",
+    "gwangju": "光州",
+    "deajeon": "大田",
+    "ulsan": "蔚山",
+    "jeju": "済州島"
+  },
+  "regions": {
+    "seoul": "ソウル",
+    "incheon_gyeonggi": "仁川/京畿",
+    "gangwon": "江原",
+    "daejeon_chungnam": "大田/忠南",
+    "chungbuk": "忠北",
+    "gwangju_jeonnam": "光州/全南",
+    "jeonbuk": "全北",
+    "busan_gyeongnam": "釜山/慶南",
+    "daegu_gyeongbuk": "大邱/慶北",
+    "ulsan": "蔚山",
+    "jeju": "済州島",
+    "all": "すべて"
+  },
+  "common": {
+    "guest": "ゲスト",
+    "see_more": "もっと見る",
+    "confirm": "確認",
+    "cancel": "キャンセル",
+    "save": "保存",
+    "delete": "削除",
+    "edit": "編集",
+    "back": "戻る",
+    "close": "閉じる",
+    "loading": "読み込み中...",
+    "error": "エラーが発生しました",
+    "retry": "再試行",
+    "success": "成功",
+    "failed": "失敗",
+    "notice": "お知らせ"
+  },
+  "search": {
+    "title": "旅行パッケージ",
+    "hint": "パッケージ名や説明で検索...",
+    "result_count": "検索結果: {count}件",
+    "selected_region": "選択地域: {region}",
+    "region": "地域: {region}"
+  },
+  "sort": {
+    "latest": "新着順",
+    "price_high": "価格が高い順",
+    "price_low": "価格が低い順",
+    "popular": "人気順",
+    "high_rating": "評価が高い順",
+    "most_reviews": "レビューが多い順"
+  },
+  "package_detail": {
+    "title": "パッケージ詳細",
+    "guide": "ガイド: {name}",
+    "participants": "募集人数: {min}～{max}名",
+    "participants_unknown": "募集人数: 情報なし",
+    "price": "₩{price}/人",
+    "booking_closed": "本日の予約は締め切りました",
+    "description": "詳細説明",
+    "course": "旅行コース",
+    "no_course": "登録された旅行コースはありません",
+    "view_route": "詳細ルートを見る",
+    "images": "詳細画像",
+    "location_info": {
+      "details": "詳細情報",
+      "view_map": "地図で見る",
+      "map_error": "地図を開けません"
+    },
+    "booking": {
+      "book_now": "予約する",
+      "closed": "本日の予約は終了"
+    }
+  },
+  "profile": {
+    "title": "マイページ",
+    "default_user": "ユーザー",
+    "guide": {
+      "section_title": "ガイド機能",
+      "create_package": "パッケージ作成",
+      "create_package_desc": "新しい旅行パッケージを登録",
+      "manage_reservations": "予約管理",
+      "manage_reservations_desc": "登録したパッケージの予約を管理",
+      "manage_packages": "パッケージ管理",
+      "manage_packages_desc": "登録したパッケージの編集・削除",
+      "certification": "ガイド認証",
+      "certification_desc": "ガイドとして認証を受ける"
+    },
+    "user": {
+      "reservations_title": "予約管理",
+      "my_reservations": "予約一覧",
+      "my_reservations_desc": "予約したパッケージを確認",
+      "liked_packages": "お気に入り",
+      "liked_packages_desc": "お気に入りのパッケージを確認"
+    },
+    "logout": "ログアウト",
+    "logout_failed": "ログアウトに失敗: {error}"
+  },
+  "package_form": {
+    "title": "新規パッケージ登録",
+    "main_image": {
+      "add": "メイン画像を追加"
+    },
+    "package_title": {
+      "label": "パッケージ名",
+      "hint": "例: ソウル市内観光",
+      "error": "パッケージ名を入力してください"
+    },
+    "region": {
+      "label": "地域"
+    },
+    "price": {
+      "label": "価格",
+      "hint": "例: 50000",
+      "error": {
+        "empty": "価格を入力してください",
+        "invalid": "有効な数字を入力してください"
+      }
+    },
+    "nights": {
+      "label": "泊数",
+      "format": "{nights}泊{days}日"
+    },
+    "departure_days": {
+      "label": "出発曜日",
+      "error": "出発曜日を選択してください",
+      "days": {
+        "mon": "月",
+        "tue": "火",
+        "wed": "水",
+        "thu": "木",
+        "fri": "金",
+        "sat": "土",
+        "sun": "日"
+      }
+    },
+    "participants": {
+      "min": {
+        "label": "最少催行人数",
+        "hint": "例: 2",
+        "error": {
+          "empty": "最少催行人数を入力してください",
+          "invalid": "有効な数字を入力してください",
+          "greater_than_max": "最少人数は最大人数を超えることはできません"
+        }
+      },
+      "max": {
+        "label": "最大募集人数",
+        "hint": "例: 10",
+        "error": {
+          "empty": "最大募集人数を入力してください",
+          "invalid": "有効な数字を入力してください"
+        }
+      }
+    },
+    "description": {
+      "label": "パッケージ説明",
+      "hint": "パッケージの詳細説明を入力してください",
+      "error": "説明を入力してください",
+      "images": {
+        "label": "説明画像",
+        "add": "追加"
+      }
+    },
+    "route": {
+      "label": "旅行ルート"
+    },
+    "submit": "パッケージを登録",
+    "places": {
+      "hotel": "ホテル",
+      "restaurant": "レストラン",
+      "attraction": "観光地"
+    },
+    "route_editor": {
+      "day": "{day}日目"
+    },
+    "travel_route": {
+      "title": "旅行ルート"
+    }
+  },
+  "guide_ranking": {
+    "title": "ガイドランキング",
+    "stats": "予約総数: {0}件 / パッケージ数: {1}",
+    "rank": "第{0}位",
+    "error": "エラー: {0}"
+  },
+  "reservations": {
+    "my_reservations": "予約一覧",
+    "pending_reservations": "承認待ち予約",
+    "confirmed_reservations": "確定済み予約",
+    "no_reservations": "予約がありません",
+    "no_pending_reservations": "承認待ちの予約はありません",
+    "no_confirmed_reservations": "確定済みの予約はありません",
+    "guide": "ガイド: {0}",
+    "reservation_date": "予約日: {0}",
+    "request_date": "申込日: {0}",
+    "price": "料金: ₩{0}",
+    "pending_approval": "承認待ち",
+    "confirmed": "予約確定",
+    "package_not_found": "パッケージが見つかりません",
+    "package_load_error": "パッケージ読み込みエラー: {0}"
+  },
+  "review": {
+    "count": "レビュー{count}件",
+    "write": "レビューを書く",
+    "edit": "レビューを編集",
+    "package_title": "パッケージ名",
+    "rating": "評価",
+    "content": {
+      "label": "レビュー内容",
+      "hint": "パッケージツアーの体験を共有してください",
+      "empty_error": "レビュー内容を入力してください"
+    },
+    "submit": "レビューを登録",
+    "update": "更新完了",
+    "success": {
+      "add": "レビューが登録されました",
+      "edit": "レビューが更新されました"
+    },
+    "stats": {
+      "count": "レビュー{count}件",
+      "empty": "まだレビューがありません"
+    },
+    "action": {
+      "write": "レビューを書く",
+      "cannot_write": "レビュー投稿不可",
+      "load_more": "もっと見る"
+    },
+    "error": {
+      "unauthorized": "予約が承認されたユーザーのみレビューを投稿できます",
+      "already_reviewed": "すでにレビューを投稿済みです",
+      "check_status": "レビュー状態の確認中にエラーが発生しました",
+      "loading": "レビューの読み込み中にエラーが発生しました"
+    }
+  }
+}

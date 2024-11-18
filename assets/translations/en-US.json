@@ -54,7 +54,7 @@
     "chat": "Chat",
     "mypage": "My Page"
   },
-  "weather regions": {
+  "weather_regions": {
     "seoul": "Seoul",
     "busan": "Busan",
     "daegu": "Daegu",
@@ -131,9 +131,6 @@
       "book_now": "Book Now",
       "closed": "Booking Closed Today"
     }
-  },
-  "review": {
-    "count": "Reviews({count})"
   },
   "profile": {
     "title": "My Page",
@@ -239,6 +236,61 @@
     },
     "travel_route": {
       "title": "Travel Route"
+    }
+  },
+  "reservations": {
+    "my_reservations": "My Reservations",
+    "pending_reservations": "Pending Reservations",
+    "confirmed_reservations": "Confirmed Reservations",
+    "no_reservations": "No reservations found.",
+    "no_pending_reservations": "No pending reservations.",
+    "no_confirmed_reservations": "No confirmed reservations.",
+    "guide": "Guide: {0}",
+    "reservation_date": "Reservation Date: {0}",
+    "request_date": "Request Date: {0}",
+    "price": "Price: ￦{0}",
+    "pending_approval": "Pending Approval",
+    "confirmed": "Confirmed",
+    "package_not_found": "Package not found.",
+    "package_load_error": "Error loading package: {0}"
+  },
+  "guide_ranking": {
+    "title": "Guide Ranking",
+    "stats": "Total {0} reservations / {1} packages",
+    "rank": "Rank {0}",
+    "error": "Error: {0}"
+  },
+  "review": {
+    "count": "{count} Reviews",
+    "write": "Write Review",
+    "edit": "Edit Review",
+    "package_title": "Package Name",
+    "rating": "Rating",
+    "content": {
+      "label": "Review Content",
+      "hint": "Share your experience about the package tour",
+      "empty_error": "Please enter review content"
+    },
+    "submit": "Submit Review",
+    "update": "Complete Update",
+    "success": {
+      "add": "Review has been submitted",
+      "edit": "Review has been updated"
+    },
+    "stats": {
+      "count": "{count} Reviews",
+      "empty": "No reviews yet"
+    },
+    "action": {
+      "write": "Write a Review",
+      "cannot_write": "Cannot Write Review",
+      "load_more": "See More"
+    },
+    "error": {
+      "unauthorized": "Only users with approved reservations can write reviews",
+      "already_reviewed": "You have already written a review",
+      "check_status": "An error occurred while checking review status",
+      "loading": "Error occurred while loading reviews"
     }
   }
 }

@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:travel_on_final/features/auth/presentation/providers/auth_provider.dart';
@@ -11,14 +12,14 @@ class LikedPackagesScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('찜한 패키지'),
+        title: Text('liked_packages'.tr()),
       ),
       body: Consumer2<AuthProvider, TravelProvider>(
         builder: (context, authProvider, travelProvider, child) {
           final user = authProvider.currentUser;
           if (user == null) {
-            return const Center(
-              child: Text('로그인이 필요합니다'),
+            return Center(
+              child: Text('login_required'.tr()),
             );
           }
 
@@ -31,8 +32,8 @@ class LikedPackagesScreen extends StatelessWidget {
                 final likedPackages = travelProvider.getLikedPackages();
 
                 if (likedPackages.isEmpty) {
-                  return const Center(
-                    child: Text('찜한 패키지가 없습니다'),
+                  return Center(
+                    child: Text('no_liked_packages'.tr()),
                   );
                 }
 
@@ -40,7 +41,6 @@ class LikedPackagesScreen extends StatelessWidget {
                   padding: const EdgeInsets.all(16),
                   itemCount: likedPackages.length,
                   itemBuilder: (context, index) {
-                    // PackageCard를 LikeablePackageCard로 변경
                     return LikeablePackageCard(package: likedPackages[index]);
                   },
                 );

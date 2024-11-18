@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
@@ -24,7 +25,7 @@ class _GuideRankingScreenState extends State<GuideRankingScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('가이드 랭킹'),
+        title: Text('guide_ranking.title'.tr()),
       ),
       body: Consumer<GuideRankingProvider>(
         builder: (context, provider, child) {
@@ -33,7 +34,9 @@ class _GuideRankingScreenState extends State<GuideRankingScreen> {
           }
 
           if (provider.error != null) {
-            return Center(child: Text('Error: ${provider.error}'));
+            return Center(
+              child: Text('guide_ranking.error'.tr(args: [provider.error.toString()])),
+            );
           }
 
           return ListView.builder(
@@ -56,7 +59,8 @@ class _GuideRankingScreenState extends State<GuideRankingScreen> {
                     backgroundImage: ranking.profileImageUrl != null &&
                         ranking.profileImageUrl!.isNotEmpty
                         ? NetworkImage(ranking.profileImageUrl!)
-                        : const AssetImage('assets/images/default_profile.png') as ImageProvider,
+                        : const AssetImage('assets/images/default_profile.png')
+                    as ImageProvider,
                   ),
                   title: Row(
                     children: [
@@ -70,7 +74,8 @@ class _GuideRankingScreenState extends State<GuideRankingScreen> {
                     ],
                   ),
                   subtitle: Text(
-                    '총 ${ranking.totalReservations}건의 예약 / ${ranking.packageCount}개의 패키지',
+                    'guide_ranking.stats'.tr().replaceAll('{0}', ranking.totalReservations.toString())
+                        .replaceAll('{1}', ranking.packageCount.toString()),
                     style: TextStyle(fontSize: 14.sp),
                   ),
                   trailing: Container(
@@ -89,7 +94,7 @@ class _GuideRankingScreenState extends State<GuideRankingScreen> {
                       borderRadius: BorderRadius.circular(20.r),
                     ),
                     child: Text(
-                      '${index + 1}위',
+                      'guide_ranking.rank'.tr().replaceAll('{0}', (index + 1).toString()),
                       style: TextStyle(
                         color: index == 0
                             ? Colors.amber.shade900
