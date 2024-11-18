@@ -76,40 +76,50 @@ class RegionalRepositoryImpl implements RegionalRepository {
         try {
           final data = json.decode(decodedBody);
           if (data['response']?['header']?['resultCode'] == '0000') {
-            final items = data['response']?['body']?['items']?['item'];
+            final items = data['response']?['body']?['items'];
 
-            // items가 null이거나 빈 문자열인 경우 빈 리스트 반환
-            if (items == null || items == '') {
+            // items가 빈 문자열이거나 null이면 빈 리스트 반환
+            if (items == null || items == '' || items is String) {
+              print('No items found in response');
               return [];
             }
 
-            // items가 List인지 확인
-            if (items is List) {
-              var spots = items
+            // items.item이 있는 경우에만 처리
+            final itemList = items['item'];
+            if (itemList == null) {
+              print('No item list found in items');
+              return [];
+            }
+
+            // itemList가 List인 경우
+            if (itemList is List) {
+              var spots = itemList
                   .map((item) => RegionalSpotModel.fromJson(item))
                   .toList();
 
               if (category != null && category != '전체') {
                 spots = spots.where((spot) {
-                  print(
-                      'Category check: ${spot.category} == $category'); // 디버그용
                   return spot.category == category;
                 }).toList();
               }
 
-              print('Parsed spots: ${spots.length}'); // 디버그용
               return spots;
+            }
+            // itemList가 단일 객체인 경우
+            else if (itemList is Map<String, dynamic>) {
+              final spot = RegionalSpotModel.fromJson(itemList);
+              if (category == null ||
+                  category == '전체' ||
+                  spot.category == category) {
+                return [spot];
+              }
             }
 
             return [];
-          } else {
-            final resultMsg = data['response']?['header']?['resultMsg'] ??
-                '알 수 없는 오류가 발생했습니다.';
-            throw ServerFailure('API 오류: $resultMsg');
           }
+          throw ServerFailure('API 응답이 올바르지 않습니다.');
         } catch (e) {
-          print('JSON 파싱 에러 상세: $e'); // 더 자세한 에러 정보
-          if (e is ServerFailure) rethrow;
+          print('Error parsing response: $e');
           throw ServerFailure('응답 데이터 처리 중 오류가 발생했습니다: $e');
         }
       }

@@ -11,26 +11,29 @@ class RegionalSpotCard extends StatelessWidget {
     required this.spot,
   });
 
-  Future<void> _launchNaverMap() async {
-    // 네이버 지도 검색 URL 생성
-    final searchQuery = Uri.encodeComponent('${spot.name} ${spot.address}');
-    final naverMapUrl = Uri.parse(
-      'nmap://search?query=$searchQuery&appname=com.example.travel_on_final',
-    );
+  void _openNaverMap(String name, String address) async {
+    // 장소명에 시/군/구 정보를 포함
+    String locationPrefix = '';
+    if (address.isNotEmpty) {
+      // 주소에서 첫 번째 시/군/구 정보 추출
+      final addressParts = address.split(' ');
+      if (addressParts.length >= 2) {
+        locationPrefix =
+            '${addressParts[0]} ${addressParts[1]} '; // 예: "부산 동래구 "
+      }
+    }
 
-    // 웹 URL (앱이 설치되지 않은 경우 사용)
-    final webUrl = Uri.parse(
-      'https://map.naver.com/v5/search/$searchQuery',
-    );
+    final searchQuery = Uri.encodeComponent('$locationPrefix$name');
+    final url =
+        'nmap://search?query=$searchQuery&appname=com.example.travel_on_final';
 
     try {
-      // 네이버 지도 앱으로 열기 시도
-      if (await canLaunchUrl(naverMapUrl)) {
-        await launchUrl(naverMapUrl);
+      if (await canLaunchUrl(Uri.parse(url))) {
+        await launchUrl(Uri.parse(url));
       } else {
-        // 앱이 없으면 웹으로 열기
-        if (await canLaunchUrl(webUrl)) {
-          await launchUrl(webUrl);
+        final webUrl = 'https://map.naver.com/v5/search/$searchQuery';
+        if (await canLaunchUrl(Uri.parse(webUrl))) {
+          await launchUrl(Uri.parse(webUrl));
         } else {
           throw '지도를 열 수 없습니다.';
         }
@@ -94,9 +97,9 @@ class RegionalSpotCard extends StatelessWidget {
         ),
         trailing: IconButton(
           icon: const Icon(CupertinoIcons.placemark_fill, color: Colors.blue),
-          onPressed: _launchNaverMap,
+          onPressed: () => _openNaverMap(spot.name, spot.address),
         ),
-        onTap: _launchNaverMap,
+        onTap: () => _openNaverMap(spot.name, spot.address),
       ),
     );
   }

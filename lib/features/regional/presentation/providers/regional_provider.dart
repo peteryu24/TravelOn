@@ -3,6 +3,7 @@ import 'package:travel_on_final/features/regional/presentation/widgets/region_se
 import '../../domain/repositories/regional_repository.dart';
 import '../../domain/entities/regional_spot.dart';
 import '../../../../core/error/failures.dart';
+import '../../../../core/constants/region_codes.dart';
 
 class RegionalProvider extends ChangeNotifier {
   final RegionalRepository repository;
@@ -84,12 +85,12 @@ class RegionalProvider extends ChangeNotifier {
   // Helper methods for codes
   String getCityCode(String city) {
     if (city == '전체') return 'all';
-    return RegionSelector.getCityCode(city);
+    return RegionCodes.getCityCode(city);
   }
 
   String getDistrictCode(String district) {
     if (_selectedCity == null) return '';
     final cityCode = getCityCode(_selectedCity!);
-    return RegionSelector.getDistrictCode(cityCode, district);
+    return RegionCodes.getDistrictCode(cityCode, district);
   }
 }
