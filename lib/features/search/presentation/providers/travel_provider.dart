@@ -442,9 +442,8 @@ class TravelProvider extends ChangeNotifier {
         }
       }
 
-      double averageRating = totalReviews > 0
-          ? (totalRatingSum / totalReviews)
-          : 0.0;
+      double averageRating =
+          totalReviews > 0 ? (totalRatingSum / totalReviews) : 0.0;
 
       return {
         'totalReviews': totalReviews,

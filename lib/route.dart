@@ -22,6 +22,7 @@ import 'package:travel_on_final/features/chat/presentation/screens/search/map_se
 // guide
 import 'package:travel_on_final/features/guide/presentation/screens/guide_packages_screen.dart';
 import 'package:travel_on_final/features/guide/presentation/screens/guide_ranking_screen.dart';
+import 'package:travel_on_final/features/recommendation/presentation/screens/recommendation_screen.dart';
 // reservation
 import 'package:travel_on_final/features/reservation/presentation/screens/reservation_calendar_screen.dart';
 // search
@@ -319,6 +320,11 @@ final goRouter = GoRouter(
     GoRoute(
       path: '/gallery-search',
       builder: (context, state) => const GallerySearchScreen(),
+    ),
+    // 추천 화면 라우트 추가
+    GoRoute(
+      path: '/recommendation',
+      builder: (context, state) => const RecommendationScreen(),
     ),
   ],
 );
