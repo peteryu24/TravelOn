@@ -5,6 +5,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_naver_map/flutter_naver_map.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:http/http.dart' as http;
 
 // Firebase
 import 'package:firebase_core/firebase_core.dart';
@@ -29,6 +30,7 @@ import 'package:travel_on_final/features/review/presentation/provider/review_pro
 import 'package:travel_on_final/features/search/presentation/providers/travel_provider.dart';
 import 'package:travel_on_final/features/gallery/presentation/providers/gallery_provider.dart';
 import 'package:travel_on_final/features/recommendation/presentation/providers/recommendation_provider.dart';
+import 'package:travel_on_final/features/regional/presentation/providers/regional_provider.dart';
 
 // Repositories & UseCases
 import 'package:travel_on_final/features/auth/data/repositories/auth_repository_impl.dart';
@@ -39,6 +41,7 @@ import 'package:travel_on_final/features/home/domain/usecases/get_next_trip.dart
 import 'package:travel_on_final/features/review/data/repositories/review_repository_impl.dart';
 import 'package:travel_on_final/features/search/data/repositories/travel_repositories_impl.dart';
 import 'package:travel_on_final/features/gallery/data/repositories/gallery_repository.dart';
+import 'package:travel_on_final/features/regional/data/repositories/regional_repository_impl.dart';
 
 // Router
 import 'package:travel_on_final/route.dart';
@@ -168,6 +171,13 @@ Future<void> main() async {
             ),
           ),
           ChangeNotifierProvider(create: (_) => RecommendationProvider()),
+          ChangeNotifierProvider(
+            create: (context) => RegionalProvider(
+              RegionalRepositoryImpl(
+                client: http.Client(),
+              ),
+            ),
+          ),
         ],
         child: const MyApp(),
       ),

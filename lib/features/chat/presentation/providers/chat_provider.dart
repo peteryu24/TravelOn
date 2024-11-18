@@ -28,6 +28,9 @@ class ChatProvider extends ChangeNotifier {
   // 메시지 수신 및 구독
   void startListeningToMessages(String chatId) {
     try {
+      // 기존 구독이 있다면 먼저 취소
+      stopListeningToMessages();
+
       _messageSubscription = _firestore
           .collection('chats')
           .doc(chatId)
@@ -51,17 +54,23 @@ class ChatProvider extends ChangeNotifier {
     }
   }
 
-  // 채팅방 구독 중지 메서드 추가
+  // 채팅방 구독 중지
   void stopListeningToMessages() {
     try {
-      _messageSubscription?.cancel();
-      _unreadCountSubscription?.cancel();
+      if (_messageSubscription != null) {
+        _messageSubscription!.cancel();
+        _messageSubscription = null;
+        _messages.clear(); // 메시지 목록도 클리어
+      }
     } catch (e) {
       print('구독 해제 중 오류 발생: $e');
-    } finally {
-      _messageSubscription = null;
-      _unreadCountSubscription = null;
     }
+  }
+
+  @override
+  void dispose() {
+    stopListeningToMessages();
+    super.dispose();
   }
 
   // 읽지 않은 메시지 수 구독

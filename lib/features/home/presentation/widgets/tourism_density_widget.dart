@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../data/datasources/tourism_density_api.dart';
 import '../../data/models/tourism_density_model.dart';
+import '../../../../core/constants/region_codes.dart';
 
 class TourismDensityWidget extends StatefulWidget {
   const TourismDensityWidget({super.key});
@@ -11,13 +12,11 @@ class TourismDensityWidget extends StatefulWidget {
 }
 
 class _TourismDensityWidgetState extends State<TourismDensityWidget> {
-  final _api = TourismDensityApi();
+  final TourismDensityApi _api = TourismDensityApi();
   List<TourismDensityModel> allSpots = [];
   List<TourismDensityModel> filteredSpots = [];
-  bool isLoading = true;
   String selectedRegion = '전체';
-
-  final List<String> regions = ['전체', '서울', '부산', '제주', '강원', '경주', '인천', '대구'];
+  bool isLoading = false;
 
   @override
   void initState() {
@@ -34,11 +33,16 @@ class _TourismDensityWidgetState extends State<TourismDensityWidget> {
         filterSpots();
       });
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('데이터를 불러오는데 실패했습니다: $e')),
-      );
+      print('Error fetching hot spots: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('데이터를 불러오는데 실패했습니다: $e')),
+        );
+      }
     } finally {
-      setState(() => isLoading = false);
+      if (mounted) {
+        setState(() => isLoading = false);
+      }
     }
   }
 
@@ -61,7 +65,7 @@ class _TourismDensityWidgetState extends State<TourismDensityWidget> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                '실시간 인기 관광지',
+                '인기 관광지 혼잡도',
                 style: TextStyle(
                   fontSize: 16.sp,
                   fontWeight: FontWeight.bold,
@@ -74,48 +78,50 @@ class _TourismDensityWidgetState extends State<TourismDensityWidget> {
             ],
           ),
           SizedBox(height: 12.h),
-          _buildRegionFilter(),
+          SizedBox(
+            height: 35.h,
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              itemCount: ['전체', ...RegionCodes.regions].length,
+              itemBuilder: (context, index) {
+                final region =
+                    index == 0 ? '전체' : RegionCodes.regions[index - 1];
+                return GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      selectedRegion = region;
+                      filterSpots();
+                    });
+                  },
+                  child: Container(
+                    padding:
+                        EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+                    margin: EdgeInsets.only(right: 8.w),
+                    decoration: BoxDecoration(
+                      color: selectedRegion == region
+                          ? Colors.blue
+                          : Colors.grey[200],
+                      borderRadius: BorderRadius.circular(20.r),
+                    ),
+                    child: Text(
+                      region,
+                      style: TextStyle(
+                        color: selectedRegion == region
+                            ? Colors.white
+                            : Colors.black,
+                        fontWeight: selectedRegion == region
+                            ? FontWeight.bold
+                            : FontWeight.normal,
+                      ),
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
           SizedBox(height: 16.h),
           _buildSpotsList(),
         ],
-      ),
-    );
-  }
-
-  Widget _buildRegionFilter() {
-    return SizedBox(
-      height: 35.h,
-      child: ListView.builder(
-        scrollDirection: Axis.horizontal,
-        itemCount: regions.length,
-        itemBuilder: (context, index) => _buildRegionChip(regions[index]),
-      ),
-    );
-  }
-
-  Widget _buildRegionChip(String region) {
-    final isSelected = selectedRegion == region;
-    return GestureDetector(
-      onTap: () {
-        setState(() {
-          selectedRegion = region;
-          filterSpots();
-        });
-      },
-      child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
-        margin: EdgeInsets.only(right: 8.w),
-        decoration: BoxDecoration(
-          color: isSelected ? Colors.blue : Colors.grey[200],
-          borderRadius: BorderRadius.circular(20.r),
-        ),
-        child: Text(
-          region,
-          style: TextStyle(
-            color: isSelected ? Colors.white : Colors.black,
-            fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-          ),
-        ),
       ),
     );
   }
