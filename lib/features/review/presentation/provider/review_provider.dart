@@ -295,7 +295,9 @@ class ReviewProvider extends ChangeNotifier {
 
   Future<List<Review>> loadReviewsForUser(String userId) async {
     try {
+      _userReviews = [];
       _isLoading = true;
+      notifyListeners();
 
       final snapshot = await FirebaseFirestore.instance
           .collection('reviews')
@@ -323,6 +325,7 @@ class ReviewProvider extends ChangeNotifier {
       return [];
     } finally {
       _isLoading = false;
+      notifyListeners();
     }
   }
 }
