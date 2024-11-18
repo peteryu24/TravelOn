@@ -8,7 +8,6 @@ import 'package:travel_on_final/features/map/domain/entities/travel_point.dart';
 import 'package:travel_on_final/features/search/domain/entities/travel_package.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_naver_map/flutter_naver_map.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class MessageBubble extends StatelessWidget {
   final MessageEntity message;
@@ -133,7 +132,7 @@ class MessageBubble extends StatelessWidget {
                 mapType: NMapType.basic,
               ),
               onMapReady: (controller) {
-                _naverMapController = controller; // 컨트롤러 초기화
+                _naverMapController = controller;
                 _naverMapController.addOverlay(NMarker(
                   id: 'shared-location',
                   position: NLatLng(latitude, longitude),
@@ -144,8 +143,10 @@ class MessageBubble extends StatelessWidget {
         ),
         SizedBox(height: 8.h),
         ElevatedButton(
-          onPressed: () async {
-            // '자세히 보기' 버튼 동작
+          onPressed: () {
+            final latitude = location['latitude'].toString();
+            final longitude = location['longitude'].toString();
+            context.push('/map-detail/$latitude/$longitude');
           },
           child: Text('자세히 보기'),
         ),

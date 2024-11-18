@@ -109,7 +109,7 @@ class NotificationProvider extends ChangeNotifier {
             presentSound: true,
           ),
         ),
-        payload: message.data['chatId'],
+        // payload: message.data['chatId'],
       );
       // 채팅 메시지의 경우 _showLocalNotification 호출하지 않음
     } else {
