@@ -241,46 +241,27 @@ class TravelRepositoryImpl implements TravelRepository {
   @override
   Future<void> toggleLike(String packageId, String userId) async {
     try {
+      final userRef = _firestore.collection('users').doc(userId);
+      final packageRef = _firestore.collection('packages').doc(packageId);
+
       await _firestore.runTransaction((transaction) async {
-        final packageRef = _firestore.collection('packages').doc(packageId);
-        final userRef = _firestore.collection('users').doc(userId);
-
-        // 패키지와 사용자 문서 가져오기
-        final packageDoc = await transaction.get(packageRef);
         final userDoc = await transaction.get(userRef);
+        final packageDoc = await transaction.get(packageRef);
 
-        if (!packageDoc.exists || !userDoc.exists) {
-          throw '패키지 또는 사용자를 찾을 수 없습니다';
-        }
+        List<String> likedPackages =
+            List<String>.from(userDoc.data()?['likedPackages'] ?? []);
 
-        // 현재 데이터
-        final List<String> likedBy =
-            List<String>.from(packageDoc.data()!['likedBy'] ?? []);
-        final List<String> userLikedPackages =
-            List<String>.from(userDoc.data()!['likedPackages'] ?? []);
-
-        if (likedBy.contains(userId)) {
-          // 좋아요 취소
-          likedBy.remove(userId);
-          userLikedPackages.remove(packageId);
-          transaction.update(packageRef, {
-            'likedBy': likedBy,
-            'likesCount': FieldValue.increment(-1),
-          });
+        if (likedPackages.contains(packageId)) {
+          likedPackages.remove(packageId);
+          transaction
+              .update(packageRef, {'likesCount': FieldValue.increment(-1)});
         } else {
-          // 좋아요 추가
-          likedBy.add(userId);
-          userLikedPackages.add(packageId);
-          transaction.update(packageRef, {
-            'likedBy': likedBy,
-            'likesCount': FieldValue.increment(1),
-          });
+          likedPackages.add(packageId);
+          transaction
+              .update(packageRef, {'likesCount': FieldValue.increment(1)});
         }
 
-        // 사용자 문서 업데이트
-        transaction.update(userRef, {
-          'likedPackages': userLikedPackages,
-        });
+        transaction.update(userRef, {'likedPackages': likedPackages});
       });
     } catch (e) {
       print('Error in toggleLike: $e');

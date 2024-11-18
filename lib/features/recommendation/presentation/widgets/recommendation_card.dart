@@ -83,7 +83,7 @@ class RecommendationCard extends StatelessWidget {
                       Icon(Icons.star, color: Colors.amber, size: 18.sp),
                       SizedBox(width: 4.w),
                       Text(
-                        package.rating.toStringAsFixed(1),
+                        package.averageRating.toStringAsFixed(1),
                         style: TextStyle(fontSize: 14.sp),
                       ),
                       SizedBox(width: 16.w),

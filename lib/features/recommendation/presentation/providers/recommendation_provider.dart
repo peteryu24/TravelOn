@@ -69,6 +69,8 @@ class RecommendationProvider extends ChangeNotifier {
                       TravelPoint.fromJson(point as Map<String, dynamic>))
                   .toList() ??
               [],
+          likesCount: (data['likesCount'] as num?)?.toInt() ?? 0,
+          likedBy: List<String>.from(data['likedBy'] ?? []),
         );
       }).toList();
 
