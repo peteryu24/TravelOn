@@ -10,7 +10,12 @@ import '../../../search/presentation/providers/travel_provider.dart';
 import '../../../search/domain/entities/travel_package.dart';
 
 class CustomerReservationsScreen extends StatefulWidget {
-  const CustomerReservationsScreen({super.key});
+  final String? initialTab;
+
+  const CustomerReservationsScreen({
+    super.key,
+    this.initialTab,
+  });
 
   @override
   State<CustomerReservationsScreen> createState() =>
@@ -24,7 +29,11 @@ class _CustomerReservationsScreenState extends State<CustomerReservationsScreen>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 2, vsync: this);
+    _tabController = TabController(
+      length: 2,
+      vsync: this,
+      initialIndex: widget.initialTab == '1' ? 1 : 0,
+    );
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _loadReservations();
     });
