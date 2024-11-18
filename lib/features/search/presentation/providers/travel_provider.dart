@@ -184,18 +184,40 @@ class TravelProvider extends ChangeNotifier {
   // 패키지 추가
   Future<void> addPackage(TravelPackage package) async {
     try {
-      _isLoading = true;
-      notifyListeners();
+      final docRef = _firestore.collection('packages').doc();
+      await docRef.set({
+        'id': docRef.id,
+        'title': package.title,
+        'titleEn': package.titleEn,
+        'titleJa': package.titleJa,
+        'titleZh': package.titleZh,
+        'description': package.description,
+        'descriptionEn': package.descriptionEn,
+        'descriptionJa': package.descriptionJa,
+        'descriptionZh': package.descriptionZh,
+        'region': package.region,
+        'price': package.price,
+        'mainImage': package.mainImage,
+        'descriptionImages': package.descriptionImages,
+        'guideName': package.guideName,
+        'guideId': package.guideId,
+        'minParticipants': package.minParticipants,
+        'maxParticipants': package.maxParticipants,
+        'nights': package.nights,
+        'totalDays': package.totalDays,
+        'departureDays': package.departureDays,
+        'likedBy': package.likedBy,
+        'likesCount': package.likesCount,
+        'averageRating': package.averageRating,
+        'reviewCount': package.reviewCount,
+        'routePoints': package.routePoints.map((point) => point.toJson()).toList(),
+        'createdAt': FieldValue.serverTimestamp(),
+      });
 
-      await _repository.addPackage(package);
-      await loadPackages();
-
-      _isLoading = false;
+      final newPackage = package.copyWith(id: docRef.id);
+      _packages.add(newPackage);
       notifyListeners();
     } catch (e) {
-      _error = e.toString();
-      _isLoading = false;
-      notifyListeners();
       print('Error adding package: $e');
       rethrow;
     }

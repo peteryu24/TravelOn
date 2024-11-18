@@ -1,4 +1,5 @@
 // ReviewDetailScreen.dart
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
@@ -25,7 +26,15 @@ class _ReviewDetailScreenState extends State<ReviewDetailScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.package.title),
+        title: Text(
+          context.locale.languageCode == 'ko'
+              ? widget.package.title
+              : context.locale.languageCode == 'en'
+                  ? widget.package.titleEn
+                  : context.locale.languageCode == 'ja'
+                      ? widget.package.titleJa
+                      : widget.package.titleZh,
+        ),
       ),
       body: Consumer<ReviewProvider>(
         builder: (context, provider, _) {
@@ -39,7 +48,6 @@ class _ReviewDetailScreenState extends State<ReviewDetailScreen> {
 
           return Column(
             children: [
-              // 별점과 리뷰 개수 표시
               Container(
                 padding: EdgeInsets.all(16.w),
                 color: Colors.grey[100],
@@ -50,11 +58,7 @@ class _ReviewDetailScreenState extends State<ReviewDetailScreen> {
                       children: [
                         Row(
                           children: [
-                            Icon(
-                              Icons.star,
-                              color: Colors.amber,
-                              size: 24.sp,
-                            ),
+                            Icon(Icons.star, color: Colors.amber, size: 24.sp),
                             SizedBox(width: 4.w),
                             Text(
                               provider.totalAverageRating.toStringAsFixed(1),
@@ -67,7 +71,9 @@ class _ReviewDetailScreenState extends State<ReviewDetailScreen> {
                         ),
                         SizedBox(height: 4.h),
                         Text(
-                          '리뷰 ${provider.totalReviewCount}개',
+                          'review.stats.count'.tr(namedArgs: {
+                            'count': provider.totalReviewCount.toString()
+                          }),
                           style: TextStyle(
                             color: Colors.grey[600],
                             fontSize: 14.sp,
@@ -86,7 +92,8 @@ class _ReviewDetailScreenState extends State<ReviewDetailScreen> {
                   if (user == null) return const SizedBox.shrink();
 
                   return FutureBuilder<String?>(
-                    future: provider.checkReviewStatus(user.id, widget.package.id),
+                    future:
+                        provider.checkReviewStatus(user.id, widget.package.id),
                     builder: (context, snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
                         return const Center(child: CircularProgressIndicator());
@@ -111,33 +118,41 @@ class _ReviewDetailScreenState extends State<ReviewDetailScreen> {
                                 ),
                               ),
                             ElevatedButton(
-                              onPressed: canReview ? () async {
-                                final reviewProvider = context.read<ReviewProvider>();
+                              onPressed: canReview
+                                  ? () async {
+                                      final reviewProvider =
+                                          context.read<ReviewProvider>();
 
-                                await Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (_) => AddReviewScreen(
-                                      packageId: widget.package.id,
-                                      packageTitle: widget.package.title,
-                                    ),
-                                  ),
-                                );
+                                      await Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (_) => AddReviewScreen(
+                                            packageId: widget.package.id,
+                                            packageTitle: widget.package.title,
+                                          ),
+                                        ),
+                                      );
 
-                                if (mounted) {
-                                  await reviewProvider.getTotalReviewStats(widget.package.id);
-                                  if (mounted) {
-                                    await reviewProvider.loadInitialReviews(widget.package.id);
-                                  }
-                                }
-                              } : null,
+                                      if (mounted) {
+                                        await reviewProvider
+                                            .getTotalReviewStats(
+                                                widget.package.id);
+                                        if (mounted) {
+                                          await reviewProvider
+                                              .loadInitialReviews(
+                                                  widget.package.id);
+                                        }
+                                      }
+                                    }
+                                  : null,
                               style: ElevatedButton.styleFrom(
                                 minimumSize: Size(double.infinity, 48.h),
                               ),
                               child: Text(
-                                  canReview ? '리뷰 작성하기' : '리뷰 작성 불가',
-                                  style: TextStyle(fontSize: 16.sp)
-                              ),
+                                  canReview
+                                      ? 'review.action.write'.tr()
+                                      : 'review.action.cannot_write'.tr(),
+                                  style: TextStyle(fontSize: 16.sp)),
                             ),
                           ],
                         ),
@@ -149,22 +164,24 @@ class _ReviewDetailScreenState extends State<ReviewDetailScreen> {
 
               Expanded(
                 child: provider.reviews.isEmpty
-                    ? const Center(child: Text('아직 작성된 리뷰가 없습니다'))
+                    ? Center(child: Text('review.stats.empty'.tr()))
                     : ListView(
-                  children: [
-                    ...provider.reviews.map((review) => ReviewCard(review: review)),
-                    if (provider.hasMore)
-                      Padding(
-                        padding: EdgeInsets.all(16.w),
-                        child: ElevatedButton(
-                          onPressed: provider.isLoading
-                              ? null
-                              : () => provider.loadMoreReviews(widget.package.id),
-                          child: Text('더보기'),
-                        ),
+                        children: [
+                          ...provider.reviews
+                              .map((review) => ReviewCard(review: review)),
+                          if (provider.hasMore)
+                            Padding(
+                              padding: EdgeInsets.all(16.w),
+                              child: ElevatedButton(
+                                onPressed: provider.isLoading
+                                    ? null
+                                    : () => provider
+                                        .loadMoreReviews(widget.package.id),
+                                child: Text('review.action.load_more'.tr()),
+                              ),
+                            ),
+                        ],
                       ),
-                  ],
-                ),
               ),
             ],
           );

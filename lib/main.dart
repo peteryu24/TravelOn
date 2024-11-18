@@ -94,6 +94,8 @@ Future<void> main() async {
       supportedLocales: const [
         Locale('ko', 'KR'),
         Locale('en', 'US'),
+        Locale('ja', 'JP'),
+        Locale('zh', 'CN'),
       ],
       path: 'assets/translations',
       fallbackLocale: const Locale('ko', 'KR'),
