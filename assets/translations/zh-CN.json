@@ -144,12 +144,16 @@
       "certification": "导游认证",
       "certification_desc": "获取导游认证"
     },
+    "auth": {
+      "login_required": "需要登录"
+    },
     "user": {
       "reservations_title": "预订管理",
       "my_reservations": "我的预订",
-      "my_reservations_desc": "查看您的套餐预订",
+      "my_reservations_desc": "查看已预订的套餐",
       "liked_packages": "收藏的套餐",
-      "liked_packages_desc": "查看您收藏的套餐"
+      "liked_packages_desc": "查看感兴趣的套餐",
+      "no_liked_packages": "暂无收藏的套餐"
     },
     "logout": "退出登录",
     "logout_failed": "退出失败: {error}"
