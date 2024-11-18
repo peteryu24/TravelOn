@@ -13,14 +13,14 @@ class WeatherApi {
   static String get apiKey => dotenv.env['WEATHER_API_KEY'] ?? '';
 
   static final cities = {
-    'weather regions.seoul'.tr(): {'nx': 60, 'ny': 127},
-    'weather regions.busan'.tr(): {'nx': 98, 'ny': 76},
-    'weather regions.daegu'.tr(): {'nx': 89, 'ny': 90},
-    'weather regions.incheon'.tr(): {'nx': 55, 'ny': 124},
-    'weather regions.gwangju'.tr(): {'nx': 58, 'ny': 74},
-    'weather regions.deajeon'.tr(): {'nx': 67, 'ny': 100},
-    'weather regions.ulsan'.tr(): {'nx': 102, 'ny': 84},
-    'weather regions.jeju'.tr(): {'nx': 52, 'ny': 38},
+    'weather_regions.seoul'.tr(): {'nx': 60, 'ny': 127},
+    'weather_regions.busan'.tr(): {'nx': 98, 'ny': 76},
+    'weather_regions.daegu'.tr(): {'nx': 89, 'ny': 90},
+    'weather_regions.incheon'.tr(): {'nx': 55, 'ny': 124},
+    'weather_regions.gwangju'.tr(): {'nx': 58, 'ny': 74},
+    'weather_regions.deajeon'.tr(): {'nx': 67, 'ny': 100},
+    'weather_regions.ulsan'.tr(): {'nx': 102, 'ny': 84},
+    'weather_regions.jeju'.tr(): {'nx': 52, 'ny': 38},
   };
 
   Future<List<WeatherModel>> getCurrentWeather() async {

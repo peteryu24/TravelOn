@@ -1,5 +1,6 @@
 
 
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
@@ -30,13 +31,12 @@ class _EditReviewScreenState extends State<EditReviewScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('리뷰 수정')),
+      appBar: AppBar(title: Text('review.edit'.tr())),
       body: SingleChildScrollView(
         padding: EdgeInsets.all(16.w),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // 별점 선택 위젯
             Container(
               padding: EdgeInsets.all(16.w),
               decoration: BoxDecoration(
@@ -46,7 +46,7 @@ class _EditReviewScreenState extends State<EditReviewScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('별점', style: TextStyle(fontSize: 16.sp)),
+                  Text('review.rating'.tr(), style: TextStyle(fontSize: 16.sp)),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: List.generate(5, (index) {
@@ -74,20 +74,19 @@ class _EditReviewScreenState extends State<EditReviewScreen> {
             TextField(
               controller: _contentController,
               maxLines: 5,
-              decoration: const InputDecoration(
-                labelText: '리뷰 내용',
+              decoration: InputDecoration(
+                labelText: 'review.content.label'.tr(),
                 border: OutlineInputBorder(),
               ),
             ),
             SizedBox(height: 24.h),
-
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
                 onPressed: () async {
                   if (_contentController.text.trim().isEmpty) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('리뷰 내용을 입력해주세요')),
+                      SnackBar(content: Text('review.content.empty_error'.tr())),
                     );
                     return;
                   }
@@ -105,7 +104,7 @@ class _EditReviewScreenState extends State<EditReviewScreen> {
 
                     if (mounted) {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('리뷰가 수정되었습니다')),
+                        SnackBar(content: Text('review.success.edit'.tr())),
                       );
                       Navigator.pop(context);
                     }
@@ -120,7 +119,7 @@ class _EditReviewScreenState extends State<EditReviewScreen> {
                 style: ElevatedButton.styleFrom(
                   padding: EdgeInsets.symmetric(vertical: 16.h),
                 ),
-                child: Text('수정 완료', style: TextStyle(fontSize: 16.sp)),
+                child: Text('review.update'.tr(), style: TextStyle(fontSize: 16.sp)),
               ),
             ),
           ],

@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:travel_on_final/features/review/domain/entities/review.dart';
 import 'package:travel_on_final/features/review/domain/repositories/review_repository.dart';
 import 'package:travel_on_final/features/search/presentation/providers/travel_provider.dart';
@@ -70,7 +71,7 @@ class ReviewRepositoryImpl implements ReviewRepository {
     try {
       // 예약 확인
       if (!await canUserReview(review.userId, review.packageId)) {
-        throw '예약 승인된 사용자만 리뷰를 작성할 수 있습니다.';
+        throw 'review.error.unauthorized'.tr();
       }
 
       // 리뷰 추가

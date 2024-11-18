@@ -19,8 +19,14 @@ class TravelRepositoryImpl implements TravelRepository {
         return TravelPackage(
           id: doc.id,
           title: data['title'] ?? '',
+          titleEn: data['titleEn'] ?? '',
+          titleJa: data['titleJa'] ?? '',
+          titleZh: data['titleZh'] ?? '',
           description: data['description'] ?? '',
-          price: (data['price'] ?? 0).toDouble(),
+          descriptionEn: data['descriptionEn'] ?? '',
+          descriptionJa: data['descriptionJa'] ?? '',
+          descriptionZh: data['descriptionZh'] ?? '',
+          price: (data['price'] as num?)?.toDouble() ?? 0.0,
           region: data['region'] ?? '',
           mainImage: data['mainImage'],
           descriptionImages: List<String>.from(data['descriptionImages'] ?? []),
@@ -28,7 +34,9 @@ class TravelRepositoryImpl implements TravelRepository {
           guideId: data['guideId'] ?? '',
           minParticipants: (data['minParticipants'] as num?)?.toInt() ?? 4,
           maxParticipants: (data['maxParticipants'] as num?)?.toInt() ?? 8,
-          nights: (data['nights'] as num?)?.toInt() ?? 1,          departureDays: List<int>.from(data['departureDays'] ?? [1,2,3,4,5,6,7]),
+          nights: (data['nights'] as num?)?.toInt() ?? 0,
+          totalDays: (data['totalDays'] as num?)?.toInt() ?? 0,
+          departureDays: List<int>.from(data['departureDays'] ?? [1,2,3,4,5,6,7]),
           reviewCount: (data['reviewCount'] as num?)?.toInt() ?? 0,
           averageRating: (data['averageRating'] as num?)?.toDouble() ?? 0.0,
           likedBy: List<String>.from(data['likedBy'] ?? []),
@@ -36,7 +44,6 @@ class TravelRepositoryImpl implements TravelRepository {
           routePoints: (data['routePoints'] as List<dynamic>?)
               ?.map((point) => TravelPoint.fromJson(point as Map<String, dynamic>))
               .toList() ?? [],
-          // routePoints 추가
         );
       }).toList();
     } catch (e) {
@@ -76,7 +83,13 @@ class TravelRepositoryImpl implements TravelRepository {
 
       final packageData = {
         'title': package.title,
+        'titleEn': package.titleEn,
+        'titleJa': package.titleJa,
+        'titleZh': package.titleZh,
         'description': package.description,
+        'descriptionEn': package.descriptionEn,
+        'descriptionJa': package.descriptionJa,
+        'descriptionZh': package.descriptionZh,
         'price': package.price,
         'region': package.region,
         'mainImage': mainImageUrl,
@@ -87,6 +100,7 @@ class TravelRepositoryImpl implements TravelRepository {
         'minParticipants': package.minParticipants,
         'maxParticipants': package.maxParticipants,
         'nights': package.nights,
+        'totalDays': package.totalDays,
         'departureDays': package.departureDays,
         'likedBy': [],
         'likesCount': 0,
@@ -122,7 +136,6 @@ class TravelRepositoryImpl implements TravelRepository {
       String? mainImageUrl;
       List<String> descriptionImageUrls = [];
 
-      // 메인 이미지가 로컬 파일인 경우에만 업로드
       if (package.mainImage != null && package.mainImage!.startsWith('/')) {
         print('Uploading new main image...');
         final mainImageFile = File(package.mainImage!);
@@ -132,10 +145,8 @@ class TravelRepositoryImpl implements TravelRepository {
         mainImageUrl = await mainImageRef.getDownloadURL();
       }
 
-      // 설명 이미지 처리
       for (String imagePath in package.descriptionImages) {
         if (imagePath.startsWith('/')) {
-          // 새로운 이미지는 업로드
           print('Uploading new description image...');
           final file = File(imagePath);
           final imageRef = _storage.ref(
@@ -144,14 +155,19 @@ class TravelRepositoryImpl implements TravelRepository {
           final imageUrl = await imageRef.getDownloadURL();
           descriptionImageUrls.add(imageUrl);
         } else {
-          // 기존 URL은 그대로 유지
           descriptionImageUrls.add(imagePath);
         }
       }
 
       final packageData = {
         'title': package.title,
+        'titleEn': package.titleEn,
+        'titleJa': package.titleJa,
+        'titleZh': package.titleZh,
         'description': package.description,
+        'descriptionEn': package.descriptionEn,
+        'descriptionJa': package.descriptionJa,
+        'descriptionZh': package.descriptionZh,
         'price': package.price,
         'region': package.region,
         'mainImage': mainImageUrl ?? package.mainImage,
@@ -162,8 +178,9 @@ class TravelRepositoryImpl implements TravelRepository {
         'minParticipants': package.minParticipants,
         'maxParticipants': package.maxParticipants,
         'nights': package.nights,
+        'totalDays': package.totalDays,
         'departureDays': package.departureDays,
-        'routePoints': package.routePoints.map((point) => point.toJson()).toList(),  // routePoints 추가
+        'routePoints': package.routePoints.map((point) => point.toJson()).toList(),
       };
 
       if (package.minParticipants <= 0) {
@@ -189,18 +206,15 @@ class TravelRepositoryImpl implements TravelRepository {
     try {
       print('Starting to delete package...');
 
-      // 패키지 문서 가져오기
       final packageDoc =
-          await _firestore.collection('packages').doc(packageId).get();
+      await _firestore.collection('packages').doc(packageId).get();
       final data = packageDoc.data();
 
       if (data != null) {
-        // 연결된 이미지 삭제
         final mainImage = data['mainImage'] as String?;
         final descriptionImages =
-            List<String>.from(data['descriptionImages'] ?? []);
+        List<String>.from(data['descriptionImages'] ?? []);
 
-        // 메인 이미지 삭제
         if (mainImage != null && mainImage.isNotEmpty) {
           try {
             await _storage.refFromURL(mainImage).delete();
@@ -210,7 +224,6 @@ class TravelRepositoryImpl implements TravelRepository {
           }
         }
 
-        // 설명 이미지들 삭제
         for (String imageUrl in descriptionImages) {
           try {
             await _storage.refFromURL(imageUrl).delete();
@@ -221,7 +234,6 @@ class TravelRepositoryImpl implements TravelRepository {
         }
       }
 
-      // Firestore 문서 삭제
       await _firestore.collection('packages').doc(packageId).delete();
       print('Package deleted successfully');
     } catch (e) {
@@ -237,7 +249,6 @@ class TravelRepositoryImpl implements TravelRepository {
         final packageRef = _firestore.collection('packages').doc(packageId);
         final userRef = _firestore.collection('users').doc(userId);
 
-        // 패키지와 사용자 문서 가져오기
         final packageDoc = await transaction.get(packageRef);
         final userDoc = await transaction.get(userRef);
 
@@ -245,14 +256,12 @@ class TravelRepositoryImpl implements TravelRepository {
           throw '패키지 또는 사용자를 찾을 수 없습니다';
         }
 
-        // 현재 데이터
         final List<String> likedBy =
-            List<String>.from(packageDoc.data()!['likedBy'] ?? []);
+        List<String>.from(packageDoc.data()!['likedBy'] ?? []);
         final List<String> userLikedPackages =
-            List<String>.from(userDoc.data()!['likedPackages'] ?? []);
+        List<String>.from(userDoc.data()!['likedPackages'] ?? []);
 
         if (likedBy.contains(userId)) {
-          // 좋아요 취소
           likedBy.remove(userId);
           userLikedPackages.remove(packageId);
           transaction.update(packageRef, {
@@ -260,7 +269,6 @@ class TravelRepositoryImpl implements TravelRepository {
             'likesCount': FieldValue.increment(-1),
           });
         } else {
-          // 좋아요 추가
           likedBy.add(userId);
           userLikedPackages.add(packageId);
           transaction.update(packageRef, {
@@ -269,7 +277,6 @@ class TravelRepositoryImpl implements TravelRepository {
           });
         }
 
-        // 사용자 문서 업데이트
         transaction.update(userRef, {
           'likedPackages': userLikedPackages,
         });

@@ -2,10 +2,16 @@ import 'package:travel_on_final/features/map/domain/entities/travel_point.dart';
 
 class TravelPackage {
   final String id;
-  final String title;
+  final String title;      // 한국어 (기본)
+  final String titleEn;    // 영어
+  final String titleJa;    // 일본어
+  final String titleZh;    // 중국어
+  final String description;      // 한국어 (기본)
+  final String descriptionEn;    // 영어
+  final String descriptionJa;    // 일본어
+  final String descriptionZh;    // 중국어
   final String region;
   final double price;
-  final String description;
   final String? mainImage;
   final List<String> descriptionImages;
   final String guideName;
@@ -13,7 +19,7 @@ class TravelPackage {
   final int minParticipants;
   final int maxParticipants;
   final int nights;
-  final int totalDays;  // 필드 추가
+  final int totalDays;
   final List<int> departureDays;
   List<String> likedBy;
   int likesCount;
@@ -21,12 +27,75 @@ class TravelPackage {
   final int reviewCount;
   final List<TravelPoint> routePoints;
 
+  String getTitle(String langCode) {
+    switch(langCode) {
+      case 'en': return titleEn.isNotEmpty ? titleEn : title;
+      case 'ja': return titleJa.isNotEmpty ? titleJa : title;
+      case 'zh': return titleZh.isNotEmpty ? titleZh : title;
+      default: return title;
+    }
+  }
+
+  String getDescription(String langCode) {
+    switch(langCode) {
+      case 'en': return descriptionEn.isNotEmpty ? descriptionEn : description;
+      case 'ja': return descriptionJa.isNotEmpty ? descriptionJa : description;
+      case 'zh': return descriptionZh.isNotEmpty ? descriptionZh : description;
+      default: return description;
+    }
+  }
+
+  bool hasTranslation(String langCode) {
+    switch(langCode) {
+      case 'en':
+        return titleEn.isNotEmpty && descriptionEn.isNotEmpty;
+      case 'ja':
+        return titleJa.isNotEmpty && descriptionJa.isNotEmpty;
+      case 'zh':
+        return titleZh.isNotEmpty && descriptionZh.isNotEmpty;
+      default:
+        return true; // 한국어는 항상 있음
+    }
+  }
+
+  String getPriceSymbol(String langCode) {
+    switch(langCode) {
+      case 'ja': return '￥';
+      case 'zh': return '¥';
+      default: return '₩';
+    }
+  }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+          other is TravelPackage &&
+              runtimeType == other.runtimeType &&
+              id == other.id;
+
+  @override
+  int get hashCode => id.hashCode;
+
+  // 디버깅을 위한 toString
+  @override
+  String toString() => 'TravelPackage('
+      'id: $id, '
+      'title: $title, '
+      'price: $price, '
+      'guideName: $guideName)';
+
   TravelPackage({
     required this.id,
     required this.title,
+    this.titleEn = '',
+    this.titleJa = '',
+    this.titleZh = '',
+    required this.description,
+    this.descriptionEn = '',
+    this.descriptionJa = '',
+    this.descriptionZh = '',
     required this.region,
     required this.price,
-    required this.description,
     this.mainImage,
     this.descriptionImages = const [],
     required this.guideName,
@@ -34,22 +103,28 @@ class TravelPackage {
     required this.minParticipants,
     required this.maxParticipants,
     required this.nights,
-    var totalDays,  // 매개변수 추가
+    var totalDays,
     required this.departureDays,
     List<String>? likedBy,
     this.likesCount = 0,
     this.averageRating = 0.0,
     this.reviewCount = 0,
     this.routePoints = const [],
-  })  : this.totalDays = totalDays ?? nights + 1,  // nights + 1로 기본값 설정
-        this.likedBy = likedBy ?? [];  // 쉼표로 구분, 마지막에 세미콜론
+  })  : this.totalDays = totalDays ?? nights + 1,
+        this.likedBy = likedBy ?? [];
 
   Map<String, dynamic> toJson() => {
     'id': id,
     'title': title,
+    'titleEn': titleEn,
+    'titleJa': titleJa,
+    'titleZh': titleZh,
     'region': region,
     'price': price,
     'description': description,
+    'descriptionEn': descriptionEn,
+    'descriptionJa': descriptionJa,
+    'descriptionZh': descriptionZh,
     'mainImage': mainImage,
     'descriptionImages': descriptionImages,
     'guideName': guideName,
@@ -57,7 +132,7 @@ class TravelPackage {
     'minParticipants': minParticipants,
     'maxParticipants': maxParticipants,
     'nights': nights,
-    'totalDays': totalDays,  // 추가
+    'totalDays': totalDays,
     'departureDays': departureDays,
     'likedBy': likedBy,
     'likesCount': likesCount,
@@ -69,7 +144,13 @@ class TravelPackage {
   factory TravelPackage.fromJson(Map<String, dynamic> json) => TravelPackage(
     id: json['id'] as String,
     title: json['title'] as String,
+    titleEn: json['titleEn'] as String? ?? '',
+    titleJa: json['titleJa'] as String? ?? '',
+    titleZh: json['titleZh'] as String? ?? '',
     description: json['description'] as String,
+    descriptionEn: json['descriptionEn'] as String? ?? '',
+    descriptionJa: json['descriptionJa'] as String? ?? '',
+    descriptionZh: json['descriptionZh'] as String? ?? '',
     price: (json['price'] as num).toDouble(),
     region: json['region'] as String,
     mainImage: json['mainImage'] as String?,
@@ -91,19 +172,34 @@ class TravelPackage {
   );
 
   TravelPackage copyWith({
+    String? id,
+    String? title,
+    String? titleEn,
+    String? titleJa,
+    String? titleZh,
+    String? description,
+    String? descriptionEn,
+    String? descriptionJa,
+    String? descriptionZh,
     List<String>? likedBy,
     int? likesCount,
     double? averageRating,
     int? reviewCount,
     List<TravelPoint>? routePoints,
-    int? totalDays,  // 추가
+    int? totalDays,
   }) {
     return TravelPackage(
-      id: id,
-      title: title,
+      id: id ?? this.id,  // 이 부분 수정
+      title: title ?? this.title,
+      titleEn: titleEn ?? this.titleEn,
+      titleJa: titleJa ?? this.titleJa,
+      titleZh: titleZh ?? this.titleZh,
       region: region,
       price: price,
-      description: description,
+      description: description ?? this.description,
+      descriptionEn: descriptionEn ?? this.descriptionEn,
+      descriptionJa: descriptionJa ?? this.descriptionJa,
+      descriptionZh: descriptionZh ?? this.descriptionZh,
       mainImage: mainImage,
       descriptionImages: descriptionImages,
       guideName: guideName,
@@ -111,7 +207,7 @@ class TravelPackage {
       minParticipants: minParticipants,
       maxParticipants: maxParticipants,
       nights: nights,
-      totalDays: totalDays ?? this.totalDays,  // 추가
+      totalDays: totalDays ?? this.totalDays,
       departureDays: departureDays,
       likedBy: likedBy ?? List<String>.from(this.likedBy),
       likesCount: likesCount ?? this.likesCount,

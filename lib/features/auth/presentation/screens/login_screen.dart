@@ -38,35 +38,79 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Widget _buildLanguageSelector() {
-    return PopupMenuButton<Locale>(
-      icon: const Icon(Icons.language),
-      onSelected: (Locale locale) {
-        context.setLocale(locale);
-      },
-      itemBuilder: (context) => [
-        PopupMenuItem(
-          value: const Locale('ko', 'KR'),
-          child: Row(
-            children: [
-              Text('🇰🇷', style: TextStyle(fontSize: 16.sp)),
-              SizedBox(width: 8.w),
-              const Text('한국어'),
-            ],
-          ),
+    return Row(
+      children: [
+        Text(
+          _getLanguageLabel(context.locale),
+          style: TextStyle(fontSize: 14.sp),
         ),
-        PopupMenuItem(
-          value: const Locale('en', 'US'),
-          child: Row(
-            children: [
-              Text('🇺🇸', style: TextStyle(fontSize: 16.sp)),
-              SizedBox(width: 8.w),
-              const Text('English'),
-            ],
-          ),
+        PopupMenuButton<Locale>(
+          icon: const Icon(Icons.language),
+          onSelected: (Locale locale) {
+            context.setLocale(locale);
+          },
+          itemBuilder: (context) => [
+            PopupMenuItem(
+              value: const Locale('ko', 'KR'),
+              child: Row(
+                children: [
+                  Text('🇰🇷', style: TextStyle(fontSize: 16.sp)),
+                  SizedBox(width: 8.w),
+                  const Text('한국어'),
+                ],
+              ),
+            ),
+            PopupMenuItem(
+              value: const Locale('en', 'US'),
+              child: Row(
+                children: [
+                  Text('🇺🇸', style: TextStyle(fontSize: 16.sp)),
+                  SizedBox(width: 8.w),
+                  const Text('English'),
+                ],
+              ),
+            ),
+            PopupMenuItem(
+              value: const Locale('ja', 'JP'),
+              child: Row(
+                children: [
+                  Text('🇯🇵', style: TextStyle(fontSize: 16.sp)),
+                  SizedBox(width: 8.w),
+                  const Text('日本語'),
+                ],
+              ),
+            ),
+            PopupMenuItem(
+              value: const Locale('zh', 'CN'),
+              child: Row(
+                children: [
+                  Text('🇨🇳', style: TextStyle(fontSize: 16.sp)),
+                  SizedBox(width: 8.w),
+                  const Text('中文'),
+                ],
+              ),
+            ),
+          ],
         ),
       ],
     );
   }
+
+  String _getLanguageLabel(Locale locale) {
+    switch(locale.languageCode) {
+      case 'ko':
+        return '🇰🇷한국어';
+      case 'en':
+        return '🇺🇸English';
+      case 'ja':
+        return '🇯🇵日本語';
+      case 'zh':
+        return '🇨🇳中文';
+      default:
+        return 'Language';
+    }
+  }
+
 
   Future<void> _saveCredentialsToPrefs() async {
     if (_saveCredentials) {
@@ -92,7 +136,9 @@ class _LoginScreenState extends State<LoginScreen> {
           await _saveCredentialsToPrefs();
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('${authProvider.currentUser!.name}님 환영합니다'),
+              content: Text(
+                  'login.welcome'.tr(namedArgs: {'name': authProvider.currentUser!.name})
+              ),
             ),
           );
           context.go('/');
@@ -318,7 +364,9 @@ class _LoginScreenState extends State<LoginScreen> {
       if (authProvider.isAuthenticated && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('${authProvider.currentUser!.name}님 환영합니다'),
+            content: Text(
+                'login.welcome'.tr(namedArgs: {'name': authProvider.currentUser!.name})
+            ),
           ),
         );
         context.go('/');
@@ -340,7 +388,9 @@ class _LoginScreenState extends State<LoginScreen> {
       if (authProvider.isAuthenticated && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('${authProvider.currentUser!.name}님 환영합니다'),
+            content: Text(
+                'login.welcome'.tr(namedArgs: {'name': authProvider.currentUser!.name})
+            ),
           ),
         );
         context.go('/');
@@ -362,7 +412,9 @@ class _LoginScreenState extends State<LoginScreen> {
       if (authProvider.isAuthenticated && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('${authProvider.currentUser!.name}님 환영합니다'),
+            content: Text(
+                'login.welcome'.tr(namedArgs: {'name': authProvider.currentUser!.name})
+            ),
           ),
         );
         context.go('/');

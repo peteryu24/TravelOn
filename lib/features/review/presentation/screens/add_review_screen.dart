@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
@@ -25,7 +26,7 @@ class _AddReviewScreenState extends State<AddReviewScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('리뷰 작성')),
+      appBar: AppBar(title: Text('review.write'.tr())),
       body: SingleChildScrollView(
         padding: EdgeInsets.all(16.w),
         child: Column(
@@ -33,13 +34,9 @@ class _AddReviewScreenState extends State<AddReviewScreen> {
           children: [
             Text(
               widget.packageTitle,
-              style: TextStyle(
-                  fontSize: 18.sp,
-                  fontWeight: FontWeight.bold
-              ),
+              style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold),
             ),
             SizedBox(height: 16.h),
-            // 별점 선택 위젯
             Container(
               padding: EdgeInsets.all(16.w),
               decoration: BoxDecoration(
@@ -49,7 +46,7 @@ class _AddReviewScreenState extends State<AddReviewScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('별점', style: TextStyle(fontSize: 16.sp)),
+                  Text('review.rating'.tr(), style: TextStyle(fontSize: 16.sp)),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: List.generate(5, (index) {
@@ -77,8 +74,8 @@ class _AddReviewScreenState extends State<AddReviewScreen> {
               controller: _contentController,
               maxLines: 5,
               decoration: InputDecoration(
-                labelText: '리뷰 내용',
-                hintText: '패키지 여행에 대한 경험을 공유해주세요',
+                labelText: 'review.content.label'.tr(),
+                hintText: 'review.content.hint'.tr(),
                 border: OutlineInputBorder(),
               ),
             ),
@@ -89,7 +86,7 @@ class _AddReviewScreenState extends State<AddReviewScreen> {
                 onPressed: () async {
                   if (_contentController.text.trim().isEmpty) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('리뷰 내용을 입력해주세요')),
+                      SnackBar(content: Text('review.content.empty_error'.tr())),
                     );
                     return;
                   }
@@ -105,12 +102,11 @@ class _AddReviewScreenState extends State<AddReviewScreen> {
                     );
 
                     if (mounted) {
-                      // 리뷰 작성 완료 후 즉시 통계 업데이트
                       final reviewProvider = context.read<ReviewProvider>();
                       await reviewProvider.getTotalReviewStats(widget.packageId);
 
                       ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('리뷰가 등록되었습니다')),
+                        SnackBar(content: Text('review.success.add'.tr())),
                       );
                       Navigator.pop(context);
                     }
@@ -125,7 +121,7 @@ class _AddReviewScreenState extends State<AddReviewScreen> {
                 style: ElevatedButton.styleFrom(
                   padding: EdgeInsets.symmetric(vertical: 16.h),
                 ),
-                child: Text('리뷰 등록', style: TextStyle(fontSize: 16.sp)),
+                child: Text('review.submit'.tr(), style: TextStyle(fontSize: 16.sp)),
               ),
             ),
           ],

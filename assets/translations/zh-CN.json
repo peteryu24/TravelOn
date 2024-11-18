@@ -1,0 +1,294 @@
+{
+  "app": {
+    "name": "TravelOn"
+  },
+  "login": {
+    "title": "登录",
+    "email": "邮箱",
+    "password": "密码",
+    "save_info": "保存登录信息",
+    "signup": "注册",
+    "reset_password": "重置密码",
+    "login_button": "登录",
+    "or": "或",
+    "sns_login": "社交账号登录",
+    "welcome": "欢迎，{name}!",
+    "login_failed": "登录失败，请重试。",
+    "google_failed": "Google登录失败。",
+    "github_failed": "GitHub登录失败。",
+    "kakao_failed": "Kakao登录失败。"
+  },
+  "home": {
+    "next_trip": {
+      "greeting": "您好，{name}",
+      "countdown": "距离{title}还有{days}天!",
+      "today": "祝您{title}愉快!",
+      "no_trips": "暂无预定行程"
+    },
+    "weather": {
+      "current": "当前天气",
+      "temperature": "{temp}°",
+      "wind_speed": "{speed}米/秒",
+      "conditions": {
+        "rain": "雨",
+        "rain_snow": "雨夹雪",
+        "snow": "雪",
+        "shower": "阵雨",
+        "clear": "晴",
+        "cloudy": "多云",
+        "overcast": "阴"
+      }
+    },
+    "popular_courses": "热门旅行线路",
+    "view_more": "查看更多"
+  },
+  "menu": {
+    "travel_tips": "旅行攻略",
+    "guide_ranking": "导游排名",
+    "recommended_places": "推荐景点",
+    "travel_gallery": "旅行相册"
+  },
+  "navigation": {
+    "home": "首页",
+    "packages": "套餐",
+    "chat": "聊天",
+    "mypage": "我的"
+  },
+  "weather_regions": {
+    "seoul": "首尔",
+    "busan": "釜山",
+    "daegu": "大邱",
+    "incheon": "仁川",
+    "gwangju": "光州",
+    "deajeon": "大田",
+    "ulsan": "蔚山",
+    "jeju": "济州岛"
+  },
+  "regions": {
+    "seoul": "首尔",
+    "incheon_gyeonggi": "仁川/京畿",
+    "gangwon": "江原",
+    "daejeon_chungnam": "大田/忠南",
+    "chungbuk": "忠北",
+    "gwangju_jeonnam": "光州/全南",
+    "jeonbuk": "全北",
+    "busan_gyeongnam": "釜山/庆南",
+    "daegu_gyeongbuk": "大邱/庆北",
+    "ulsan": "蔚山",
+    "jeju": "济州岛",
+    "all": "全部"
+  },
+  "common": {
+    "guest": "游客",
+    "see_more": "查看更多",
+    "confirm": "确认",
+    "cancel": "取消",
+    "save": "保存",
+    "delete": "删除",
+    "edit": "编辑",
+    "back": "返回",
+    "close": "关闭",
+    "loading": "加载中...",
+    "error": "发生错误",
+    "retry": "重试",
+    "success": "成功",
+    "failed": "失败",
+    "notice": "通知"
+  },
+  "search": {
+    "result_count": "搜索结果: {count}个",
+    "selected_region": "已选地区: {region}",
+    "region": "地区: {region}"
+  },
+  "sort": {
+    "latest": "最新",
+    "price_high": "价格从高到低",
+    "price_low": "价格从低到高",
+    "popular": "人气",
+    "high_rating": "评分最高",
+    "most_reviews": "评价最多"
+  },
+  "package_detail": {
+    "title": "套餐详情",
+    "guide": "导游: {name}",
+    "participants": "可预订人数: {min}~{max}人",
+    "participants_unknown": "可预订人数: 暂无信息",
+    "price": "₩{price}/人",
+    "booking_closed": "今日预订已截止",
+    "description": "详细说明",
+    "course": "旅行路线",
+    "no_course": "暂无旅行路线",
+    "view_route": "查看详细路线",
+    "images": "详细图片",
+    "location_info": {
+      "details": "详细信息",
+      "view_map": "查看地图",
+      "map_error": "无法打开地图"
+    },
+    "booking": {
+      "book_now": "立即预订",
+      "closed": "今日预订已关闭"
+    }
+  },
+  "profile": {
+    "title": "我的主页",
+    "default_user": "用户",
+    "guide": {
+      "section_title": "导游功能",
+      "create_package": "创建套餐",
+      "create_package_desc": "注册新的旅行套餐",
+      "manage_reservations": "管理预订",
+      "manage_reservations_desc": "管理您的套餐预订",
+      "manage_packages": "管理套餐",
+      "manage_packages_desc": "编辑或删除您的套餐",
+      "certification": "导游认证",
+      "certification_desc": "获取导游认证"
+    },
+    "user": {
+      "reservations_title": "预订管理",
+      "my_reservations": "我的预订",
+      "my_reservations_desc": "查看您的套餐预订",
+      "liked_packages": "收藏的套餐",
+      "liked_packages_desc": "查看您收藏的套餐"
+    },
+    "logout": "退出登录",
+    "logout_failed": "退出失败: {error}"
+  },
+  "package_form": {
+    "title": "注册新套餐",
+    "main_image": {
+      "add": "添加主图"
+    },
+    "package_title": {
+      "label": "套餐标题",
+      "hint": "例: 首尔城市游",
+      "error": "请输入标题"
+    },
+    "region": {
+      "label": "地区"
+    },
+    "price": {
+      "label": "价格",
+      "hint": "例: 50000",
+      "error": {
+        "empty": "请输入价格",
+        "invalid": "请输入有效数字"
+      }
+    },
+    "nights": {
+      "label": "住宿天数",
+      "format": "{nights}晚{days}天"
+    },
+    "departure_days": {
+      "label": "出发日期",
+      "error": "请选择出发日期",
+      "days": {
+        "mon": "周一",
+        "tue": "周二",
+        "wed": "周三",
+        "thu": "周四",
+        "fri": "周五",
+        "sat": "周六",
+        "sun": "周日"
+      }
+    },
+    "participants": {
+      "min": {
+        "label": "最少人数",
+        "hint": "例: 2",
+        "error": {
+          "empty": "请输入最少人数",
+          "invalid": "请输入有效数字",
+          "greater_than_max": "最少人数不能大于最大人数"
+        }
+      },
+      "max": {
+        "label": "最大人数",
+        "hint": "例: 10",
+        "error": {
+          "empty": "请输入最大人数",
+          "invalid": "请输入有效数字"
+        }
+      }
+    },
+    "description": {
+      "label": "套餐说明",
+      "hint": "请输入套餐详细说明",
+      "error": "请输入说明",
+      "images": {
+        "label": "说明图片",
+        "add": "添加"
+      }
+    },
+    "route": {
+      "label": "旅行路线"
+    },
+    "submit": "注册套餐",
+    "places": {
+      "hotel": "酒店",
+      "restaurant": "餐厅",
+      "attraction": "景点"
+    },
+    "route_editor": {
+      "day": "第{day}天"
+    },
+    "travel_route": {
+      "title": "旅行路线"
+    }
+  },
+  "guide_ranking": {
+    "title": "导游排名",
+    "stats": "总预约: {0}件 / 套餐: {1}个",
+    "rank": "第{0}名",
+    "error": "错误: {0}"
+  },
+  "reservations": {
+    "my_reservations": "我的预约",
+    "pending_reservations": "待确认预约",
+    "confirmed_reservations": "已确认预约",
+    "no_reservations": "暂无预约",
+    "no_pending_reservations": "暂无待确认预约",
+    "no_confirmed_reservations": "暂无已确认预约",
+    "guide": "导游: {0}",
+    "reservation_date": "预约日期: {0}",
+    "request_date": "申请日期: {0}",
+    "price": "价格: ₩{0}",
+    "pending_approval": "等待确认",
+    "confirmed": "已确认",
+    "package_not_found": "未找到套餐",
+    "package_load_error": "套餐加载错误: {0}"
+  },
+  "review": {
+    "count": "{count}条评论",
+    "write": "写评论",
+    "edit": "编辑评论",
+    "package_title": "套餐名称",
+    "rating": "评分",
+    "content": {
+      "label": "评论内容",
+      "hint": "分享您的旅行套餐体验",
+      "empty_error": "请输入评论内容"
+    },
+    "submit": "提交评论",
+    "update": "完成更新",
+    "success": {
+      "add": "评论已提交",
+      "edit": "评论已更新"
+    },
+    "stats": {
+      "count": "评论{count}条",
+      "empty": "暂无评论"
+    },
+    "action": {
+      "write": "写评论",
+      "cannot_write": "无法写评论",
+      "load_more": "查看更多"
+    },
+    "error": {
+      "unauthorized": "仅预订已获批准的用户可以写评论",
+      "already_reviewed": "您已经写过评论",
+      "check_status": "检查评论状态时发生错误",
+      "loading": "加载评论时发生错误"
+    }
+  }
+}
