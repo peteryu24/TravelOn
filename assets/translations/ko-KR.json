@@ -43,7 +43,7 @@
     "view_more": "더보기"
   },
   "menu": {
-    "travel_tips": "여행꿀팁",
+    "travel_recommendation": "여행추천",
     "guide_ranking": "가이드랭킹",
     "recommended_places": "추천장소",
     "travel_gallery": "여행갤러리"
@@ -292,5 +292,9 @@
       "check_status": "리뷰 상태 확인 중 오류가 발생했습니다",
       "loading": "리뷰 로딩 중 오류가 발생했습니다"
     }
+  },
+  "recommendation": {
+    "title": "맞춤 여행 추천",
+    "empty": "추천할 여행 패키지가 없습니다.\n여행 패키지를 좋아요하고 더 많은 추천을 받아보세요!"
   }
 }

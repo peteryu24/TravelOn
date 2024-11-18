@@ -36,14 +36,18 @@ class TravelRepositoryImpl implements TravelRepository {
           maxParticipants: (data['maxParticipants'] as num?)?.toInt() ?? 8,
           nights: (data['nights'] as num?)?.toInt() ?? 0,
           totalDays: (data['totalDays'] as num?)?.toInt() ?? 0,
-          departureDays: List<int>.from(data['departureDays'] ?? [1,2,3,4,5,6,7]),
+          departureDays:
+              List<int>.from(data['departureDays'] ?? [1, 2, 3, 4, 5, 6, 7]),
           reviewCount: (data['reviewCount'] as num?)?.toInt() ?? 0,
           averageRating: (data['averageRating'] as num?)?.toDouble() ?? 0.0,
+          rating: (data['rating'] as num?)?.toDouble() ?? 0.0,
           likedBy: List<String>.from(data['likedBy'] ?? []),
           likesCount: (data['likesCount'] as num?)?.toInt() ?? 0,
           routePoints: (data['routePoints'] as List<dynamic>?)
-              ?.map((point) => TravelPoint.fromJson(point as Map<String, dynamic>))
-              .toList() ?? [],
+                  ?.map((point) =>
+                      TravelPoint.fromJson(point as Map<String, dynamic>))
+                  .toList() ??
+              [],
         );
       }).toList();
     } catch (e) {
@@ -104,7 +108,8 @@ class TravelRepositoryImpl implements TravelRepository {
         'departureDays': package.departureDays,
         'likedBy': [],
         'likesCount': 0,
-        'routePoints': package.routePoints.map((point) => point.toJson()).toList(),
+        'routePoints':
+            package.routePoints.map((point) => point.toJson()).toList(),
       };
 
       if (package.minParticipants <= 0) {
@@ -180,7 +185,8 @@ class TravelRepositoryImpl implements TravelRepository {
         'nights': package.nights,
         'totalDays': package.totalDays,
         'departureDays': package.departureDays,
-        'routePoints': package.routePoints.map((point) => point.toJson()).toList(),
+        'routePoints':
+            package.routePoints.map((point) => point.toJson()).toList(),
       };
 
       if (package.minParticipants <= 0) {
@@ -207,13 +213,13 @@ class TravelRepositoryImpl implements TravelRepository {
       print('Starting to delete package...');
 
       final packageDoc =
-      await _firestore.collection('packages').doc(packageId).get();
+          await _firestore.collection('packages').doc(packageId).get();
       final data = packageDoc.data();
 
       if (data != null) {
         final mainImage = data['mainImage'] as String?;
         final descriptionImages =
-        List<String>.from(data['descriptionImages'] ?? []);
+            List<String>.from(data['descriptionImages'] ?? []);
 
         if (mainImage != null && mainImage.isNotEmpty) {
           try {
@@ -252,14 +258,10 @@ class TravelRepositoryImpl implements TravelRepository {
         final packageDoc = await transaction.get(packageRef);
         final userDoc = await transaction.get(userRef);
 
-        if (!packageDoc.exists || !userDoc.exists) {
-          throw '패키지 또는 사용자를 찾을 수 없습니다';
-        }
-
         final List<String> likedBy =
-        List<String>.from(packageDoc.data()!['likedBy'] ?? []);
+            List<String>.from(packageDoc.data()!['likedBy'] ?? []);
         final List<String> userLikedPackages =
-        List<String>.from(userDoc.data()!['likedPackages'] ?? []);
+            List<String>.from(userDoc.data()!['likedPackages'] ?? []);
 
         if (likedBy.contains(userId)) {
           likedBy.remove(userId);

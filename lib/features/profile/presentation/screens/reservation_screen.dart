@@ -1,5 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import 'package:go_router/go_router.dart';
@@ -12,10 +13,12 @@ class CustomerReservationsScreen extends StatefulWidget {
   const CustomerReservationsScreen({super.key});
 
   @override
-  State<CustomerReservationsScreen> createState() => _CustomerReservationsScreenState();
+  State<CustomerReservationsScreen> createState() =>
+      _CustomerReservationsScreenState();
 }
 
-class _CustomerReservationsScreenState extends State<CustomerReservationsScreen> with SingleTickerProviderStateMixin {
+class _CustomerReservationsScreenState extends State<CustomerReservationsScreen>
+    with SingleTickerProviderStateMixin {
   late TabController _tabController;
 
   @override
@@ -62,7 +65,7 @@ class _CustomerReservationsScreenState extends State<CustomerReservationsScreen>
       Navigator.pop(context);
 
       final package = travelProvider.packages.firstWhere(
-            (p) => p.id == packageId,
+        (p) => p.id == packageId,
         orElse: () => throw Exception('reservations.package_not_found'.tr()),
       );
 
@@ -72,23 +75,22 @@ class _CustomerReservationsScreenState extends State<CustomerReservationsScreen>
       if (!mounted) return;
       Navigator.pop(context);
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('reservations.package_load_error'.tr(args: [e.toString()]))),
+        SnackBar(
+            content: Text(
+                'reservations.package_load_error'.tr(args: [e.toString()]))),
       );
     }
   }
 
   Widget _buildReservationList(ReservationProvider provider, String status) {
-    final reservations = provider.reservations
-        .where((res) => res.status == status)
-        .toList();
+    final reservations =
+        provider.reservations.where((res) => res.status == status).toList();
 
     if (reservations.isEmpty) {
       return Center(
-        child: Text(
-            status == 'pending'
-                ? 'reservations.no_pending_reservations'.tr()
-                : 'reservations.no_confirmed_reservations'.tr()
-        ),
+        child: Text(status == 'pending'
+            ? 'reservations.no_pending_reservations'.tr()
+            : 'reservations.no_confirmed_reservations'.tr()),
       );
     }
 
@@ -130,9 +132,10 @@ class _CustomerReservationsScreenState extends State<CustomerReservationsScreen>
     );
   }
 
-  Widget _buildPackageImage(dynamic reservation, TravelProvider travelProvider) {
+  Widget _buildPackageImage(
+      dynamic reservation, TravelProvider travelProvider) {
     final package = travelProvider.packages.firstWhere(
-          (p) => p.id == reservation.packageId,
+      (p) => p.id == reservation.packageId,
       orElse: () => TravelPackage(
         id: reservation.packageId,
         title: reservation.packageTitle,
@@ -142,10 +145,12 @@ class _CustomerReservationsScreenState extends State<CustomerReservationsScreen>
         guideName: reservation.guideName,
         guideId: reservation.guideId,
         maxParticipants: 0,
+        minParticipants: 1,
         nights: 1,
         departureDays: [1, 2, 3, 4, 5, 6, 7],
-        minParticipants: 1,
         totalDays: 1,
+        descriptionImages: [],
+        routePoints: [],
       ),
     );
 
@@ -164,7 +169,7 @@ class _CustomerReservationsScreenState extends State<CustomerReservationsScreen>
                 child: CircularProgressIndicator(
                   value: loadingProgress.expectedTotalBytes != null
                       ? loadingProgress.cumulativeBytesLoaded /
-                      loadingProgress.expectedTotalBytes!
+                          loadingProgress.expectedTotalBytes!
                       : null,
                 ),
               ),
@@ -220,43 +225,41 @@ class _CustomerReservationsScreenState extends State<CustomerReservationsScreen>
     );
   }
 
-
-
   Widget _buildReservationDetails(dynamic reservation, String status) {
-    final languageCode = context.locale.languageCode;
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          '${LocalizedStrings.getLocalizedText(languageCode, LocalizedStrings.guide)}'
-              '${reservation.guideName}',
+          '가이드: ${reservation.guideName}',
+          style: TextStyle(fontSize: 14.sp),
         ),
         Text(
-          '${LocalizedStrings.getLocalizedText(languageCode, LocalizedStrings.reservationDate)}'
-              '${DateFormat('yyyy年 MM月 dd日').format(reservation.reservationDate)}',
+          '예약일: ${DateFormat('yyyy년 MM월 dd일').format(reservation.reservationDate)}',
+          style: TextStyle(fontSize: 14.sp),
         ),
         Text(
-          '${LocalizedStrings.getLocalizedText(languageCode, LocalizedStrings.requestDate)}'
-              '${DateFormat('yyyy年 MM月 dd日').format(reservation.requestedAt)}',
+          '신청일: ${DateFormat('yyyy년 MM월 dd일').format(reservation.requestedAt)}',
+          style: TextStyle(fontSize: 14.sp),
         ),
         Text(
-          '${LocalizedStrings.getLocalizedText(languageCode, LocalizedStrings.price)}'
-              '${NumberFormat('#,###').format(reservation.price.toInt())}',
+          '가격: ￦${NumberFormat('#,###').format(reservation.price.toInt())}',
+          style: TextStyle(fontSize: 14.sp),
         ),
-        const SizedBox(height: 8),
+        SizedBox(height: 8.h),
         Container(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
           decoration: BoxDecoration(
-            color: status == 'pending' ? Colors.orange.shade100 : Colors.green.shade100,
-            borderRadius: BorderRadius.circular(4),
+            color: status == 'pending'
+                ? Colors.orange.shade100
+                : Colors.green.shade100,
+            borderRadius: BorderRadius.circular(4.r),
           ),
           child: Text(
-            status == 'pending'
-                ? LocalizedStrings.getLocalizedText(languageCode, LocalizedStrings.pendingApproval)
-                : LocalizedStrings.getLocalizedText(languageCode, LocalizedStrings.confirmed),
+            status == 'pending' ? '승인 대기중' : '예약 확정',
             style: TextStyle(
-              color: status == 'pending' ? Colors.orange.shade900 : Colors.green.shade900,
+              color: status == 'pending'
+                  ? Colors.orange.shade900
+                  : Colors.green.shade900,
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -265,31 +268,24 @@ class _CustomerReservationsScreenState extends State<CustomerReservationsScreen>
     );
   }
 
-
   @override
   Widget build(BuildContext context) {
-    final languageCode = context.locale.languageCode;
-
     return Scaffold(
       appBar: AppBar(
-        title: Text(LocalizedStrings.getLocalizedText(
-            languageCode, LocalizedStrings.myReservations)),
+        title: const Text('내 예약 내역'),
         bottom: TabBar(
           controller: _tabController,
-          tabs: [
-            Tab(text: LocalizedStrings.getLocalizedText(
-                languageCode, LocalizedStrings.pendingReservations)),
-            Tab(text: LocalizedStrings.getLocalizedText(
-                languageCode, LocalizedStrings.confirmedReservations)),
+          tabs: const [
+            Tab(text: '대기중인 예약'),
+            Tab(text: '확정된 예약'),
           ],
         ),
       ),
       body: Consumer<ReservationProvider>(
         builder: (context, provider, child) {
           if (provider.reservations.isEmpty) {
-            return Center(
-              child: Text(LocalizedStrings.getLocalizedText(
-                  languageCode, LocalizedStrings.noReservations)),
+            return const Center(
+              child: Text('예약 내역이 없습니다.'),
             );
           }
 
@@ -304,89 +300,4 @@ class _CustomerReservationsScreenState extends State<CustomerReservationsScreen>
       ),
     );
   }
-}
-
-class LocalizedStrings {
-  static String getLocalizedText(String languageCode, Map<String, String> texts) {
-    switch (languageCode) {
-      case 'ko':
-        return texts['ko'] ?? texts['en']!; // 한국어가 없으면 영어 사용
-      case 'ja':
-        return texts['ja'] ?? texts['en']!;
-      case 'zh':
-        return texts['zh'] ?? texts['en']!;
-      default:
-        return texts['en']!;
-    }
-  }
-
-  static final guide = {
-    'ko': '가이드: ',
-    'en': 'Guide: ',
-    'ja': 'ガイド: ',
-    'zh': '导游: ',
-  };
-
-  static final reservationDate = {
-    'ko': '예약일: ',
-    'en': 'Reservation Date: ',
-    'ja': '予約日: ',
-    'zh': '预约日期: ',
-  };
-
-  static final requestDate = {
-    'ko': '신청일: ',
-    'en': 'Request Date: ',
-    'ja': '申込日: ',
-    'zh': '申请日期: ',
-  };
-
-  static final price = {
-    'ko': '가격: ￦',
-    'en': 'Price: ￦',
-    'ja': '料金: ￥',
-    'zh': '价格: ¥',
-  };
-
-  static final pendingApproval = {
-    'ko': '승인 대기중',
-    'en': 'Pending Approval',
-    'ja': '承認待ち',
-    'zh': '等待确认',
-  };
-
-  static final confirmed = {
-    'ko': '예약 확정',
-    'en': 'Confirmed',
-    'ja': '予約確定',
-    'zh': '已确认',
-  };
-
-  static final myReservations = {
-    'ko': '내 예약 내역',
-    'en': 'My Reservations',
-    'ja': '予約一覧',
-    'zh': '我的预约',
-  };
-
-  static final pendingReservations = {
-    'ko': '대기중인 예약',
-    'en': 'Pending Reservations',
-    'ja': '承認待ち予約',
-    'zh': '待确认预约',
-  };
-
-  static final confirmedReservations = {
-    'ko': '확정된 예약',
-    'en': 'Confirmed Reservations',
-    'ja': '確定済み予約',
-    'zh': '已确认预约',
-  };
-
-  static final noReservations = {
-    'ko': '예약 내역이 없습니다.',
-    'en': 'No reservations found.',
-    'ja': '予約がありません',
-    'zh': '暂无预约',
-  };
 }
