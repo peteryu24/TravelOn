@@ -125,17 +125,29 @@ class _HomeScreenState extends State<HomeScreen> {
                 crossAxisSpacing: 15.w,
                 childAspectRatio: 0.9,
                 children: [
-                  _buildMenuItem(Icons.recommend,
-                      'menu.travel_recommendation'.tr(), '/recommendation'),
-                  _buildMenuItem(Icons.people, 'menu.guide_ranking'.tr(),
-                      '/guide-ranking'),
-                  _buildMenuItem(Icons.favorite_border,
-                      'menu.recommended_places'.tr(), '/recommended-places'),
-                  _buildMenuItem(Icons.photo_camera, 'menu.travel_gallery'.tr(),
-                      '/travel-gallery'),
+                  _buildMenuItem(
+                    Icons.thumb_up,
+                    '여행추천',
+                    '/recommendation',
+                  ),
+                  _buildMenuItem(
+                    Icons.group,
+                    '가이드랭킹',
+                    '/guide-ranking',
+                  ),
+                  _buildMenuItem(
+                    Icons.explore,
+                    '지역탐방',
+                    '/regional-exploration',
+                  ),
+                  _buildMenuItem(
+                    Icons.photo_camera,
+                    '여행갤러리',
+                    '/travel-gallery',
+                  ),
                 ],
               ),
-              // SizedBox(height: 10.h),
+              SizedBox(height: 10.h),
               const TourismDensityWidget(),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,

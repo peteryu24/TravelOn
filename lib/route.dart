@@ -54,6 +54,7 @@ import 'package:travel_on_final/features/gallery/presentation/screens/edit_galle
 import 'package:travel_on_final/features/gallery/presentation/screens/gallery_search_screen.dart';
 // review
 import 'package:travel_on_final/features/review/presentation/screens/add_review_screen.dart';
+import 'features/regional/presentation/screens/regional_exploration_screen.dart';
 
 final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>();
 
@@ -325,6 +326,10 @@ final goRouter = GoRouter(
     GoRoute(
       path: '/recommendation',
       builder: (context, state) => const RecommendationScreen(),
+    ),
+    GoRoute(
+      path: '/regional-exploration',
+      builder: (context, state) => const RegionalExplorationScreen(),
     ),
   ],
 );
