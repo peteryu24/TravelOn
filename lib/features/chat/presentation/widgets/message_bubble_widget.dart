@@ -14,6 +14,7 @@ class MessageBubble extends StatelessWidget {
   final bool isMe;
   final String otherUserName;
   final String currentUserId;
+  final bool showTime;
 
   const MessageBubble({
     super.key,
@@ -21,6 +22,7 @@ class MessageBubble extends StatelessWidget {
     required this.isMe,
     required this.otherUserName,
     required this.currentUserId,
+    this.showTime = false,
   });
 
   @override
@@ -102,6 +104,17 @@ class MessageBubble extends StatelessWidget {
               ),
             ],
           ),
+          if (showTime)
+            Padding(
+              padding: EdgeInsets.only(top: 0.h, right: 10.w, left: 10.w),
+              child: Text(
+                DateFormat('MM월 dd일 a hh:mm', 'ko').format(message.createdAt.toDate()),
+                style: TextStyle(
+                  color: Colors.grey[600],
+                  fontSize: 12.sp,
+                ),
+              ),
+            ),
         ],
       ),
     );

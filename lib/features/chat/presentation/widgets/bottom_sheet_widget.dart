@@ -16,96 +16,105 @@ class BottomSheetWidget {
     required String otherUserId,
     required String currentUserProfileImage,
     required String username,
-    double initialHeightFactor = 0.3,
+    double initialHeightFactor = 0.15,
   }) {
     final chatProvider = Provider.of<ChatProvider>(parentContext, listen: false);
 
     showModalBottomSheet(
       context: parentContext,
       isScrollControlled: true,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16.r)),
+      ),
       builder: (BuildContext context) {
         return FractionallySizedBox(
           heightFactor: initialHeightFactor,
-          child: SingleChildScrollView(
-            child: Padding(
-              padding: EdgeInsets.symmetric(vertical: 16.h, horizontal: 4.w),
-              child: Wrap(
-                alignment: WrapAlignment.center,
-                spacing: 16.w,
-                runSpacing: 16.h,
-                children: [
-                  // 갤러리 버튼
-                  buildIconButton(
-                    context,
-                    icon: Icons.image,
-                    label: '갤러리',
-                    backgroundColor: Colors.lightBlue,
-                    onTap: () async {
-                      Navigator.pop(context);
-                      final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
-                      if (image != null) {
-                        _showConfirmationDialog(parentContext, image, chatId, userId, otherUserId, currentUserProfileImage, username);
-                      }
-                    },
-                  ),
-                  // 카메라 버튼
-                  buildIconButton(
-                    context,
-                    icon: Icons.camera_alt,
-                    label: '카메라',
-                    backgroundColor: Colors.blueAccent,
-                    onTap: () async {
-                      Navigator.pop(context);
-                      final XFile? image = await _picker.pickImage(source: ImageSource.camera);
-                      if (image != null) {
-                        _showConfirmationDialog(parentContext, image, chatId, userId, otherUserId, currentUserProfileImage, username);
-                      }
-                    },
-                  ),
-                  // 사용자 버튼
-                  buildIconButton(
-                    context,
-                    icon: Icons.person,
-                    label: '사용자',
-                    backgroundColor: Colors.purple,
-                    onTap: () {
-                      Navigator.pop(context);
-                      context.push(
-                        '/user-search',
-                        extra: {'chatId': chatId, 'otherUserId': otherUserId},
-                      );
-                    },
-                  ),
-                  // 패키지 버튼
-                  buildIconButton(
-                    context,
-                    icon: Icons.card_travel,
-                    label: '패키지',
-                    backgroundColor: Colors.orange,
-                    onTap: () {
-                      Navigator.pop(context);
-                      context.push(
-                        '/package-search',
-                        extra: {'chatId': chatId, 'otherUserId': otherUserId},
-                      );
-                    },
-                  ),
-                  // 지도 버튼
-                  buildIconButton(
-                    context,
-                    icon: Icons.map,
-                    label: '지도',
-                    backgroundColor: Color(0xFF03C75A),
-                    onTap: () {
-                      Navigator.pop(context);
-                      context.push(
-                        '/map-search',
-                        extra: {'chatId': chatId, 'otherUserId': otherUserId},
-                      );
-                    },
-                  ),
-                ],
-              ),
+          child: Container(
+            width: double.infinity,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.vertical(top: Radius.circular(16.r)),
+            ),
+            padding: EdgeInsets.symmetric(vertical: 16.h, horizontal: 8.w),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                SizedBox(width: 12.w),
+                // 갤러리 버튼
+                buildIconButton(
+                  context,
+                  icon: Icons.image,
+                  label: '갤러리',
+                  backgroundColor: Colors.lightBlue,
+                  onTap: () async {
+                    Navigator.pop(context);
+                    final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
+                    if (image != null) {
+                      _showConfirmationDialog(parentContext, image, chatId, userId, otherUserId, currentUserProfileImage, username);
+                    }
+                  },
+                ),
+                SizedBox(width: 15.w),
+                // 카메라 버튼
+                buildIconButton(
+                  context,
+                  icon: Icons.camera_alt,
+                  label: '카메라',
+                  backgroundColor: Colors.blueAccent,
+                  onTap: () async {
+                    Navigator.pop(context);
+                    final XFile? image = await _picker.pickImage(source: ImageSource.camera);
+                    if (image != null) {
+                      _showConfirmationDialog(parentContext, image, chatId, userId, otherUserId, currentUserProfileImage, username);
+                    }
+                  },
+                ),
+                SizedBox(width: 15.w),
+                // 사용자 버튼
+                buildIconButton(
+                  context,
+                  icon: Icons.person,
+                  label: '사용자',
+                  backgroundColor: Colors.purple,
+                  onTap: () {
+                    Navigator.pop(context);
+                    context.push(
+                      '/user-search',
+                      extra: {'chatId': chatId, 'otherUserId': otherUserId},
+                    );
+                  },
+                ),
+                SizedBox(width: 15.w),
+                // 패키지 버튼
+                buildIconButton(
+                  context,
+                  icon: Icons.card_travel,
+                  label: '패키지',
+                  backgroundColor: Colors.orange,
+                  onTap: () {
+                    Navigator.pop(context);
+                    context.push(
+                      '/package-search',
+                      extra: {'chatId': chatId, 'otherUserId': otherUserId},
+                    );
+                  },
+                ),
+                SizedBox(width: 15.w),
+                // 지도 버튼
+                buildIconButton(
+                  context,
+                  icon: Icons.map,
+                  label: '지도',
+                  backgroundColor: Color(0xFF03C75A),
+                  onTap: () {
+                    Navigator.pop(context);
+                    context.push(
+                      '/map-search',
+                      extra: {'chatId': chatId, 'otherUserId': otherUserId},
+                    );
+                  },
+                ),
+              ],
             ),
           ),
         );
@@ -113,32 +122,31 @@ class BottomSheetWidget {
     );
   }
 
-  Widget buildIconButton(BuildContext context, {
+  Widget buildIconButton(
+    BuildContext context, {
     required IconData icon,
     required String label,
     required VoidCallback onTap,
     required Color backgroundColor,
   }) {
-    return SizedBox(
-      width: 60.w,
-      child: Column(
-        children: [
-          InkWell(
-            onTap: onTap,
-            child: CircleAvatar(
-              backgroundColor: backgroundColor,
-              radius: 30.w,
-              child: Icon(icon, size: 35.w, color: Colors.white),
-            ),
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        InkWell(
+          onTap: onTap,
+          child: CircleAvatar(
+            backgroundColor: backgroundColor,
+            radius: 27.w,
+            child: Icon(icon, size: 28.w, color: Colors.white),
           ),
-          SizedBox(height: 4.h),
-          Text(
-            label,
-            style: TextStyle(fontSize: 12.sp),
-            textAlign: TextAlign.center,
-          ),
-        ],
-      ),
+        ),
+        SizedBox(height: 8.h),
+        Text(
+          label,
+          style: TextStyle(fontSize: 12.sp),
+          textAlign: TextAlign.center,
+        ),
+      ],
     );
   }
 
