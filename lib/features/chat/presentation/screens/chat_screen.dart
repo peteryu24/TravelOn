@@ -174,7 +174,7 @@ class _ChatScreenState extends State<ChatScreen> {
                                 hintText: '메시지를 입력하세요...',
                                 border: InputBorder.none,
                                 contentPadding:
-                                    EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),
+                                    EdgeInsets.symmetric(horizontal: 0.w, vertical: 10.h),
                               ),
                             ),
                           ),
