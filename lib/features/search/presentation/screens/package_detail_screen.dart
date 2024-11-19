@@ -290,7 +290,6 @@ class _PackageDetailScreenState extends State<PackageDetailScreen> {
                       children: [
                         Row(
                           children: [
-                            SizedBox(width: 8.w),
                             Container(
                               decoration: BoxDecoration(
                                 color: Colors.grey.shade100,
@@ -298,30 +297,36 @@ class _PackageDetailScreenState extends State<PackageDetailScreen> {
                               ),
                               child: Row(
                                 children: [
-                                  const Icon(Icons.person, color: Colors.black),
-                                  SizedBox(width: 8.w),
-                                  Text(
-                                    'package_detail.guide'.tr(namedArgs: {
-                                      'name': widget.package.guideName
-                                    }),
-                                    style: const TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
+                                  IconButton(  // 사람 아이콘을 IconButton으로 변경
+                                    icon: const Icon(Icons.person),
+                                    onPressed: () {
+                                      // 가이드 프로필 페이지로 이동
+                                      context.push('/user-profile/${widget.package.guideId}');
+                                    },
+                                  ),
+                                  TextButton(
+                                    onPressed: () {
+                                      context.push('/user-profile/${widget.package.guideId}');
+                                    },
+                                    child: Text(
+                                      'package_detail.guide'.tr(namedArgs: {
+                                        'name': widget.package.guideName
+                                      }),
+                                      style: const TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.black,  // TextButton의 기본 색상을 black으로 변경
+                                      ),
                                     ),
                                   ),
                                   if (_currentUserId != widget.package.guideId)
                                     IconButton(
                                       onPressed: () async {
-                                        final authProvider =
-                                            Provider.of<AuthProvider>(context,
-                                                listen: false);
-                                        final userId =
-                                            authProvider.currentUser?.id;
+                                        final authProvider = Provider.of<AuthProvider>(context, listen: false);
+                                        final userId = authProvider.currentUser?.id;
                                         if (userId != null) {
-                                          final otherUserId =
-                                              widget.package.guideId;
-                                          final chatId = CreateChatId()
-                                              .call(userId, otherUserId);
+                                          final otherUserId = widget.package.guideId;
+                                          final chatId = CreateChatId().call(userId, otherUserId);
                                           context.push('/chat/$chatId');
                                         }
                                       },
