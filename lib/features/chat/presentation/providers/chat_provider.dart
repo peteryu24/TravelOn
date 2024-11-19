@@ -60,10 +60,11 @@ class ChatProvider extends ChangeNotifier {
       if (_messageSubscription != null) {
         _messageSubscription!.cancel();
         _messageSubscription = null;
-        _messages.clear(); // 메시지 목록도 클리어
       }
+      _messages.clear();
+      notifyListeners();
     } catch (e) {
-      print('구독 해제 중 오류 발생: $e');
+      print('메시지 스트림 해제 중 오류 발생: $e');
     }
   }
 
@@ -86,9 +87,20 @@ class ChatProvider extends ChangeNotifier {
 
   // 로그아웃 시 호출할 메서드
   void clearDataOnLogout() {
-    stopListeningToMessages();
-    _messages.clear();
-    notifyListeners();
+    try {
+      // 메시지 스트림 구독 해제
+      stopListeningToMessages();
+
+      // 읽지 않은 메시지 수 구독 해제
+      _unreadCountSubscription?.cancel();
+      _unreadCountSubscription = null;
+
+      // 내부 데이터 초기화
+      _messages.clear();
+      notifyListeners();
+    } catch (e) {
+      print('로그아웃 시 데이터 초기화 오류: $e');
+    }
   }
 
   // 채팅방 생성 확인 및 생성

@@ -166,16 +166,29 @@ class ProfileScreen extends StatelessWidget {
                     width: double.infinity,
                     child: ElevatedButton(
                       onPressed: () async {
+                        showDialog(
+                          context: context,
+                          barrierDismissible: false,
+                          builder: (context) => const Center(child: CircularProgressIndicator()),
+                        );
+
                         try {
-                          await Provider.of<AuthProvider>(context, listen: false)
-                              .logout(context);
-                          context.go('/login');
+                          await Provider.of<AuthProvider>(context, listen: false).logout(context);
+
+                          if (context.mounted) {
+                            Navigator.of(context).pop();
+                            context.go('/login');
+                          }
                         } catch (e) {
-                          print('profile.logout_failed'
-                              .tr(args: [e.toString()]));
+                          if (context.mounted) Navigator.of(context).pop();
+
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text('로그아웃 실패: ${e.toString()}')),
+                          );
+                          print('로그아웃 실패: $e');
                         }
                       },
-                      child: Text('profile.logout'.tr()),
+                      child: Text('로그아웃'),
                     ),
                   ),
                 ),

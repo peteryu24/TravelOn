@@ -101,18 +101,70 @@ class AuthProvider with ChangeNotifier {
     }
   }
 
+  // 로그아웃 메서드
   Future<void> logout(BuildContext context) async {
     try {
       Provider.of<ChatProvider>(context, listen: false).clearDataOnLogout();
 
       await _auth.signOut();
-      _currentUser = null;
 
-      // 기타 필요한 데이터 초기화
+      _currentUser = null;
       notifyListeners();
     } catch (e) {
-      print('로그아웃 에러: $e');
+      print('로그아웃 실패: $e');
       rethrow;
+    }
+  }
+
+  // 회원 탈퇴 메서드
+  Future<void> deleteAccount(BuildContext context, String password) async {
+    final user = _auth.currentUser;
+
+    if (user == null || user.email == null) {
+      throw '사용자가 인증되지 않았습니다.';
+    }
+
+    try {
+      final credential = EmailAuthProvider.credential(
+        email: user.email!,
+        password: password,
+      );
+      await user.reauthenticateWithCredential(credential);
+
+      final userId = user.uid;
+
+      Provider.of<ChatProvider>(context, listen: false).clearDataOnLogout();
+
+      final batch = _firestore.batch();
+
+      final userDocRef = _firestore.collection('users').doc(userId);
+      batch.delete(userDocRef);
+
+      final chatSnapshots = await _firestore
+          .collection('chats')
+          .where('participants', arrayContains: userId)
+          .get();
+
+      for (final chatDoc in chatSnapshots.docs) {
+        batch.delete(chatDoc.reference);
+      }
+
+      await batch.commit();
+
+      await user.delete();
+
+      _currentUser = null;
+      notifyListeners();
+
+      print('회원 탈퇴가 성공적으로 완료되었습니다.');
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'requires-recent-login') {
+        throw '최근 로그인 상태가 필요합니다. 다시 로그인 후 시도해주세요.';
+      }
+      throw '회원 탈퇴 중 오류가 발생했습니다: ${e.message}';
+    } catch (e) {
+      print('회원 탈퇴 실패: $e');
+      throw '회원 탈퇴에 실패했습니다.';
     }
   }
 
