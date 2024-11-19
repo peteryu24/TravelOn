@@ -150,8 +150,36 @@
       "closed": "오늘은 예약 마감"
     }
   },
+  "profile": {
+    "title": "마이 페이지",
+    "default_user": "사용자",
+    "guide": {
+      "section_title": "가이드 기능",
+      "create_package": "나만의 패키지 만들기",
+      "create_package_desc": "새로운 여행 패키지를 등록합니다",
+      "manage_reservations": "내 패키지 예약 관리",
+      "manage_reservations_desc": "등록한 패키지의 예약을 관리합니다",
+      "manage_packages": "내 패키지 관리",
+      "manage_packages_desc": "등록된 패키지 수정하거나 삭제합니다",
+      "certification": "가이드 인증",
+      "certification_desc": "가이드 인증을 진행하세요"
+    },
+    "auth": {
+      "login_required": "로그인 필요"
+    },
+    "user": {
+      "reservations_title": "예약 관리",
+      "my_reservations": "내 예약 내역",
+      "my_reservations_desc": "예약한 패키지를 확인합니다",
+      "liked_packages": "찜한 패키지",
+      "liked_packages_desc": "관심 있는 패키지를 확인합니다",
+      "no_liked_packages": "찜한 패키지가 없습니다"
+    },
+    "logout": "로그아웃",
+    "logout_failed": "로그아웃 실패: {error}"
+  },
   "package_form": {
-    "title": "새 패키지 등록",
+    "title": "새 패키지여행 만들기",
     "main_image": {
       "add": "메인 이미지 추가"
     },
