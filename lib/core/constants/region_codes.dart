@@ -1,41 +1,43 @@
+import 'package:easy_localization/easy_localization.dart';
+
 class RegionCodes {
-  static const Map<String, Map<String, String>> codes = {
-    '서울': {
+  static Map<String, Map<String, String>> codes = {
+    'weather_regions.seoul'.tr(): {
       '중구': '11140',
       '종로구': '11110',
       '용산구': '11170',
     },
-    '부산': {
+    'weather_regions.busan'.tr(): {
       '중구': '26110',
       '해운대구': '26310',
       '서구': '26140',
     },
-    '대구': {
+    'weather_regions.daegu'.tr(): {
       '중구': '27110',
       '동구': '27140',
       '서구': '27170',
     },
-    '인천': {
+    'weather_regions.incheon'.tr(): {
       '중구': '28110',
       '동구': '28140',
       '미추홀구': '28177',
     },
-    '광주': {
+    'weather_regions.gwangju'.tr(): {
       '동구': '29110',
       '서구': '29140',
       '남구': '29155',
     },
-    '대전': {
+    'weather_regions.deajeon'.tr(): {
       '동구': '30110',
       '중구': '30140',
       '서구': '30170',
     },
-    '울산': {
+    'weather_regions.ulsan'.tr(): {
       '중구': '31110',
       '남구': '31140',
       '동구': '31170',
     },
-    '경기': {
+    'weather_regions.gyeonggi'.tr(): {
       '수원시 장안구': '41111',
       '수원시 권선구': '41113',
       '수원시 팔달구': '41115',
@@ -58,12 +60,12 @@ class RegionCodes {
       '성남시': '41130',
       '과천시': '41290',
     },
-    '강원': {
+    'weather_regions.gangwon'.tr(): {
       '춘천시': '42110',
       '원주시': '42130',
       '강릉시': '42150',
     },
-    '제주': {
+    'weather_regions.jeju'.tr(): {
       '제주시': '50110',
       '서귀포시': '50130',
     },

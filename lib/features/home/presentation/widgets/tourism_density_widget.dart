@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../data/datasources/tourism_density_api.dart';
@@ -65,7 +66,7 @@ class _TourismDensityWidgetState extends State<TourismDensityWidget> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                '인기 관광지 혼잡도',
+                'menu.Congestion of popular tourist attractions'.tr(),
                 style: TextStyle(
                   fontSize: 16.sp,
                   fontWeight: FontWeight.bold,
@@ -85,7 +86,7 @@ class _TourismDensityWidgetState extends State<TourismDensityWidget> {
               itemCount: ['전체', ...RegionCodes.regions].length,
               itemBuilder: (context, index) {
                 final region =
-                    index == 0 ? '전체' : RegionCodes.regions[index - 1];
+                    index == 0 ? 'regions.all'.tr() : RegionCodes.regions[index - 1];
                 return GestureDetector(
                   onTap: () {
                     setState(() {
@@ -210,7 +211,9 @@ class _TourismDensityWidgetState extends State<TourismDensityWidget> {
         ),
         SizedBox(width: 4.w),
         Text(
-          '혼잡도 ${density.toStringAsFixed(1)}%',
+          density != null
+              ? 'density.percent'.tr(namedArgs: {'value': density.toStringAsFixed(1)})
+              : 'density.percent'.tr(namedArgs: {'value': '0.0'}),
           style: TextStyle(
             color: isHigh ? Colors.red : Colors.blue,
             fontSize: 13.sp,

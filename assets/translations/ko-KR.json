@@ -45,8 +45,10 @@
   "menu": {
     "travel_recommendation": "여행추천",
     "guide_ranking": "가이드랭킹",
+    "local tour": "지역탐방",
     "recommended_places": "추천장소",
-    "travel_gallery": "여행갤러리"
+    "travel_gallery": "여행갤러리",
+    "Congestion of popular tourist attractions": "인기 관광지 혼잡도"
   },
   "navigation": {
     "home": "홈",
@@ -62,6 +64,8 @@
     "gwangju": "광주",
     "deajeon": "대전",
     "ulsan": "울산",
+    "gyeonggi": "경기",
+    "gangwon": "강원",
     "jeju": "제주"
   },
   "regions": {
@@ -249,10 +253,10 @@
     "no_reservations": "예약 내역이 없습니다.",
     "no_pending_reservations": "대기중인 예약이 없습니다.",
     "no_confirmed_reservations": "확정된 예약이 없습니다.",
-    "guide": "가이드: {0}",
-    "reservation_date": "예약일: {0}",
-    "request_date": "신청일: {0}",
-    "price": "가격: ￦{0}",
+    "guide": "Guide: {name}",
+    "reservation_date": "예약일: {date}",
+    "request_date": "신청일: {date}",
+    "price": "가격: ￦{amount}",
     "pending_approval": "승인 대기중",
     "confirmed": "예약 확정",
     "package_not_found": "패키지를 찾을 수 없 습니다.",
@@ -299,6 +303,101 @@
   },
   "recommendation": {
     "title": "맞춤 여행 추천",
-    "empty": "추천할 여행 패키지가 없습니다.\n여행 패키지를 좋아요하고 더 많은 추천을 받아보세요!"
+    "empty": "추천할 여행 패키지가 없습니다.\n여행 패키지를 좋아요하고 더 많은 추천을 받아보세요!",
+    "rank": "{rank}위"
+  },
+  "density": {
+    "percent": "혼잡도 {value}%"
+  },
+  "tourist_category": {
+    "palace": "고궁",
+    "beach": "해변",
+    "nature": "자연",
+    "observatory": "전망대",
+    "attraction": "관광지"
+  },
+  "gallery": {
+    "title": "여행갤러리",
+    "no_posts": "아직 게시물이 없습니다",
+    "post": {
+      "login_required": "로그인이 필요합니다",
+      "like_error": "좋아요 처리 중 오류가 발생했습니다",
+      "scrap_success": "스크랩이 완료되었습니다",
+      "scrap_canceled": "스크랩이 해제되었습니다",
+      "scrap_error": "스크랩 처리 중 오류가 발생했습니다",
+      "delete_title": "게시물 삭제",
+      "delete_confirm": "이 게시물을 삭제하시겠습니까?",
+      "cancel": "취소",
+      "delete": "삭제",
+      "delete_success": "게시물이 삭제되었습니다",
+      "delete_error": "삭제 실패: {error}",
+      "edit": "수정",
+      "likes_count": "좋아요 {count}개",
+      "comments_count": "댓글 {count}개 모두 보기",
+      "add_post": {
+        "title": "새 게시물",
+        "share": "공유",
+        "add_image": "이미지 추가",
+        "location": {
+          "label": "위치",
+          "hint": "예: 서울 남산타워",
+          "error": "위치를 입력해주세요"
+        },
+        "description": {
+          "label": "설명",
+          "hint": "여행 경험을 공유해주세요",
+          "error": "설명을 입력해주세요"
+        },
+        "package_tag": {
+          "label": "여행 패키지 태그",
+          "hint": "관련 패키지 선택 (선택사항)",
+          "none": "선택 안함"
+        },
+        "upload": {
+          "success": "게시물이 업로드되었습니다",
+          "error": "업로드 실패: {error}",
+          "package_not_found": "선택한 패키지를 찾을 수 없습니다"
+        }
+      }
+    }
+  },
+  "commends": {
+    "commend": "댓글",
+    "Writing comments": "댓글 작성..."
+  },
+  "chat": {
+    "title": "채팅 목록",
+    "login_required": "로그인이 필요합니다",
+    "search": {
+      "label": "검색",
+      "guide": "가이드 검색"
+    },
+    "screen": {
+      "loading": "로딩 중...",
+      "conversation_with": "님과의 대화",
+      "input": {
+        "hint": "메시지를 입력하세요..."
+      }
+    },
+    "add_content": {
+      "gallery": "갤러리",
+      "camera": "카메라",
+      "user": "사용자",
+      "package": "패키지",
+      "map": "지도",
+      "image": {
+        "send": "사진 보내기",
+        "no": "아니오",
+        "yes": "예"
+      }
+    },
+    "no_chats": "채팅방이 없습니다",
+    "no_results": "조건에 맞는 채팅방이 없습니다",
+    "error": "오류가 발생했습니다",
+    "leave": {
+      "confirm_title": "{name}님과의 대화방을 나가시겠습니까?",
+      "cancel": "취소",
+      "confirm": "나가기"
+    }
   }
 }

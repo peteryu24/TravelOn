@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
@@ -39,7 +40,8 @@ class _ChatListScreenState extends State<ChatListScreen> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    navigationProvider = Provider.of<NavigationProvider>(context, listen: false);
+    navigationProvider =
+        Provider.of<NavigationProvider>(context, listen: false);
     navigationProvider.addListener(_checkForReset);
     _checkForReset();
   }
@@ -87,9 +89,9 @@ class _ChatListScreenState extends State<ChatListScreen> {
           scrolledUnderElevation: 0,
           elevation: 0,
           centerTitle: true,
-          title: const Text('채팅 목록'),
+          title: Text('chat.title'.tr()),
         ),
-        body: const Center(child: Text('로그인이 필요합니다')),
+        body: Center(child: Text('chat.login_required'.tr())),
       );
     }
 
@@ -101,7 +103,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
           scrolledUnderElevation: 0,
           elevation: 0,
           centerTitle: true,
-          title: const Text('채팅 목록'),
+          title: Text('chat.title'.tr()),
         ),
         body: Column(
           children: [
@@ -119,8 +121,9 @@ class _ChatListScreenState extends State<ChatListScreen> {
                       controller: _searchController,
                       focusNode: _focusNode,
                       decoration: InputDecoration(
-                        labelText: '검색',
-                        labelStyle: TextStyle(color: Colors.blue, fontSize: 14.sp),
+                        labelText: 'chat.search.label'.tr(),
+                        labelStyle:
+                            TextStyle(color: Colors.blue, fontSize: 14.sp),
                         border: InputBorder.none,
                       ),
                     ),
@@ -146,10 +149,11 @@ class _ChatListScreenState extends State<ChatListScreen> {
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.blueAccent,
-                      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
                     ),
-                    child: const Text(
-                      '가이드 검색',
+                    child: Text(
+                      'chat.search.guide'.tr(),
                       style: TextStyle(
                         color: Colors.white,
                       ),
@@ -169,42 +173,55 @@ class _ChatListScreenState extends State<ChatListScreen> {
                   }
 
                   if (chatSnapshot.hasError) {
-                    return const Center(child: Text('오류가 발생했습니다.'));
+                    return Center(child: Text('chat.error'.tr()));
                   }
 
-                  if (!chatSnapshot.hasData || chatSnapshot.data!.docs.isEmpty) {
-                    return const Center(child: Text('채팅방이 없습니다.'));
+                  if (!chatSnapshot.hasData ||
+                      chatSnapshot.data!.docs.isEmpty) {
+                    return Center(child: Text('chat.no_chats'.tr()));
                   }
 
                   final chatDocs = chatSnapshot.data!.docs.where((doc) {
-                    final participants = List<String>.from(doc['participants'] ?? []);
+                    final participants =
+                        List<String>.from(doc['participants'] ?? []);
                     final chatData = doc.data() as Map<String, dynamic>? ?? {};
 
-                    final isInChat = chatData['lastMessage']?.toLowerCase().contains(_searchText) ?? false;
+                    final isInChat = chatData['lastMessage']
+                            ?.toLowerCase()
+                            .contains(_searchText) ??
+                        false;
                     final isGuideName = (chatData['usernames']?.values ?? [])
-                        .any((name) => name.toLowerCase().contains(_searchText) &&
-                              (name != authProvider.currentUser!.name || _isGuideSearch));
-                    
-                    return participants.contains(authProvider.currentUser!.id) &&
+                        .any((name) =>
+                            name.toLowerCase().contains(_searchText) &&
+                            (name != authProvider.currentUser!.name ||
+                                _isGuideSearch));
+
+                    return participants
+                            .contains(authProvider.currentUser!.id) &&
                         (_searchText.isEmpty || isInChat || isGuideName);
                   }).toList();
 
                   if (chatDocs.isEmpty) {
-                    return const Center(child: Text('조건에 맞는 채팅방이 없습니다.'));
+                    return Center(child: Text('chat.no_results'.tr()));
                   }
 
                   return ListView.builder(
                     itemCount: chatDocs.length,
                     itemBuilder: (ctx, index) {
-                      final chatData = chatDocs[index].data() as Map<String, dynamic>? ?? {};
+                      final chatData =
+                          chatDocs[index].data() as Map<String, dynamic>? ?? {};
                       final chatId = chatDocs[index].id;
 
-                      final participants = chatData['participants'] as List<dynamic>? ?? [];
-                      final otherUserId = authProvider.currentUser!.id == participants[0]
-                          ? participants[1]
-                          : participants[0];
+                      final participants =
+                          chatData['participants'] as List<dynamic>? ?? [];
+                      final otherUserId =
+                          authProvider.currentUser!.id == participants[0]
+                              ? participants[1]
+                              : participants[0];
 
-                      final unreadCount = chatData['unreadCount']?[authProvider.currentUser!.id] ?? 0;
+                      final unreadCount = chatData['unreadCount']
+                              ?[authProvider.currentUser!.id] ??
+                          0;
 
                       chatProvider.updateOtherUserInfo(chatId, otherUserId);
 
@@ -215,23 +232,35 @@ class _ChatListScreenState extends State<ChatListScreen> {
                             direction: DismissDirection.endToStart,
                             background: Container(
                               color: Colors.red[200],
-                              padding: const EdgeInsets.symmetric(horizontal: 20),
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 20),
                               alignment: Alignment.centerRight,
-                              child: const Icon(Icons.delete, color: Colors.white),
+                              child:
+                                  const Icon(Icons.delete, color: Colors.white),
                             ),
                             confirmDismiss: (direction) async {
                               final confirm = await showDialog<bool>(
                                 context: context,
                                 builder: (ctx) => AlertDialog(
-                                  title: Text('${chatData['usernames'][otherUserId] ?? 'Unknown'}님과의 대화방을 나가시겠습니까?'),
+                                  title: Text(
+                                    'chat.leave.confirm_title'.tr(
+                                      namedArgs: {
+                                        'name': chatData['usernames']
+                                                [otherUserId] ??
+                                            'Unknown'
+                                      },
+                                    ),
+                                  ),
                                   actions: [
                                     TextButton(
-                                      onPressed: () => Navigator.of(ctx).pop(false),
-                                      child: const Text('취소'),
+                                      onPressed: () =>
+                                          Navigator.of(ctx).pop(false),
+                                      child: Text('chat.leave.cancel'.tr()),
                                     ),
                                     TextButton(
-                                      onPressed: () => Navigator.of(ctx).pop(true),
-                                      child: const Text('나가기'),
+                                      onPressed: () =>
+                                          Navigator.of(ctx).pop(true),
+                                      child: Text('chat.leave.confirm'.tr()),
                                     ),
                                   ],
                                 ),
@@ -239,23 +268,37 @@ class _ChatListScreenState extends State<ChatListScreen> {
                               return confirm ?? false;
                             },
                             onDismissed: (direction) async {
-                              await chatProvider.leaveChatRoom(chatId, authProvider.currentUser!.id);
+                              await chatProvider.leaveChatRoom(
+                                  chatId, authProvider.currentUser!.id);
                             },
                             child: ListTile(
                               leading: CircleAvatar(
                                 radius: 20,
-                                backgroundImage: (chatData['userProfileImages']?[otherUserId] == null ||
-                                        chatData['userProfileImages'][otherUserId].isEmpty)
-                                    ? const AssetImage('assets/images/default_profile.png')
+                                backgroundImage: (chatData['userProfileImages']
+                                                ?[otherUserId] ==
+                                            null ||
+                                        chatData['userProfileImages']
+                                                [otherUserId]
+                                            .isEmpty)
+                                    ? const AssetImage(
+                                        'assets/images/default_profile.png')
                                     : null,
-                                child: (chatData['userProfileImages']?[otherUserId] != null &&
-                                        chatData['userProfileImages'][otherUserId].isNotEmpty)
+                                child: (chatData['userProfileImages']
+                                                ?[otherUserId] !=
+                                            null &&
+                                        chatData['userProfileImages']
+                                                [otherUserId]
+                                            .isNotEmpty)
                                     ? CachedNetworkImage(
-                                        imageUrl: chatData['userProfileImages'][otherUserId],
+                                        imageUrl: chatData['userProfileImages']
+                                            [otherUserId],
                                         placeholder: (context, url) => Center(
-                                          child: CircularProgressIndicator(strokeWidth: 2),
+                                          child: CircularProgressIndicator(
+                                              strokeWidth: 2),
                                         ),
-                                        imageBuilder: (context, imageProvider) => CircleAvatar(
+                                        imageBuilder:
+                                            (context, imageProvider) =>
+                                                CircleAvatar(
                                           backgroundImage: imageProvider,
                                           radius: 20,
                                         ),
@@ -266,38 +309,51 @@ class _ChatListScreenState extends State<ChatListScreen> {
                                 children: [
                                   Expanded(
                                     child: Text(
-                                      chatData['usernames'][otherUserId]?.substring(
-                                              0,
-                                              chatData['usernames'][otherUserId].length > 15
-                                                  ? 15
-                                                  : chatData['usernames'][otherUserId].length) ??
+                                      chatData['usernames'][otherUserId]
+                                              ?.substring(
+                                                  0,
+                                                  chatData['usernames']
+                                                                  [otherUserId]
+                                                              .length >
+                                                          15
+                                                      ? 15
+                                                      : chatData['usernames']
+                                                              [otherUserId]
+                                                          .length) ??
                                           'Unknown User',
-                                      style: const TextStyle(fontWeight: FontWeight.bold),
+                                      style: const TextStyle(
+                                          fontWeight: FontWeight.bold),
                                     ),
                                   ),
                                   if (unreadCount > 0)
                                     Container(
                                       margin: const EdgeInsets.only(left: 8),
-                                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 6, vertical: 2),
                                       decoration: BoxDecoration(
                                         color: Colors.red,
                                         borderRadius: BorderRadius.circular(12),
                                       ),
                                       child: Text(
-                                        unreadCount > 999 ? "+999" : "$unreadCount",
-                                        style: const TextStyle(color: Colors.white, fontSize: 12),
+                                        unreadCount > 999
+                                            ? "+999"
+                                            : "$unreadCount",
+                                        style: const TextStyle(
+                                            color: Colors.white, fontSize: 12),
                                       ),
                                     ),
                                 ],
                               ),
                               subtitle: Text(
-                                (chatData['lastMessage'] != null && chatData['lastMessage'].length > 65)
+                                (chatData['lastMessage'] != null &&
+                                        chatData['lastMessage'].length > 65)
                                     ? '${chatData['lastMessage'].substring(0, 65)}...'
                                     : chatData['lastMessage'] ?? '',
                               ),
                               onTap: () {
                                 _clearFocus();
-                                chatProvider.resetUnreadCount(chatId, authProvider.currentUser!.id);
+                                chatProvider.resetUnreadCount(
+                                    chatId, authProvider.currentUser!.id);
                                 chatProvider.startListeningToMessages(chatId);
                                 GoRouter.of(context).push('/chat/$chatId');
                               },

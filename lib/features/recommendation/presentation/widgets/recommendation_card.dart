@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import 'package:easy_localization/easy_localization.dart';
 import '../../../search/domain/entities/travel_package.dart';
 
 class RecommendationCard extends StatelessWidget {
@@ -18,19 +19,44 @@ class RecommendationCard extends StatelessWidget {
     return Card(
       margin: EdgeInsets.only(bottom: 16.h),
       child: InkWell(
-        onTap: () =>
-            context.push('/package-detail/${package.id}', extra: package),
+        onTap: () => context.push('/package-detail/${package.id}', extra: package),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Stack(
               children: [
-                Image.network(
-                  package.mainImage ?? 'https://picsum.photos/300/200',
-                  width: double.infinity,
-                  height: 200.h,
-                  fit: BoxFit.cover,
-                ),
+                if (package.mainImage != null && package.mainImage!.isNotEmpty)
+                  Image.network(
+                    package.mainImage!,
+                    width: double.infinity,
+                    height: 200.h,
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) {
+                      return Container(
+                        width: double.infinity,
+                        height: 200.h,
+                        color: Colors.grey[200],
+                        child: const Center(
+                          child: Icon(
+                            Icons.error_outline,
+                            color: Colors.grey,
+                          ),
+                        ),
+                      );
+                    },
+                  )
+                else
+                  Container(
+                    width: double.infinity,
+                    height: 200.h,
+                    color: Colors.grey[200],
+                    child: const Center(
+                      child: Icon(
+                        Icons.image_not_supported,
+                        color: Colors.grey,
+                      ),
+                    ),
+                  ),
                 Positioned(
                   top: 8,
                   left: 8,
@@ -44,7 +70,17 @@ class RecommendationCard extends StatelessWidget {
                       borderRadius: BorderRadius.circular(20.r),
                     ),
                     child: Text(
-                      '$rank위',
+                      // 기존 코드
+                      // 'recommendation.rank'.tr(args: [rank.toString()]),
+
+                      // 수정된 코드
+                      context.locale.languageCode == 'ko'
+                          ? '$rank위'
+                          : context.locale.languageCode == 'en'
+                          ? 'Rank $rank'
+                          : context.locale.languageCode == 'ja'
+                          ? '第${rank}位'
+                          : '第${rank}名',
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 14.sp,
@@ -61,7 +97,7 @@ class RecommendationCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    package.title,
+                    package.getTitle(context.locale.languageCode),
                     style: TextStyle(
                       fontSize: 18.sp,
                       fontWeight: FontWeight.bold,
@@ -69,7 +105,7 @@ class RecommendationCard extends StatelessWidget {
                   ),
                   SizedBox(height: 8.h),
                   Text(
-                    package.description,
+                    package.getDescription(context.locale.languageCode),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(

@@ -48,7 +48,13 @@ class RecommendationProvider extends ChangeNotifier {
         return TravelPackage(
           id: doc.id,
           title: data['title'] ?? '',
+          titleEn: data['titleEn'] ?? '',
+          titleJa: data['titleJa'] ?? '',
+          titleZh: data['titleZh'] ?? '',
           description: data['description'] ?? '',
+          descriptionEn: data['descriptionEn'] ?? '',
+          descriptionJa: data['descriptionJa'] ?? '',
+          descriptionZh: data['descriptionZh'] ?? '',
           price: (data['price'] ?? 0).toDouble(),
           region: data['region'] ?? '',
           mainImage: data['mainImage'],

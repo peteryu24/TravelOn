@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -222,7 +223,7 @@ class _CommentBottomSheetState extends State<CommentBottomSheet> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  '댓글',
+                  'commends.commend'.tr(),
                   style: TextStyle(
                     fontSize: 18.sp,
                     fontWeight: FontWeight.bold,
@@ -249,7 +250,7 @@ class _CommentBottomSheetState extends State<CommentBottomSheet> {
                   child: TextField(
                     controller: _commentController,
                     decoration: InputDecoration(
-                      hintText: '댓글 작성...',
+                      hintText: 'commends.Writing comments'.tr(),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(20.r),
                       ),
