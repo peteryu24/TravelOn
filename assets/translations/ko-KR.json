@@ -146,12 +146,16 @@
       "certification": "가이드 인증",
       "certification_desc": "가이드 인증을 진행하세요"
     },
+    "auth": {
+      "login_required": "로그인이 필요합니다"
+    },
     "user": {
       "reservations_title": "예약 관리",
       "my_reservations": "내 예약 내역",
       "my_reservations_desc": "예약한 패키지를 확인합니다",
       "liked_packages": "찜한 패키지",
-      "liked_packages_desc": "관심있는 패키지를 확인합니다"
+      "liked_packages_desc": "관심있는 패키지를 확인합니다",
+      "no_liked_packages": "찜한 패키지가 없습니다"
     },
     "logout": "로그아웃",
     "logout_failed": "로그아웃 실패: {error}"

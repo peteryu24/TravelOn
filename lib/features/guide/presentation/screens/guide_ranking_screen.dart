@@ -48,10 +48,8 @@ class _GuideRankingScreenState extends State<GuideRankingScreen> {
                 margin: EdgeInsets.only(bottom: 16.h),
                 child: ListTile(
                   onTap: () {
-                    context.push(
-                      '/guide-packages/${ranking.guideId}',
-                      extra: ranking.guideName,
-                    );
+                    // '/guide-packages/${ranking.guideId}' 대신 사용자 프로필 페이지로 이동
+                    context.push('/user-profile/${ranking.guideId}');
                   },
                   leading: CircleAvatar(
                     radius: 25,

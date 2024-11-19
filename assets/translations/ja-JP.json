@@ -146,12 +146,16 @@
       "certification": "ガイド認証",
       "certification_desc": "ガイドとして認証を受ける"
     },
+    "auth": {
+      "login_required": "ログインが必要です"
+    },
     "user": {
       "reservations_title": "予約管理",
-      "my_reservations": "予約一覧",
-      "my_reservations_desc": "予約したパッケージを確認",
-      "liked_packages": "お気に入り",
-      "liked_packages_desc": "お気に入りのパッケージを確認"
+      "my_reservations": "予約履歴",
+      "my_reservations_desc": "予約したパッケージを確認します",
+      "liked_packages": "お気に入りパッケージ",
+      "liked_packages_desc": "興味のあるパッケージを確認します",
+      "no_liked_packages": "お気に入りパッケージはありません"
     },
     "logout": "ログアウト",
     "logout_failed": "ログアウトに失敗: {error}"
