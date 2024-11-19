@@ -31,11 +31,14 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        title: Text('확인'),
+        title: Text('메일 전송 완료'),
         content: Text('비밀번호 재설정 메일을 보냈습니다.'),
         actions: [
           TextButton(
-            onPressed: () => Navigator.of(context).pop(),
+            onPressed: () {
+              Navigator.of(context).pop();
+              Navigator.of(context).pop();
+            },
             child: Text('확인'),
           ),
         ],
