@@ -42,6 +42,7 @@ class MessageModel {
 
   Map<String, dynamic> toMap() {
     return {
+      'id': id,
       'text': text,
       'uId': uId,
       'createdAt': createdAt,
@@ -55,6 +56,7 @@ class MessageModel {
 
   MessageEntity toEntity() {
     return MessageEntity(
+      id: id,
       text: text,
       uId: uId,
       createdAt: createdAt,
