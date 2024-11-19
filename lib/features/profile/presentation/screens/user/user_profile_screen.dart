@@ -11,8 +11,6 @@ import 'package:travel_on_final/features/chat/domain/usecases/create_chat_id.dar
 import 'package:image_picker/image_picker.dart';
 import 'package:go_router/go_router.dart';
 
-// 머지용
-
 class UserProfileScreen extends StatefulWidget {
   final String userId;
 

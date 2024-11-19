@@ -12,14 +12,14 @@ class LikedPackagesScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('liked_packages'.tr()),
+        title: Text('profile.user.liked_packages'.tr()),
       ),
       body: Consumer2<AuthProvider, TravelProvider>(
         builder: (context, authProvider, travelProvider, child) {
           final user = authProvider.currentUser;
           if (user == null) {
             return Center(
-              child: Text('login_required'.tr()),
+              child: Text('auth.login_required'.tr()),
             );
           }
 
@@ -33,7 +33,7 @@ class LikedPackagesScreen extends StatelessWidget {
 
                 if (likedPackages.isEmpty) {
                   return Center(
-                    child: Text('no_liked_packages'.tr()),
+                    child: Text('profile.user.no_liked_packages'.tr()),
                   );
                 }
 
