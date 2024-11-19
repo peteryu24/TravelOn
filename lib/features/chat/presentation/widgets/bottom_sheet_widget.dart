@@ -39,7 +39,7 @@ class BottomSheetWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                SizedBox(width: 12.w),
+                SizedBox(width: 13.w),
                 // 갤러리 버튼
                 buildIconButton(
                   context,

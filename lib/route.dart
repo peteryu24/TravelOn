@@ -223,13 +223,23 @@ final goRouter = GoRouter(
       },
     ),
     GoRoute(
-      path: '/map-detail/:latitude/:longitude',
-      builder: (context, state) {
-        final latitude = double.parse(state.pathParameters['latitude']!);
-        final longitude = double.parse(state.pathParameters['longitude']!);
-        return MapDetailScreen(latitude: latitude, longitude: longitude);
-      },
-    ),
+    path: '/map-detail/:latitude/:longitude',
+    builder: (context, state) {
+      final latitude = double.parse(state.pathParameters['latitude']!);
+      final longitude = double.parse(state.pathParameters['longitude']!);
+
+      final extra = state.extra as Map<String, dynamic>?;
+      final name = extra?['name'] ?? 'Unknown Location';
+      final address = extra?['address'] ?? '';
+
+      return MapDetailScreen(
+        latitude: latitude,
+        longitude: longitude,
+        name: name,
+        address: address,
+      );
+    },
+  ),
     // profile 관련 코드
     GoRoute(
       path: '/user-profile/:userId',
