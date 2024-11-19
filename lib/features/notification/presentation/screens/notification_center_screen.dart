@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:timeago/timeago.dart' as timeago;
+import 'package:go_router/go_router.dart';
 import '../providers/notification_provider.dart';
 import '../../domain/entities/notification.dart';
 
@@ -67,6 +68,32 @@ class _NotificationTile extends StatelessWidget {
 
   const _NotificationTile({required this.notification});
 
+  void _handleNotificationTap(BuildContext context) {
+    // 읽지 않은 알림인 경우 읽음 상태로 변경
+    if (!notification.isRead) {
+      context.read<NotificationProvider>().markAsRead(notification.id);
+    }
+
+    // 알림 유형에 따른 네비게이션 처리
+    switch (notification.type) {
+      case 'reservation_request':
+        // 가이드의 예약 관리 화면으로 이동
+        context.push('/reservations/guide');
+        break;
+      case 'reservation_update':
+        // 예약 상태가 승인된 경우에만 확정된 예약 탭으로 이동
+        if (notification.message.contains('승인')) {
+          context.push('/reservations/customer', extra: {'initialTab': '1'});
+        } else {
+          // 그 외의 경우(예약 신청, 거절 등)는 기본 탭(대기중인 예약)으로 이동
+          context.push('/reservations/customer');
+        }
+        break;
+      default:
+        break;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Dismissible(
@@ -83,38 +110,53 @@ class _NotificationTile extends StatelessWidget {
             .read<NotificationProvider>()
             .deleteNotification(notification.id);
       },
-      child: ListTile(
-        leading: _getNotificationIcon(notification.type),
-        title: Text(
-          notification.title,
-          style: TextStyle(
-            fontWeight:
-                notification.isRead ? FontWeight.normal : FontWeight.bold,
+      child: Card(
+        margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        child: InkWell(
+          onTap: () => _handleNotificationTap(context),
+          child: Padding(
+            padding: const EdgeInsets.all(12),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _getNotificationIcon(notification.type),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        notification.title,
+                        style: TextStyle(
+                          fontWeight: notification.isRead
+                              ? FontWeight.normal
+                              : FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        notification.message,
+                        style: TextStyle(
+                          color: Colors.grey[600],
+                          fontSize: 14,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        timeago.format(notification.createdAt, locale: 'ko'),
+                        style: TextStyle(
+                          color: Colors.grey[500],
+                          fontSize: 12,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
-        subtitle: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(notification.message),
-            Text(
-              timeago.format(notification.createdAt, locale: 'ko'),
-              style: TextStyle(
-                color: Colors.grey[600],
-                fontSize: 12,
-              ),
-            ),
-          ],
-        ),
-        onTap: () {
-          if (!notification.isRead) {
-            context.read<NotificationProvider>().markAsRead(notification.id);
-          }
-          // TODO: 알림 타입에 따른 네비게이션 처리
-          if (notification.type == 'reservation_request' &&
-              notification.reservationId != null) {
-            // 예약 상세 페이지로 이동
-          }
-        },
       ),
     );
   }
@@ -123,10 +165,14 @@ class _NotificationTile extends StatelessWidget {
     switch (type) {
       case 'reservation_request':
         return const CircleAvatar(
-          backgroundColor: Colors.blue,
+          backgroundColor: Colors.lightBlueAccent,
           child: Icon(Icons.calendar_today, color: Colors.white),
         );
-      // 다른 알림 타입에 대한 아이콘 추가
+      case 'reservation_update':
+        return const CircleAvatar(
+          backgroundColor: Colors.blue,
+          child: Icon(Icons.check_circle, color: Colors.white),
+        );
       default:
         return const CircleAvatar(
           backgroundColor: Colors.grey,

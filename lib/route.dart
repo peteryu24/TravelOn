@@ -109,7 +109,12 @@ final goRouter = GoRouter(
     ),
     GoRoute(
       path: '/reservations/customer',
-      builder: (context, state) => const CustomerReservationsScreen(),
+      builder: (context, state) {
+        final extra = state.extra as Map<String, String>?;
+        return CustomerReservationsScreen(
+          initialTab: extra?['initialTab'],
+        );
+      },
     ),
     GoRoute(
       path: '/review/add',
