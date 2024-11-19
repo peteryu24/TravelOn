@@ -8,6 +8,7 @@ import 'package:travel_on_final/features/review/domain/entities/review.dart';
 import 'package:travel_on_final/features/review/presentation/provider/review_provider.dart';
 import 'package:travel_on_final/features/search/presentation/providers/travel_provider.dart';
 import 'package:travel_on_final/features/chat/domain/usecases/create_chat_id.dart';
+import 'package:travel_on_final/features/profile/presentation/widgets/profile_dialogs.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:go_router/go_router.dart';
 
@@ -32,6 +33,10 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<ReviewProvider>().loadReviewsForUser(widget.userId);
     });
+  }
+
+  void _onEditProfileButtonPressed() {
+    showPasswordDialog(context);
   }
 
   Future<void> _pickBackgroundImage(UserModel user, AuthProvider authProvider) async {
@@ -331,9 +336,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                                 ),
                                 child: IconButton(
                                   icon: Icon(Icons.edit_note, color: Colors.white),
-                                  onPressed: () {
-                                    context.push('/profile/edit');
-                                  },
+                                  onPressed: _onEditProfileButtonPressed,
                                 ),
                               ),
                               Container(

@@ -297,7 +297,10 @@ class ReviewProvider extends ChangeNotifier {
     try {
       _userReviews = [];
       _isLoading = true;
-      notifyListeners();
+
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        notifyListeners();
+      });
 
       final snapshot = await FirebaseFirestore.instance
           .collection('reviews')
@@ -325,7 +328,10 @@ class ReviewProvider extends ChangeNotifier {
       return [];
     } finally {
       _isLoading = false;
-      notifyListeners();
+
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        notifyListeners();
+      });
     }
   }
 }
