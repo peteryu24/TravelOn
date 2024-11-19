@@ -67,8 +67,8 @@ class _ChatScreenState extends State<ChatScreen> {
 
   @override
   void dispose() {
-    chatProvider?.stopListeningToMessages();
-    chatProvider = null;
+    chatProvider?.stopListeningToMessages(); // 스트림 해제
+    chatProvider = null; // Provider 참조 해제
     messageController.dispose();
     super.dispose();
   }
@@ -116,7 +116,6 @@ class _ChatScreenState extends State<ChatScreen> {
           children: [
             Expanded(
               child: ListView.builder(
-                key: ValueKey(chatProvider.messages.length),
                 reverse: true,
                 itemCount: chatProvider.messages.length,
                 cacheExtent: 500.0,
@@ -127,7 +126,7 @@ class _ChatScreenState extends State<ChatScreen> {
                   final showTime = index == 0;
 
                   return MessageBubble(
-                    key: ValueKey(message.createdAt),
+                    key: ValueKey(message.id),
                     message: message,
                     isMe: isMe,
                     otherUserName: otherUserName,
@@ -161,8 +160,7 @@ class _ChatScreenState extends State<ChatScreen> {
                                 otherUserId: otherUserId!,
                                 currentUserProfileImage: Provider.of<AuthProvider>(context, listen: false)
                                         .currentUser!
-                                        .profileImageUrl ??
-                                    '',
+                                        .profileImageUrl ?? '',
                                 username: Provider.of<AuthProvider>(context, listen: false).currentUser!.name,
                               );
                             },

@@ -27,44 +27,45 @@ class ChatProvider extends ChangeNotifier {
 
   // 메시지 수신 및 구독
   void startListeningToMessages(String chatId) {
-    try {
-      // 기존 구독이 있다면 먼저 취소
-      stopListeningToMessages();
+    stopListeningToMessages();
 
+    try {
       _messageSubscription = _firestore
           .collection('chats')
           .doc(chatId)
           .collection('messages')
           .orderBy('createdAt', descending: true)
           .snapshots()
-          .listen((querySnapshot) {
-        _messages = querySnapshot.docs
-            .map((doc) => MessageModel.fromDocument(doc).toEntity())
-            .toList();
-        notifyListeners();
-      }, onError: (error) {
-        print('Error listening to messages: $error');
-        _messages = [];
-        notifyListeners();
-      });
+          .listen(
+        (snapshot) {
+          _messages = snapshot.docs
+              .map((doc) => MessageModel.fromDocument(doc).toEntity())
+              .toList();
+          notifyListeners();
+        },
+        onError: (error) {
+          print("메시지 스트림 중 오류 발생: $error");
+          _messages.clear();
+          notifyListeners();
+        },
+      );
     } catch (e) {
-      print('Error starting message listener: $e');
-      _messages = [];
-      notifyListeners();
+      print("메시지 스트림 시작 실패: $e");
     }
   }
 
   // 채팅방 구독 중지
   void stopListeningToMessages() {
     try {
-      if (_messageSubscription != null) {
-        _messageSubscription!.cancel();
-        _messageSubscription = null;
-      }
+      _messageSubscription?.cancel();
+      _messageSubscription = null;
       _messages.clear();
-      notifyListeners();
+
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        notifyListeners();
+      });
     } catch (e) {
-      print('메시지 스트림 해제 중 오류 발생: $e');
+      print("메시지 스트림 해제 중 오류 발생: $e");
     }
   }
 
@@ -87,30 +88,22 @@ class ChatProvider extends ChangeNotifier {
 
   // 로그아웃 시 호출할 메서드
   void clearDataOnLogout() {
-    try {
-      // 메시지 스트림 구독 해제
-      stopListeningToMessages();
-
-      // 읽지 않은 메시지 수 구독 해제
-      _unreadCountSubscription?.cancel();
-      _unreadCountSubscription = null;
-
-      // 내부 데이터 초기화
-      _messages.clear();
-      notifyListeners();
-    } catch (e) {
-      print('로그아웃 시 데이터 초기화 오류: $e');
-    }
+    stopListeningToMessages();
+    _unreadCountSubscription?.cancel();
+    _unreadCountSubscription = null;
+    _messages.clear();
+    notifyListeners();
   }
+
 
   // 채팅방 생성 확인 및 생성
   Future<void> _ensureChatRoomExists(
       String chatId, BuildContext context, String otherUserId) async {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    DocumentReference chatRef = _firestore.collection('chats').doc(chatId);
 
     try {
-      DocumentSnapshot chatSnapshot = await chatRef.get();
+      final chatRef = _firestore.collection('chats').doc(chatId);
+      final chatSnapshot = await chatRef.get();
 
       if (!chatSnapshot.exists && authProvider.currentUser != null) {
         String otherUserName = await _getOtherUserName(otherUserId);
@@ -127,17 +120,17 @@ class ChatProvider extends ChangeNotifier {
           },
           'userProfileImages': {
             authProvider.currentUser!.id:
-                authProvider.currentUser!.profileImageUrl,
+                authProvider.currentUser!.profileImageUrl ?? '',
             otherUserId: otherUserProfileImage,
           },
           'unreadCount': {
             authProvider.currentUser!.id: 0,
             otherUserId: 0,
-          }
+          },
         });
       }
     } catch (e) {
-      print('Error ensuring chat room exists: $e');
+      print("채팅방 생성 실패: $e");
     }
   }
 
@@ -197,18 +190,24 @@ class ChatProvider extends ChangeNotifier {
 
   // Firestore에서 사용자 이름 가져오기
   Future<String> _getOtherUserName(String uid) async {
-    DocumentSnapshot userSnapshot =
-        await _firestore.collection('users').doc(uid).get();
-    return userSnapshot.exists
-        ? userSnapshot['name'] ?? 'Unknown User'
-        : 'Unknown User';
+    try {
+      final doc = await _firestore.collection('users').doc(uid).get();
+      return doc.exists ? doc['name'] ?? 'Unknown' : 'Unknown';
+    } catch (e) {
+      print("사용자 이름 가져오기 실패: $e");
+      return 'Unknown';
+    }
   }
 
   // Firestore에서 사용자 프로필 이미지 가져오기
   Future<String> _getOtherUserProfileImage(String uid) async {
-    DocumentSnapshot userSnapshot =
-        await _firestore.collection('users').doc(uid).get();
-    return userSnapshot.exists ? userSnapshot['profileImageUrl'] ?? '' : '';
+    try {
+      final doc = await _firestore.collection('users').doc(uid).get();
+      return doc.exists ? doc['profileImageUrl'] ?? '' : '';
+    } catch (e) {
+      print("프로필 이미지 가져오기 실패: $e");
+      return '';
+    }
   }
 
   // 상대방 유저 정보 갖고오기
@@ -235,19 +234,22 @@ class ChatProvider extends ChangeNotifier {
 
   // 채팅방 나가기
   Future<void> leaveChatRoom(String chatId, String userId) async {
-    final chatRef = _firestore.collection('chats').doc(chatId);
-    final chatSnapshot = await chatRef.get();
+    try {
+      final chatRef = _firestore.collection('chats').doc(chatId);
+      final chatSnapshot = await chatRef.get();
 
-    if (chatSnapshot.exists) {
-      final participants = List<String>.from(chatSnapshot['participants']);
+      if (chatSnapshot.exists) {
+        final participants = List<String>.from(chatSnapshot['participants']);
+        participants.remove(userId);
 
-      participants.remove(userId);
-
-      if (participants.isEmpty) {
-        await chatRef.delete();
-      } else {
-        await chatRef.update({'participants': participants});
+        if (participants.isEmpty) {
+          await chatRef.delete();
+        } else {
+          await chatRef.update({'participants': participants});
+        }
       }
+    } catch (e) {
+      print("채팅방 나가기 중 오류 발생: $e");
     }
   }
 

@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class MessageEntity {
+  final String id;
   final String text;
   final String uId;
   final Timestamp createdAt;
@@ -11,6 +12,7 @@ class MessageEntity {
   final Map<String, dynamic>? location;
 
   MessageEntity({
+    required this.id,
     required this.text,
     required this.uId,
     required this.createdAt,
