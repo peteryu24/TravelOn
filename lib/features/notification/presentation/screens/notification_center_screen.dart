@@ -47,7 +47,7 @@ class _NotificationCenterScreenState extends State<NotificationCenterScreen> {
           }
 
           if (provider.notifications.isEmpty) {
-            return const Center(child: Text('알림이 없습니다'));
+            return Center(child: Text('알림이 없습니다'));
           }
 
           return ListView.builder(

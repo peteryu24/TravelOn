@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
@@ -30,7 +31,7 @@ class PackageTag extends StatelessWidget {
                 showDialog(
                   context: context,
                   builder: (context) => AlertDialog(
-                    title: const Text('알림'),
+                    title: Text('common.notice'.tr()),
                     content: const Text('존재하지 않거나 종료된 패키지입니다.'),
                     actions: [
                       TextButton(

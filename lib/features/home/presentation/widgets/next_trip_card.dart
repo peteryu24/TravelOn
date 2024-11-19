@@ -8,6 +8,21 @@ import '../providers/home_provider.dart';
 class NextTripCard extends StatelessWidget {
   const NextTripCard({super.key});
 
+  String _getLocalizedTitle(BuildContext context, String title, String? titleEn,
+      String? titleJa, String? titleZh) {
+    final locale = context.locale.languageCode;
+    switch (locale) {
+      case 'en':
+        return titleEn ?? title;
+      case 'ja':
+        return titleJa ?? title;
+      case 'zh':
+        return titleZh ?? title;
+      default:
+        return title;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final user = context.watch<AuthProvider>().currentUser;
@@ -33,10 +48,23 @@ class NextTripCard extends StatelessWidget {
           else if (homeProvider.nextTrip != null)
             Text(
               homeProvider.nextTrip!.isTodayTrip
-                  ? 'home.next_trip.today'.tr(
-                      namedArgs: {'title': homeProvider.nextTrip!.packageTitle})
+                  ? 'home.next_trip.today'.tr(namedArgs: {
+                      'title': _getLocalizedTitle(
+                        context,
+                        homeProvider.nextTrip!.packageTitle,
+                        homeProvider.nextTrip!.packageTitleEn,
+                        homeProvider.nextTrip!.packageTitleJa,
+                        homeProvider.nextTrip!.packageTitleZh,
+                      )
+                    })
                   : 'home.next_trip.countdown'.tr(namedArgs: {
-                      'title': homeProvider.nextTrip!.packageTitle,
+                      'title': _getLocalizedTitle(
+                        context,
+                        homeProvider.nextTrip!.packageTitle,
+                        homeProvider.nextTrip!.packageTitleEn,
+                        homeProvider.nextTrip!.packageTitleJa,
+                        homeProvider.nextTrip!.packageTitleZh,
+                      ),
                       'days': homeProvider.nextTrip!.dDay.toString()
                     }),
               style: TextStyle(

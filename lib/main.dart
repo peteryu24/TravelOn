@@ -145,7 +145,7 @@ Future<void> main() async {
                 ChatProvider(context.read<NavigationProvider>()),
           ),
           ChangeNotifierProvider(
-            create: (_) => ReservationProvider(FirebaseFirestore.instance),
+            create: (context) => ReservationProvider(FirebaseFirestore.instance),
           ),
           ChangeNotifierProvider(
             create: (context) => ReviewProvider(

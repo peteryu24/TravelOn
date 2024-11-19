@@ -45,10 +45,19 @@
   "menu": {
     "travel_recommendation": "Travel Recommendation",
     "guide_ranking": "Guide Ranking",
-    "local tour": "local tour",
+    "local_tour": "local tour",
     "recommended_places": "Recommended Places",
     "travel_gallery": "Travel Gallery",
     "Congestion of popular tourist attractions": "Tourist Attraction Congestion"
+  },
+  "regional": {
+    "select_region": "Please select a region",
+    "no_spots": "No recommended places in the selected region"
+  },
+  "region_selector": {
+    "city": "Select City/Province",
+    "district": "Select District",
+    "all": "All"
   },
   "navigation": {
     "home": "Home",
@@ -98,6 +107,8 @@
     "success": "Success",
     "failed": "Failed",
     "notice": "Notice",
+    "Read_it_all": "Read_it_all"
+,
     "error": {
       "no_data": "No data found",
       "load_failed": "Failed to load data"
@@ -264,7 +275,27 @@
     "pending_approval": "Pending Approval",
     "confirmed": "Confirmed",
     "package_not_found": "Package not found.",
-    "package_load_error": "Error loading package: {0}"
+    "package_load_error": "Error loading package: {0}",
+    "error": {
+      "invalid_participants": "Invalid number of participants",
+      "date_full": "This date is already fully booked",
+      "not_found": "Reservation not found"
+    },
+    "notification": {
+      "title": {
+        "reservation_change": "Reservation Status Changed",
+        "new_request": "New Reservation Request"
+      },
+      "message": {
+        "reservation_change": "Your reservation for {package} has been {status}",
+        "new_request": "{name} has requested to book {package} ({count} people)"
+      }
+    },
+    "status": {
+      "approved": "approved",
+      "rejected": "rejected",
+      "pending": "pending"
+    }
   },
   "guide_ranking": {
     "title": "Guide Ranking",
@@ -309,7 +340,7 @@
     "percent": "Congestion {value}%"
   },
   "recommendation": {
-    "title": "Customized travel recommendations",
+    "title": "Travel Recommendations",
     "empty": "I don't have any travel packages to recommend.\nLikes travel packages and get more recommendations!",
     "rank": "Rank {rank}"
   },
@@ -402,6 +433,46 @@
       "confirm_title": "Leave chat with {name}?",
       "cancel": "Cancel",
       "confirm": "Leave"
+    }
+  },
+  "user_profile": {
+    "title": {
+      "with_name": "s Profile",
+      "default": "Profile"
+    },
+    "loading": "Loading...",
+    "error": "An error occurred.",
+    "user_not_found": "User information not found.",
+    "guide_badge": "Guide",
+    "default_intro": "Nice to meet you.",
+    "background": {
+      "change_title": "Change Background Image",
+      "change_message": "Would you like to change the background image?",
+      "remove_title": "Remove Background Image",
+      "remove_message": "Would you like to remove the background image?",
+      "remove_error": "Failed to remove the background image. Please try again.",
+      "yes": "Yes",
+      "no": "No",
+      "cancel": "Cancel",
+      "confirm": "Confirm"
+    },
+    "guide_stats": {
+      "average_rating": "Average rating: {rating}",
+      "review_count": "{count} reviews",
+      "review_error": "Error loading review information.",
+      "no_reviews": "No review data available.",
+      "packages": {
+        "title": "Guide Packages",
+        "view_more": "View More"
+      }
+    },
+    "reviews": {
+      "recent_title": "Recently Written Reviews",
+      "view_more": "View More",
+      "package_prefix": "Package:",
+      "no_reviews": "No reviews written.",
+      "rating": "Rating: {rating} / 5",
+      "created_at": "Created on: {date}"
     }
   }
 }

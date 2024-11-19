@@ -45,10 +45,19 @@
   "menu": {
     "travel_recommendation": "여행추천",
     "guide_ranking": "가이드랭킹",
-    "local tour": "지역탐방",
+    "local_tour": "지역탐방",
     "recommended_places": "추천장소",
     "travel_gallery": "여행갤러리",
     "Congestion of popular tourist attractions": "인기 관광지 혼잡도"
+  },
+  "regional": {
+    "select_region": "지역을 선택해주세요",
+    "no_spots": "선택한 지역의 추천 장소가 없습니다"
+  },
+  "region_selector": {
+    "city": "시/도 선택",
+    "district": "시/군/구 선택",
+    "all": "전체"
   },
   "navigation": {
     "home": "홈",
@@ -98,6 +107,7 @@
     "success": "성공",
     "failed": "실패",
     "notice": "알림",
+    "Read_it_all": "모두 읽음",
     "error": {
       "no_data": "데이터를 찾을 수 없습니다",
       "load_failed": "데이터를 불러오는데 실패했습니다"
@@ -139,34 +149,6 @@
       "book_now": "예약하기",
       "closed": "오늘은 예약 마감"
     }
-  },
-  "profile": {
-    "title": "마이페이지",
-    "default_user": "사용자",
-    "guide": {
-      "section_title": "가이드 기능",
-      "create_package": "나만의 패키지 만들기",
-      "create_package_desc": "새로운 여행 패키지를 등록합니다",
-      "manage_reservations": "내 패키지 예약 관리",
-      "manage_reservations_desc": "등록한 패키지의 예약을 관리합니다",
-      "manage_packages": "내 패키지 관리",
-      "manage_packages_desc": "등록한 패키지를 수정하거나 삭제합니다",
-      "certification": "가이드 인증",
-      "certification_desc": "가이드 인증을 진행하세요"
-    },
-    "auth": {
-      "login_required": "로그인이 필요합니다"
-    },
-    "user": {
-      "reservations_title": "예약 관리",
-      "my_reservations": "내 예약 내역",
-      "my_reservations_desc": "예약한 패키지를 확인합니다",
-      "liked_packages": "찜한 패키지",
-      "liked_packages_desc": "관심있는 패키지를 확인합니다",
-      "no_liked_packages": "찜한 패키지가 없습니다"
-    },
-    "logout": "로그아웃",
-    "logout_failed": "로그아웃 실패: {error}"
   },
   "package_form": {
     "title": "새 패키지 등록",
@@ -264,7 +246,27 @@
     "pending_approval": "승인 대기중",
     "confirmed": "예약 확정",
     "package_not_found": "패키지를 찾을 수 없 습니다.",
-    "package_load_error": "패키지 정보를 불러올 수 없습니다: {0}"
+    "package_load_error": "패키지 정보를 불러올 수 없습니다: {0}",
+    "error": {
+      "invalid_participants": "올바르지 않은 인원 수입니다",
+      "date_full": "이미 예약이 마감된 날짜입니다",
+      "not_found": "예약을 찾을 수 없습니다"
+    },
+    "notification": {
+      "title": {
+        "reservation_change": "예약 상태 변경",
+        "new_request": "새로운 예약 요청"
+      },
+      "message": {
+        "reservation_change": "{package} 패키지의 예약이 {status}되었습니다",
+        "new_request": "{name}님이 {package} 패키지를 예약 신청했습니다. ({count}명)"
+      }
+    },
+    "status": {
+      "approved": "승인",
+      "rejected": "거절",
+      "pending": "대기중"
+    }
   },
   "guide_ranking": {
     "title": "가이드 랭킹",
@@ -402,6 +404,46 @@
       "confirm_title": "{name}님과의 대화방을 나가시겠습니까?",
       "cancel": "취소",
       "confirm": "나가기"
+    }
+  },
+  "user_profile": {
+    "title": {
+      "with_name": "님의 프로필",
+      "default": "프로필"
+    },
+    "loading": "로딩중...",
+    "error": "오류가 발생했습니다.",
+    "user_not_found": "사용자 정보를 찾을 수 없습니다.",
+    "guide_badge": "가이드",
+    "default_intro": "반갑습니다.",
+    "background": {
+      "change_title": "배경 이미지 변경",
+      "change_message": "배경 이미지를 바꾸시겠습니까?",
+      "remove_title": "배경 이미지 제거",
+      "remove_message": "배경 이미지를 제거하시겠습니까?",
+      "remove_error": "배경 이미지 제거에 실패했습니다. 다시 시도해주세요.",
+      "yes": "예",
+      "no": "아니오",
+      "cancel": "취소",
+      "confirm": "확인"
+    },
+    "guide_stats": {
+      "average_rating": "평균 별점 {rating}점",
+      "review_count": "리뷰 {count}개",
+      "review_error": "리뷰 정보를 불러오는 중 오류 발생",
+      "no_reviews": "리뷰 데이터가 없습니다.",
+      "packages": {
+        "title": "가이드 패키지",
+        "view_more": "더보기"
+      }
+    },
+    "reviews": {
+      "recent_title": "최근에 작성한 리뷰",
+      "view_more": "더보기",
+      "package_prefix": "패키지:",
+      "no_reviews": "작성한 리뷰가 없습니다.",
+      "rating": "평점: {rating} / 5",
+      "created_at": "작성일: {date}"
     }
   }
 }
