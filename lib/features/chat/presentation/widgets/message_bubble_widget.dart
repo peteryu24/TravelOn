@@ -14,6 +14,7 @@ class MessageBubble extends StatelessWidget {
   final bool isMe;
   final String otherUserName;
   final String currentUserId;
+  final bool showTime;
 
   const MessageBubble({
     super.key,
@@ -21,6 +22,7 @@ class MessageBubble extends StatelessWidget {
     required this.isMe,
     required this.otherUserName,
     required this.currentUserId,
+    this.showTime = false,
   });
 
   @override
@@ -102,15 +104,28 @@ class MessageBubble extends StatelessWidget {
               ),
             ],
           ),
+          if (showTime)
+            Padding(
+              padding: EdgeInsets.only(top: 0.h, right: 10.w, left: 10.w),
+              child: Text(
+                DateFormat('MM월 dd일 a hh:mm', 'ko').format(message.createdAt.toDate()),
+                style: TextStyle(
+                  color: Colors.grey[600],
+                  fontSize: 12.sp,
+                ),
+              ),
+            ),
         ],
       ),
     );
   }
 
   Widget _buildLocationDetails(
-      BuildContext context, Map<String, dynamic> location) {
+    BuildContext context, Map<String, dynamic> location) {
     final latitude = location['latitude'] ?? 0.0;
     final longitude = location['longitude'] ?? 0.0;
+    final name = location['title'] ?? '위치 정보';
+    final address = location['address'] ?? '';
 
     if (latitude == 0.0 && longitude == 0.0) {
       return const Center(child: Text('위치 정보를 불러올 수 없습니다.'));
@@ -122,7 +137,7 @@ class MessageBubble extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Text(
-          location['title'] ?? '위치 정보',
+          name,
           style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.bold),
         ),
         SizedBox(height: 8.h),
@@ -152,9 +167,13 @@ class MessageBubble extends StatelessWidget {
         SizedBox(height: 8.h),
         ElevatedButton(
           onPressed: () {
-            final latitude = location['latitude'].toString();
-            final longitude = location['longitude'].toString();
-            context.push('/map-detail/$latitude/$longitude');
+            context.push(
+              '/map-detail/$latitude/$longitude',
+              extra: {
+                'name': name,
+                'address': address,
+              },
+            );
           },
           child: const Text('자세히 보기'),
         ),

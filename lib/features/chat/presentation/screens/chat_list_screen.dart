@@ -198,108 +198,128 @@ class _ChatListScreenState extends State<ChatListScreen> {
                     itemBuilder: (ctx, index) {
                       final chatData = chatDocs[index].data() as Map<String, dynamic>? ?? {};
                       final chatId = chatDocs[index].id;
-                      
+
                       final participants = chatData['participants'] as List<dynamic>? ?? [];
                       final otherUserId = authProvider.currentUser!.id == participants[0]
                           ? participants[1]
                           : participants[0];
-                      
+
                       final unreadCount = chatData['unreadCount']?[authProvider.currentUser!.id] ?? 0;
-                      
+
                       chatProvider.updateOtherUserInfo(chatId, otherUserId);
 
-                      return Dismissible(
-                        key: Key(chatId),
-                        direction: DismissDirection.endToStart,
-                        background: Container(
-                          color: Colors.red[200],
-                          padding: const EdgeInsets.symmetric(horizontal: 20),
-                          alignment: Alignment.centerRight,
-                          child: const Icon(Icons.delete, color: Colors.white),
-                        ),
-                        confirmDismiss: (direction) async {
-                          final confirm = await showDialog<bool>(
-                            context: context,
-                            builder: (ctx) => AlertDialog(
-                              title: Text('${chatData['usernames'][otherUserId] ?? 'Unknown'}님과의 대화방을 나가시겠습니까?'),
-                              actions: [
-                                TextButton(
-                                  onPressed: () => Navigator.of(ctx).pop(false),
-                                  child: const Text('취소'),
-                                ),
-                                TextButton(
-                                  onPressed: () => Navigator.of(ctx).pop(true),
-                                  child: const Text('나가기'),
-                                ),
-                              ],
+                      return Column(
+                        children: [
+                          Dismissible(
+                            key: Key(chatId),
+                            direction: DismissDirection.endToStart,
+                            background: Container(
+                              color: Colors.red[200],
+                              padding: const EdgeInsets.symmetric(horizontal: 20),
+                              alignment: Alignment.centerRight,
+                              child: const Icon(Icons.delete, color: Colors.white),
                             ),
-                          );
-                          return confirm ?? false;
-                        },
-                        onDismissed: (direction) async {
-                          await chatProvider.leaveChatRoom(chatId, authProvider.currentUser!.id);
-                        },
-                        child: ListTile(
-                          leading: CircleAvatar(
-                            radius: 20,
-                            backgroundImage: (chatData['userProfileImages']?[otherUserId] == null ||
-                                    chatData['userProfileImages'][otherUserId].isEmpty)
-                                ? const AssetImage('assets/images/default_profile.png')
-                                : null,
-                            child: (chatData['userProfileImages']?[otherUserId] != null &&
-                                    chatData['userProfileImages'][otherUserId].isNotEmpty)
-                                ? CachedNetworkImage(
-                                    imageUrl: chatData['userProfileImages'][otherUserId],
-                                    placeholder: (context, url) => Center(
-                                      child: CircularProgressIndicator(strokeWidth: 2),
+                            confirmDismiss: (direction) async {
+                              final confirm = await showDialog<bool>(
+                                context: context,
+                                builder: (ctx) => AlertDialog(
+                                  title: Text('${chatData['usernames'][otherUserId] ?? 'Unknown'}님과의 대화방을 나가시겠습니까?'),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () => Navigator.of(ctx).pop(false),
+                                      child: const Text('취소'),
                                     ),
-                                    imageBuilder: (context, imageProvider) => CircleAvatar(
-                                      backgroundImage: imageProvider,
-                                      radius: 20,
+                                    TextButton(
+                                      onPressed: () => Navigator.of(ctx).pop(true),
+                                      child: const Text('나가기'),
                                     ),
-                                  )
-                                : null,
-                          ),
-                          title: Row(
-                            children: [
-                              Expanded(
-                                child: Text(
-                                  chatData['usernames'][otherUserId]?.substring(
-                                          0,
-                                          chatData['usernames'][otherUserId].length > 15
-                                              ? 15
-                                              : chatData['usernames'][otherUserId].length) ??
-                                      'Unknown User',
-                                  style: const TextStyle(fontWeight: FontWeight.bold),
+                                  ],
                                 ),
+                              );
+                              return confirm ?? false;
+                            },
+                            onDismissed: (direction) async {
+                              await chatProvider.leaveChatRoom(chatId, authProvider.currentUser!.id);
+                            },
+                            child: ListTile(
+                              leading: CircleAvatar(
+                                radius: 20,
+                                backgroundImage: (chatData['userProfileImages']?[otherUserId] == null ||
+                                        chatData['userProfileImages'][otherUserId].isEmpty)
+                                    ? const AssetImage('assets/images/default_profile.png')
+                                    : null,
+                                child: (chatData['userProfileImages']?[otherUserId] != null &&
+                                        chatData['userProfileImages'][otherUserId].isNotEmpty)
+                                    ? CachedNetworkImage(
+                                        imageUrl: chatData['userProfileImages'][otherUserId],
+                                        placeholder: (context, url) => Center(
+                                          child: CircularProgressIndicator(strokeWidth: 2),
+                                        ),
+                                        imageBuilder: (context, imageProvider) => CircleAvatar(
+                                          backgroundImage: imageProvider,
+                                          radius: 20,
+                                        ),
+                                      )
+                                    : null,
                               ),
-                              if (unreadCount > 0)
-                                Container(
-                                  margin: const EdgeInsets.only(left: 8),
-                                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                                  decoration: BoxDecoration(
-                                    color: Colors.red,
-                                    borderRadius: BorderRadius.circular(12),
+                              title: Row(
+                                children: [
+                                  Expanded(
+                                    child: Text(
+                                      chatData['usernames'][otherUserId]?.substring(
+                                              0,
+                                              chatData['usernames'][otherUserId].length > 15
+                                                  ? 15
+                                                  : chatData['usernames'][otherUserId].length) ??
+                                          'Unknown User',
+                                      style: const TextStyle(fontWeight: FontWeight.bold),
+                                    ),
                                   ),
-                                  child: Text(
-                                    unreadCount > 999 ? "+999" : "$unreadCount",
-                                    style: const TextStyle(color: Colors.white, fontSize: 12),
+                                  if (unreadCount > 0)
+                                    Container(
+                                      margin: const EdgeInsets.only(left: 8),
+                                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                      decoration: BoxDecoration(
+                                        color: Colors.red,
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                      child: Text(
+                                        unreadCount > 999 ? "+999" : "$unreadCount",
+                                        style: const TextStyle(color: Colors.white, fontSize: 12),
+                                      ),
+                                    ),
+                                ],
+                              ),
+                              subtitle: Text(
+                                (chatData['lastMessage'] != null && chatData['lastMessage'].length > 65)
+                                    ? '${chatData['lastMessage'].substring(0, 65)}...'
+                                    : chatData['lastMessage'] ?? '',
+                              ),
+                              onTap: () {
+                                _clearFocus();
+                                chatProvider.resetUnreadCount(chatId, authProvider.currentUser!.id);
+                                chatProvider.startListeningToMessages(chatId);
+                                GoRouter.of(context).push('/chat/$chatId');
+                              },
+                            ),
+                          ),
+                          Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 16.w),
+                            child: Container(
+                              height: 1,
+                              decoration: BoxDecoration(
+                                color: Colors.grey[300],
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withOpacity(0.1),
+                                    offset: Offset(0, 1),
+                                    blurRadius: 4,
                                   ),
-                                ),
-                            ],
+                                ],
+                              ),
+                            ),
                           ),
-                          subtitle: Text(
-                            (chatData['lastMessage'] != null && chatData['lastMessage'].length > 65)
-                                ? '${chatData['lastMessage'].substring(0, 65)}...'
-                                : chatData['lastMessage'] ?? '',
-                          ),
-                          onTap: () {
-                            _clearFocus();
-                            chatProvider.resetUnreadCount(chatId, authProvider.currentUser!.id);
-                            chatProvider.startListeningToMessages(chatId);
-                            GoRouter.of(context).push('/chat/$chatId');
-                          },
-                        ),
+                        ],
                       );
                     },
                   );

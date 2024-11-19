@@ -124,12 +124,17 @@ class _ChatScreenState extends State<ChatScreen> {
                   final message = chatProvider.messages[index];
                   final isMe = message.uId ==
                       Provider.of<AuthProvider>(context, listen: false).currentUser!.id;
+                  final showTime = index == 0;
+
                   return MessageBubble(
                     key: ValueKey(message.createdAt),
                     message: message,
                     isMe: isMe,
                     otherUserName: otherUserName,
-                    currentUserId: Provider.of<AuthProvider>(context, listen: false).currentUser!.id,
+                    currentUserId: Provider.of<AuthProvider>(context, listen: false)
+                        .currentUser!
+                        .id,
+                    showTime: showTime,
                   );
                 },
               ),
