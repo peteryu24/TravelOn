@@ -218,12 +218,38 @@ class _CustomerReservationsScreenState extends State<CustomerReservationsScreen>
     return Row(
       children: [
         Expanded(
-          child: Text(
-            reservation.packageTitle,
-            style: const TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-            ),
+          child: Consumer<TravelProvider>(
+            builder: (context, travelProvider, _) {
+              // 해당 패키지 찾기
+              final package = travelProvider.packages.firstWhere(
+                    (p) => p.id == reservation.packageId,
+                orElse: () => TravelPackage(
+                  id: reservation.packageId,
+                  title: reservation.packageTitle,
+                  description: '',
+                  price: reservation.price,
+                  region: '',
+                  guideName: reservation.guideName,
+                  guideId: reservation.guideId,
+                  maxParticipants: 0,
+                  minParticipants: 1,
+                  nights: 1,
+                  departureDays: [1, 2, 3, 4, 5, 6, 7],
+                  totalDays: 1,
+                  descriptionImages: [],
+                  routePoints: [],
+                ),
+              );
+
+              // 현재 언어에 맞는 제목 가져오기
+              return Text(
+                package.getTitle(context.locale.languageCode),
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              );
+            },
           ),
         ),
         Icon(
@@ -239,19 +265,27 @@ class _CustomerReservationsScreenState extends State<CustomerReservationsScreen>
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          '가이드: ${reservation.guideName}',
+          'reservations.guide'.tr(namedArgs: {
+            'name': reservation.guideName
+          }),
           style: TextStyle(fontSize: 14.sp),
         ),
         Text(
-          '예약일: ${DateFormat('yyyy년 MM월 dd일').format(reservation.reservationDate)}',
+          'reservations.reservation_date'.tr(namedArgs: {
+            'date': DateFormat('yyyy년 MM월 dd일').format(reservation.reservationDate)
+          }),
           style: TextStyle(fontSize: 14.sp),
         ),
         Text(
-          '신청일: ${DateFormat('yyyy년 MM월 dd일').format(reservation.requestedAt)}',
+          'reservations.request_date'.tr(namedArgs: {
+            'date': DateFormat('yyyy년 MM월 dd일').format(reservation.requestedAt)
+          }),
           style: TextStyle(fontSize: 14.sp),
         ),
         Text(
-          '가격: ￦${NumberFormat('#,###').format(reservation.price.toInt())}',
+          'reservations.price'.tr(namedArgs: {
+            'amount': NumberFormat('#,###').format(reservation.price.toInt())
+          }),
           style: TextStyle(fontSize: 14.sp),
         ),
         SizedBox(height: 8.h),
@@ -264,7 +298,9 @@ class _CustomerReservationsScreenState extends State<CustomerReservationsScreen>
             borderRadius: BorderRadius.circular(4.r),
           ),
           child: Text(
-            status == 'pending' ? '승인 대기중' : '예약 확정',
+            status == 'pending'
+                ? 'reservations.pending_approval'.tr()
+                : 'reservations.confirmed'.tr(),
             style: TextStyle(
               color: status == 'pending'
                   ? Colors.orange.shade900
@@ -281,20 +317,20 @@ class _CustomerReservationsScreenState extends State<CustomerReservationsScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('내 예약 내역'),
+        title: Text('profile.user.my_reservations'.tr()),
         bottom: TabBar(
           controller: _tabController,
-          tabs: const [
-            Tab(text: '대기중인 예약'),
-            Tab(text: '확정된 예약'),
+          tabs: [
+            Tab(text: 'reservations.pending_reservations'.tr()),
+            Tab(text: 'reservations.confirmed_reservations'.tr()),
           ],
         ),
       ),
       body: Consumer<ReservationProvider>(
         builder: (context, provider, child) {
           if (provider.reservations.isEmpty) {
-            return const Center(
-              child: Text('예약 내역이 없습니다.'),
+            return Center(
+              child: Text('reservations.no_reservations'.tr()),
             );
           }
 

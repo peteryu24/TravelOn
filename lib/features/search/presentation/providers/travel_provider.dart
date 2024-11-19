@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:travel_on_final/features/auth/data/models/user_model.dart';
@@ -27,6 +30,8 @@ class TravelProvider extends ChangeNotifier {
   String? _error;
   SortOption _currentSort = SortOption.latest;
   SortOption get currentSort => _currentSort;
+  final FirebaseStorage _storage = FirebaseStorage.instance;  // 추가
+
 
   TravelProvider(this._repository, {required FirebaseAuth auth})
       : _auth = auth {
@@ -184,6 +189,28 @@ class TravelProvider extends ChangeNotifier {
   // 패키지 추가
   Future<void> addPackage(TravelPackage package) async {
     try {
+      // 1. 먼저 이미지들을 Firebase Storage에 업로드
+      String? mainImageUrl;
+      List<String> descriptionImageUrls = [];
+
+      // 메인 이미지 업로드
+      if (package.mainImage != null) {
+        final mainImageRef = _storage.ref()
+            .child('package_images/${DateTime.now().millisecondsSinceEpoch}_main.jpg');
+        await mainImageRef.putFile(File(package.mainImage!));
+        mainImageUrl = await mainImageRef.getDownloadURL();
+      }
+
+      // 설명 이미지들 업로드
+      for (String imagePath in package.descriptionImages) {
+        final imageRef = _storage.ref()
+            .child('package_images/${DateTime.now().millisecondsSinceEpoch}_${descriptionImageUrls.length}.jpg');
+        await imageRef.putFile(File(imagePath));
+        final url = await imageRef.getDownloadURL();
+        descriptionImageUrls.add(url);
+      }
+
+      // 2. Firestore에 저장
       final docRef = _firestore.collection('packages').doc();
       await docRef.set({
         'id': docRef.id,
@@ -197,8 +224,8 @@ class TravelProvider extends ChangeNotifier {
         'descriptionZh': package.descriptionZh,
         'region': package.region,
         'price': package.price,
-        'mainImage': package.mainImage,
-        'descriptionImages': package.descriptionImages,
+        'mainImage': mainImageUrl,  // 업로드된 URL 사용
+        'descriptionImages': descriptionImageUrls,  // 업로드된 URL 리스트 사용
         'guideName': package.guideName,
         'guideId': package.guideId,
         'minParticipants': package.minParticipants,
@@ -214,7 +241,11 @@ class TravelProvider extends ChangeNotifier {
         'createdAt': FieldValue.serverTimestamp(),
       });
 
-      final newPackage = package.copyWith(id: docRef.id);
+      final newPackage = package.copyWith(
+        id: docRef.id,
+        mainImage: mainImageUrl,
+        descriptionImages: descriptionImageUrls,
+      );
       _packages.add(newPackage);
       notifyListeners();
     } catch (e) {

@@ -45,8 +45,10 @@
   "menu": {
     "travel_recommendation": "Travel Recommendation",
     "guide_ranking": "Guide Ranking",
+    "local tour": "local tour",
     "recommended_places": "Recommended Places",
-    "travel_gallery": "Travel Gallery"
+    "travel_gallery": "Travel Gallery",
+    "Congestion of popular tourist attractions": "Tourist Attraction Congestion"
   },
   "navigation": {
     "home": "Home",
@@ -62,6 +64,8 @@
     "gwangju": "Gwangju",
     "deajeon": "Deajeon",
     "ulsan": "Ulsan",
+    "gyeonggi": "Gyeonggi",
+    "gangwon": "Gangwon",
     "jeju": "Jeju Island"
   },
   "regions": {
@@ -249,10 +253,10 @@
     "no_reservations": "No reservations found.",
     "no_pending_reservations": "No pending reservations.",
     "no_confirmed_reservations": "No confirmed reservations.",
-    "guide": "Guide: {0}",
-    "reservation_date": "Reservation Date: {0}",
-    "request_date": "Request Date: {0}",
-    "price": "Price: ￦{0}",
+    "guide": "Guide: {name}",
+    "reservation_date": "Reservation Date: {date}",
+    "request_date": "Request Date: {date}",
+    "price": "Price: ￦{amount}",
     "pending_approval": "Pending Approval",
     "confirmed": "Confirmed",
     "package_not_found": "Package not found.",
@@ -295,6 +299,105 @@
       "already_reviewed": "You have already written a review",
       "check_status": "An error occurred while checking review status",
       "loading": "Error occurred while loading reviews"
+    }
+  },
+  "density": {
+    "percent": "Congestion {value}%"
+  },
+  "recommendation": {
+    "title": "Customized travel recommendations",
+    "empty": "I don't have any travel packages to recommend.\nLikes travel packages and get more recommendations!",
+    "rank": "Rank {rank}"
+  },
+  "tourist_category": {
+    "palace": "Palace",
+    "beach": "Beach",
+    "nature": "Nature",
+    "observatory": "Observatory",
+    "attraction": "Tourist Attraction"
+  },
+  "gallery": {
+    "title": "Travel Gallery",
+    "no_posts": "No posts yet",
+    "post": {
+      "login_required": "Login required",
+      "like_error": "Error occurred while processing like",
+      "scrap_success": "Post has been saved",
+      "scrap_canceled": "Post has been unsaved",
+      "scrap_error": "Error occurred while saving post",
+      "delete_title": "Delete Post",
+      "delete_confirm": "Are you sure you want to delete this post?",
+      "cancel": "Cancel",
+      "delete": "Delete",
+      "delete_success": "Post has been deleted",
+      "delete_error": "Delete failed: {error}",
+      "edit": "Edit",
+      "likes_count": "{count} likes",
+      "comments_count": "View all {count} comments",
+      "add_post": {
+        "title": "New Post",
+        "share": "Share",
+        "add_image": "Add Image",
+        "location": {
+          "label": "Location",
+          "hint": "e.g. Seoul Tower",
+          "error": "Please enter location"
+        },
+        "description": {
+          "label": "Description",
+          "hint": "Share your travel experience",
+          "error": "Please enter description"
+        },
+        "package_tag": {
+          "label": "Travel Package Tag",
+          "hint": "Select related package (optional)",
+          "none": "None"
+        },
+        "upload": {
+          "success": "Post has been uploaded",
+          "error": "Upload failed: {error}",
+          "package_not_found": "Selected package not found"
+        }
+      }
+    }
+  },
+  "commends": {
+    "commend": "commend",
+    "Writing comments": "Writing comments..."
+  },
+  "chat": {
+    "title": "Chat List",
+    "login_required": "Login Required",
+    "search": {
+      "label": "Search",
+      "guide": "Search Guide"
+    },
+    "screen": {
+      "loading": "Loading...",
+      "conversation_with": "'s Chat",
+      "input": {
+        "hint": "Type a message..."
+      }
+    },
+    "add_content": {
+      "gallery": "Gallery",
+      "camera": "Camera",
+      "user": "User",
+      "package": "Package",
+      "map": "Map",
+      "image": {
+        "send": "Send Photo",
+        "no": "No",
+        "yes": "Yes"
+      }
+    },
+    "no_chats": "No chat rooms",
+    "no_results": "No matching chat rooms",
+    "error": "An error occurred",
+    "leave": {
+      "confirm_title": "Leave chat with {name}?",
+      "cancel": "Cancel",
+      "confirm": "Leave"
     }
   }
 }

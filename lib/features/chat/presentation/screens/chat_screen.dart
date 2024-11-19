@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -77,7 +78,7 @@ class _ChatScreenState extends State<ChatScreen> {
   Widget build(BuildContext context) {
     if (isLoading) {
       return Scaffold(
-        appBar: AppBar(title: Text("로딩 중...")),
+        appBar: AppBar(title: Text('chat.screen.loading'.tr())),
         body: Center(
           child: CircularProgressIndicator(),
         ),
@@ -100,7 +101,7 @@ class _ChatScreenState extends State<ChatScreen> {
                 ),
               ),
               TextSpan(
-                text: "님과의 대화",
+                text: 'chat.screen.conversation_with'.tr(),
                 style: TextStyle(
                   fontSize: 16.sp,
                   color: Colors.black,
@@ -176,7 +177,7 @@ class _ChatScreenState extends State<ChatScreen> {
                                 });
                               },
                               decoration: InputDecoration(
-                                hintText: '메시지를 입력하세요...',
+                                hintText: 'chat.screen.input.hint'.tr(),
                                 border: InputBorder.none,
                                 contentPadding:
                                     EdgeInsets.symmetric(horizontal: 0.w, vertical: 10.h),

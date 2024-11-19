@@ -75,9 +75,9 @@ class TourismDensityApi {
 
       final nameMatch = RegExp(r'<tAtsNm>([^<]+)</tAtsNm>').firstMatch(itemXml);
       final rateMatch =
-          RegExp(r'<cnctrRate>([^<]+)</cnctrRate>').firstMatch(itemXml);
+      RegExp(r'<cnctrRate>([^<]+)</cnctrRate>').firstMatch(itemXml);
       final dateMatch =
-          RegExp(r'<baseYmd>([^<]+)</baseYmd>').firstMatch(itemXml);
+      RegExp(r'<baseYmd>([^<]+)</baseYmd>').firstMatch(itemXml);
 
       if (nameMatch != null && rateMatch != null && dateMatch != null) {
         final name = nameMatch.group(1)!;
@@ -105,10 +105,10 @@ class TourismDensityApi {
   }
 
   static String _determineCategory(String name) {
-    if (name.contains('궁') || name.contains('문')) return '고궁';
-    if (name.contains('해수욕장') || name.contains('해변')) return '해변';
-    if (name.contains('산') || name.contains('공원')) return '자연';
-    if (name.contains('타워') || name.contains('전망대')) return '전망대';
-    return '관광지';
+    if (name.contains('궁') || name.contains('문')) return 'palace';
+    if (name.contains('해수욕장') || name.contains('해변')) return 'beach';
+    if (name.contains('산') || name.contains('공원')) return 'nature';
+    if (name.contains('타워') || name.contains('전망대')) return 'observatory';
+    return 'attraction';
   }
 }

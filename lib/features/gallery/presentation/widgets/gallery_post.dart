@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -107,7 +108,7 @@ class _GalleryPostState extends State<GalleryPost> {
         });
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('좋아요 처리 중 오류가 발생했습니다')),
+            SnackBar(content: Text('gallery.post.like_error'.tr())),
           );
         }
       }
@@ -133,7 +134,7 @@ class _GalleryPostState extends State<GalleryPost> {
     final user = context.read<AuthProvider>().currentUser;
     if (user == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('로그인이 필요합니다')),
+        SnackBar(content: Text('gallery.post.login_required'.tr())),
       );
       return;
     }
@@ -147,7 +148,11 @@ class _GalleryPostState extends State<GalleryPost> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(isScrapped ? '스크랩이 완료되었습니다' : '스크랩이 해제되었습니다'),
+            content: Text(
+                isScrapped
+                    ? 'gallery.post.scrap_success'.tr()
+                    : 'gallery.post.scrap_canceled'.tr()
+            ),
           ),
         );
       }
@@ -157,7 +162,7 @@ class _GalleryPostState extends State<GalleryPost> {
           isScrapped = !isScrapped;
         });
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('스크랩 처리 중 오류가 발생했습니다')),
+          SnackBar(content: Text('gallery.post.login_required'.tr())),
         );
       }
     }
@@ -232,18 +237,18 @@ class _GalleryPostState extends State<GalleryPost> {
                       final confirmed = await showDialog<bool>(
                         context: context,
                         builder: (context) => AlertDialog(
-                          title: const Text('게시물 삭제'),
-                          content: const Text('이 게시물을 삭제하시겠습니까?'),
+                          title: Text('gallery.post.delete_title'.tr()),
+                          content: Text('gallery.post.delete_confirm'.tr()),
                           actions: [
                             TextButton(
                               onPressed: () => Navigator.pop(context, false),
-                              child: const Text('취소'),
+                              child: Text('gallery.post.cancel'.tr()),
                             ),
                             TextButton(
                               onPressed: () => Navigator.pop(context, true),
-                              child: const Text(
-                                '삭제',
-                                style: TextStyle(color: Colors.red),
+                              child: Text(
+                                'gallery.post.delete'.tr(),
+                                style: const TextStyle(color: Colors.red),
                               ),
                             ),
                           ],
@@ -271,23 +276,26 @@ class _GalleryPostState extends State<GalleryPost> {
                     }
                   },
                   itemBuilder: (context) => [
-                    const PopupMenuItem(
+                    PopupMenuItem(
                       value: 'edit',
                       child: Row(
                         children: [
-                          Icon(Icons.edit),
-                          SizedBox(width: 8),
-                          Text('수정'),
+                          const Icon(Icons.edit),
+                          const SizedBox(width: 8),
+                          Text('gallery.post.edit'.tr()),
                         ],
                       ),
                     ),
-                    const PopupMenuItem(
+                    PopupMenuItem(
                       value: 'delete',
                       child: Row(
                         children: [
-                          Icon(Icons.delete, color: Colors.red),
-                          SizedBox(width: 8),
-                          Text('삭제', style: TextStyle(color: Colors.red)),
+                          const Icon(Icons.delete, color: Colors.red),
+                          const SizedBox(width: 8),
+                          Text(
+                            'gallery.post.delete'.tr(),
+                            style: const TextStyle(color: Colors.red),
+                          ),
                         ],
                       ),
                     ),
@@ -330,7 +338,7 @@ class _GalleryPostState extends State<GalleryPost> {
           Padding(
             padding: EdgeInsets.symmetric(horizontal: 10.w),
             child: Text(
-              '좋아요 $likeCount개',
+              'gallery.post.likes_count'.tr(namedArgs: {'count': likeCount.toString()}),
               style: const TextStyle(fontWeight: FontWeight.bold),
             ),
           ),
@@ -351,7 +359,9 @@ class _GalleryPostState extends State<GalleryPost> {
                 TextButton(
                   onPressed: _showComments,
                   child: Text(
-                    '댓글 ${widget.comments.length}개 모두 보기',
+                    'gallery.post.comments_count'.tr(
+                        namedArgs: {'count': widget.comments.length.toString()}
+                    ),
                     style: TextStyle(
                       color: Colors.grey[600],
                       fontSize: 14.sp,

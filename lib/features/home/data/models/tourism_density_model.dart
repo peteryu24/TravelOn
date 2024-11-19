@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import '../../domain/entities/tourism_density.dart';
 
 class TourismDensityModel extends TourismDensity {
@@ -18,11 +19,15 @@ class TourismDensityModel extends TourismDensity {
   }
 
   static String _determineCategory(String name) {
-    if (name.contains('궁') || name.contains('문')) return '고궁';
-    if (name.contains('해수욕장') || name.contains('해변')) return '해변';
-    if (name.contains('산') || name.contains('공원')) return '자연';
-    if (name.contains('타워') || name.contains('전망대')) return '전망대';
-    return '관광지';
+    if (name.contains('궁') || name.contains('문'))
+      return 'tourist_category.palace'.tr();
+    if (name.contains('해수욕장') || name.contains('해변'))
+      return 'tourist_category.beach'.tr();
+    if (name.contains('산') || name.contains('공원'))
+      return 'tourist_category.nature'.tr();
+    if (name.contains('타워') || name.contains('전망대'))
+      return 'tourist_category.observatory'.tr();
+    return 'tourist_category.attraction'.tr();
   }
 
   Map<String, dynamic> toJson() {

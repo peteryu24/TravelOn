@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import '../widgets/gallery_post.dart';
@@ -16,7 +17,7 @@ class TravelGalleryScreen extends StatelessWidget {
         scrolledUnderElevation: 0,
         elevation: 0,
         centerTitle: true,
-        title: const Text('여행갤러리'),
+        title: Text('gallery.title'.tr()),
         actions: [
           IconButton(
             onPressed: () => context.push('/gallery-search'),
@@ -40,7 +41,7 @@ class TravelGalleryScreen extends StatelessWidget {
 
           final posts = provider.posts;
           if (posts.isEmpty) {
-            return const Center(child: Text('아직 게시물이 없습니다'));
+            return Center(child: Text('gallery.no_posts'.tr()));
           }
 
           return ListView.builder(

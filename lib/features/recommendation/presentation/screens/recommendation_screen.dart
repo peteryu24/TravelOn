@@ -54,8 +54,8 @@ class _RecommendationScreenState extends State<RecommendationScreen> {
           }
 
           if (provider.recommendedPackages.isEmpty) {
-            return const Center(
-              child: Text('추천할 여행 패키지가 없습니다.\n여행 패키지를 좋아요하고 더 많은 추천을 받아보세요!'),
+            return Center(
+              child: Text('recommendation.empty'.tr()),
             );
           }
 

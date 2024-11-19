@@ -143,7 +143,7 @@ class _DetailScreenState extends State<DetailScreen> {
             padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
             color: Colors.grey[100],
             child: Text(
-              'search.selected_region'.tr(args: [_getRegionText(provider.selectedRegion)]),
+              'search.selected_region'.tr(namedArgs: {'region': _getRegionText(provider.selectedRegion)}),
               style: TextStyle(
                 fontSize: 14.sp,
                 color: Colors.grey,

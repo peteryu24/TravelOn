@@ -128,22 +128,22 @@ class _HomeScreenState extends State<HomeScreen> {
                 children: [
                   _buildMenuItem(
                     CupertinoIcons.heart_fill,
-                    '여행추천',
+                    'menu.travel_recommendation'.tr(),
                     '/recommendation',
                   ),
                   _buildMenuItem(
                     CupertinoIcons.person_3_fill,
-                    '가이드랭킹',
+                    'menu.guide_ranking'.tr(),
                     '/guide-ranking',
                   ),
                   _buildMenuItem(
                     CupertinoIcons.map_pin_ellipse,
-                    '지역탐방',
+                    'menu.local tour'.tr(),
                     '/regional-exploration',
                   ),
                   _buildMenuItem(
                     CupertinoIcons.camera_fill,
-                    '여행갤러리',
+                    'menu.travel_gallery'.tr(),
                     '/travel-gallery',
                   ),
                 ],

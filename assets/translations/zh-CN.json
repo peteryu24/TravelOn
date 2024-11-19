@@ -45,8 +45,10 @@
   "menu": {
     "travel_recommendation": "旅游推荐",
     "guide_ranking": "导游排名",
+    "local tour": "地域探訪",
     "recommended_places": "推荐景点",
-    "travel_gallery": "旅行相册"
+    "travel_gallery": "旅行相册",
+    "Congestion of popular tourist attractions": "热门旅游景点拥挤程度"
   },
   "navigation": {
     "home": "首页",
@@ -62,6 +64,8 @@
     "gwangju": "光州",
     "deajeon": "大田",
     "ulsan": "蔚山",
+    "gyeonggi": "京畿道",
+    "gangwon": "江原",
     "jeju": "济州岛"
   },
   "regions": {
@@ -253,10 +257,10 @@
     "no_reservations": "暂无预约",
     "no_pending_reservations": "暂无待确认预约",
     "no_confirmed_reservations": "暂无已确认预约",
-    "guide": "导游: {0}",
-    "reservation_date": "预约日期: {0}",
-    "request_date": "申请日期: {0}",
-    "price": "价格: ₩{0}",
+    "guide": "导游：{name}",
+    "reservation_date": "预订日期：{date}",
+    "request_date": "申请日期：{date}",
+    "price": "价格：￦{amount}",
     "pending_approval": "等待确认",
     "confirmed": "已确认",
     "package_not_found": "未找到套餐",
@@ -293,6 +297,105 @@
       "already_reviewed": "您已经写过评论",
       "check_status": "检查评论状态时发生错误",
       "loading": "加载评论时发生错误"
+    }
+  },
+  "density": {
+    "percent": "拥挤度 {value}%"
+  },
+  "recommendation": {
+    "title": "定製旅行推薦",
+    "empty": "沒有推薦的旅行套餐。\n喜歡旅行套餐，請接受更多的推薦吧！",
+    "rank": "第{rank}名"
+  },
+  "tourist_category": {
+    "palace": "宫殿",
+    "beach": "海滩",
+    "nature": "自然",
+    "observatory": "观景台",
+    "attraction": "景点"
+  },
+  "gallery": {
+    "title": "旅行图库",
+    "no_posts": "暂无帖子",
+    "post": {
+      "login_required": "需要登录",
+      "like_error": "点赞处理时出错",
+      "scrap_success": "已收藏",
+      "scrap_canceled": "已取消收藏",
+      "scrap_error": "收藏处理时出错",
+      "delete_title": "删除帖子",
+      "delete_confirm": "确定要删除这条帖子吗？",
+      "cancel": "取消",
+      "delete": "删除",
+      "delete_success": "帖子已删除",
+      "delete_error": "删除失败: {error}",
+      "edit": "编辑",
+      "likes_count": "{count}个赞",
+      "comments_count": "查看全部{count}条评论",
+      "add_post": {
+        "title": "新帖子",
+        "share": "分享",
+        "add_image": "添加图片",
+        "location": {
+          "label": "位置",
+          "hint": "例：首尔塔",
+          "error": "请输入位置"
+        },
+        "description": {
+          "label": "说明",
+          "hint": "分享您的旅行体验",
+          "error": "请输入说明"
+        },
+        "package_tag": {
+          "label": "旅行套餐标签",
+          "hint": "选择相关套餐（可选）",
+          "none": "不选择"
+        },
+        "upload": {
+          "success": "帖子已上传",
+          "error": "上传失败: {error}",
+          "package_not_found": "未找到所选套餐"
+        }
+      }
+    }
+  },
+  "commends": {
+    "commend": "回帖",
+    "Writing comments": "回帖..."
+  },
+  "chat": {
+    "title": "聊天列表",
+    "login_required": "需要登录",
+    "search": {
+      "label": "搜索",
+      "guide": "搜索导游"
+    },
+    "screen": {
+      "loading": "加载中...",
+      "conversation_with": "的对话",
+      "input": {
+        "hint": "输入消息..."
+      }
+    },
+    "add_content": {
+      "gallery": "相册",
+      "camera": "相机",
+      "user": "用户",
+      "package": "套餐",
+      "map": "地图",
+      "image": {
+        "send": "发送照片",
+        "no": "否",
+        "yes": "是"
+      }
+    },
+    "no_chats": "暂无聊天室",
+    "no_results": "没有匹配的聊天室",
+    "error": "发生错误",
+    "leave": {
+      "confirm_title": "要退出与{name}的聊天室吗？",
+      "cancel": "取消",
+      "confirm": "退出"
     }
   }
 }

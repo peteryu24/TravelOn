@@ -45,8 +45,10 @@
   "menu": {
     "travel_recommendation": "旅行のおすすめ",
     "guide_ranking": "ガイドランキング",
+    "local tour": "地域探訪",
     "recommended_places": "おすすめスポット",
-    "travel_gallery": "旅行ギャラリー"
+    "travel_gallery": "旅行ギャラリー",
+    "Congestion of popular tourist attractions": "人気観光地の混雑度"
   },
   "navigation": {
     "home": "ホーム",
@@ -62,6 +64,8 @@
     "gwangju": "光州",
     "deajeon": "大田",
     "ulsan": "蔚山",
+    "gyeonggi": "京畿道",
+    "gangwon": "江原",
     "jeju": "済州島"
   },
   "regions": {
@@ -255,10 +259,10 @@
     "no_reservations": "予約がありません",
     "no_pending_reservations": "承認待ちの予約はありません",
     "no_confirmed_reservations": "確定済みの予約はありません",
-    "guide": "ガイド: {0}",
-    "reservation_date": "予約日: {0}",
-    "request_date": "申込日: {0}",
-    "price": "料金: ₩{0}",
+    "guide": "ガイド: {name}",
+    "reservation_date": "予約日: {date}",
+    "request_date": "申請日: {date}",
+    "price": "料金: ￦{amount}",
     "pending_approval": "承認待ち",
     "confirmed": "予約確定",
     "package_not_found": "パッケージが見つかりません",
@@ -295,6 +299,105 @@
       "already_reviewed": "すでにレビューを投稿済みです",
       "check_status": "レビュー状態の確認中にエラーが発生しました",
       "loading": "レビューの読み込み中にエラーが発生しました"
+    }
+  },
+  "density": {
+    "percent": "混雑度 {value}%"
+  },
+  "recommendation": {
+    "title": "オーダーメイド旅行のおすすめ",
+    "empty": "おすすめの旅行パッケージはありません。\n旅行パッケージがいいですね、もっとたくさんおすすめしてもらってみてください！\n",
+    "rank": "第{rank}位"
+  },
+  "tourist_category": {
+    "palace": "宮殿",
+    "beach": "ビーチ",
+    "nature": "自然",
+    "observatory": "展望台",
+    "attraction": "観光地"
+  },
+  "gallery": {
+    "title": "旅行ギャラリー",
+    "no_posts": "投稿がありません",
+    "post": {
+      "login_required": "ログインが必要です",
+      "like_error": "いいね処理中にエラーが発生しました",
+      "scrap_success": "保存しました",
+      "scrap_canceled": "保存を解除しました",
+      "scrap_error": "保存処理中にエラーが発生しました",
+      "delete_title": "投稿を削除",
+      "delete_confirm": "この投稿を削除しますか？",
+      "cancel": "キャンセル",
+      "delete": "削除",
+      "delete_success": "投稿を削除しました",
+      "delete_error": "削除に失敗しました: {error}",
+      "edit": "編集",
+      "likes_count": "いいね {count}件",
+      "comments_count": "コメント{count}件をすべて見る",
+      "add_post": {
+        "title": "新規投稿",
+        "share": "シェア",
+        "add_image": "画像を追加",
+        "location": {
+          "label": "場所",
+          "hint": "例：ソウルタワー",
+          "error": "場所を入力してください"
+        },
+        "description": {
+          "label": "説明",
+          "hint": "旅行体験を共有してください",
+          "error": "説明を入力してください"
+        },
+        "package_tag": {
+          "label": "旅行パッケージタグ",
+          "hint": "関連パッケージを選択（任意）",
+          "none": "選択しない"
+        },
+        "upload": {
+          "success": "投稿がアップロードされました",
+          "error": "アップロードに失敗しました: {error}",
+          "package_not_found": "選択したパッケージが見つかりません"
+        }
+      }
+    }
+  },
+  "commends": {
+    "commend": "コメント",
+    "Writing comments": "コメント作成..."
+  },
+  "chat": {
+    "title": "チャット一覧",
+    "login_required": "ログインが必要です",
+    "search": {
+      "label": "検索",
+      "guide": "ガイド検索"
+    },
+    "screen": {
+      "loading": "読み込み中...",
+      "conversation_with": "さんとのチャット",
+      "input": {
+        "hint": "メッセージを入力..."
+      }
+    },
+    "add_content": {
+      "gallery": "ギャラリー",
+      "camera": "カメラ",
+      "user": "ユーザー",
+      "package": "パッケージ",
+      "map": "地図",
+      "image": {
+        "send": "写真を送信",
+        "no": "いいえ",
+        "yes": "はい"
+      }
+    },
+    "no_chats": "チャットルームがありません",
+    "no_results": "該当するチャットルームがありません",
+    "error": "エラーが発生しました",
+    "leave": {
+      "confirm_title": "{name}さんとのチャットを退出しますか？",
+      "cancel": "キャンセル",
+      "confirm": "退出"
     }
   }
 }

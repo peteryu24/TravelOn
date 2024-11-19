@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:image_picker/image_picker.dart';
@@ -67,7 +68,8 @@ class _AddGalleryPostScreenState extends State<AddGalleryPostScreen> {
       if (_selectedPackageId != null) {
         final selectedReservation = _confirmedReservations.firstWhere(
           (r) => r.packageId == _selectedPackageId,
-          orElse: () => throw Exception('선택한 패키지를 찾을 수 없습니다'),
+          orElse: () =>
+              throw Exception('gallery.post.add_post.upload.package_not_found'.tr()),
         );
         selectedPackageTitle = selectedReservation.packageTitle;
       }
@@ -86,13 +88,16 @@ class _AddGalleryPostScreenState extends State<AddGalleryPostScreen> {
       if (mounted) {
         context.pop();
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('게시물이 업로드되었습니다')),
+          SnackBar(content: Text('gallery.post.add_post.upload.success'.tr())),
         );
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('업로드 실패: $e')),
+          SnackBar(
+            content: Text('gallery.post.add_post.upload.error'
+                .tr(namedArgs: {'error': e.toString()})),
+          ),
         );
       }
     } finally {
@@ -104,7 +109,7 @@ class _AddGalleryPostScreenState extends State<AddGalleryPostScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('새 게시물'),
+        title: Text('gallery.post.add_post.title'.tr()),
         actions: [
           TextButton(
             onPressed: _isLoading ? null : _uploadPost,
@@ -114,8 +119,8 @@ class _AddGalleryPostScreenState extends State<AddGalleryPostScreen> {
                     height: 20.h,
                     child: const CircularProgressIndicator(strokeWidth: 2),
                   )
-                : const Text(
-                    '공유',
+                : Text(
+                    'gallery.post.add_post.share'.tr(),
                     style: TextStyle(fontWeight: FontWeight.bold),
                   ),
           ),
@@ -162,7 +167,7 @@ class _AddGalleryPostScreenState extends State<AddGalleryPostScreen> {
                                     size: 50.r,
                                   ),
                                   SizedBox(height: 8.h),
-                                  const Text('이미지 추가'),
+                                  Text('gallery.post.add_post.add_image'.tr()),
                                 ],
                               ),
                       ),
@@ -172,8 +177,8 @@ class _AddGalleryPostScreenState extends State<AddGalleryPostScreen> {
                   TextFormField(
                     controller: _locationController,
                     decoration: InputDecoration(
-                      labelText: '위치',
-                      hintText: '예: 서울 남산타워',
+                      labelText: 'gallery.post.add_post.location.label'.tr(),
+                      hintText: 'gallery.post.add_post.location.hint'.tr(),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8.r),
                       ),
@@ -189,15 +194,16 @@ class _AddGalleryPostScreenState extends State<AddGalleryPostScreen> {
                         vertical: 12.h,
                       ),
                     ),
-                    validator: (value) =>
-                        value?.isEmpty ?? true ? '위치를 입력해주세요' : null,
+                    validator: (value) => value?.isEmpty ?? true
+                        ? 'gallery.post.add_post.location.error'.tr()
+                        : null,
                   ),
                   SizedBox(height: 16.h),
                   TextFormField(
                     controller: _descriptionController,
                     decoration: InputDecoration(
-                      labelText: '설명',
-                      hintText: '여행 경험을 공유해주세요',
+                      labelText: 'gallery.post.add_post.description.label'.tr(),
+                      hintText: 'gallery.post.add_post.description.hint'.tr(),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8.r),
                       ),
@@ -214,15 +220,16 @@ class _AddGalleryPostScreenState extends State<AddGalleryPostScreen> {
                       ),
                     ),
                     maxLines: 3,
-                    validator: (value) =>
-                        value?.isEmpty ?? true ? '설명을 입력해주세요' : null,
+                    validator: (value) => value?.isEmpty ?? true
+                        ? 'gallery.post.add_post.description.error'.tr()
+                        : null,
                   ),
                   if (_confirmedReservations.isNotEmpty) ...[
                     SizedBox(height: 16.h),
                     DropdownButtonFormField<String>(
                       value: _selectedPackageId,
                       decoration: InputDecoration(
-                        labelText: '여행 패키지 태그',
+                        labelText: 'gallery.post.add_post.package_tag.label'.tr(),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(8.r),
                         ),
@@ -238,12 +245,12 @@ class _AddGalleryPostScreenState extends State<AddGalleryPostScreen> {
                           vertical: 12.h,
                         ),
                       ),
-                      hint: const Text('관련 패키지 선택 (선택사항)'),
+                      hint: Text('gallery.post.add_post.package_tag.hint'.tr()),
                       isExpanded: true,
                       items: [
-                        const DropdownMenuItem(
+                        DropdownMenuItem(
                           value: null,
-                          child: Text('선택 안함'),
+                          child: Text('gallery.post.add_post.package_tag.none'.tr()),
                         ),
                         ..._confirmedReservations.map((reservation) {
                           return DropdownMenuItem(

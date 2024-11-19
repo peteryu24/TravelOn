@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
@@ -44,7 +45,7 @@ class BottomSheetWidget {
                 buildIconButton(
                   context,
                   icon: Icons.image,
-                  label: '갤러리',
+                  label: 'gallery',  // 'chat.add_content.gallery' 키와 매칭
                   backgroundColor: Colors.lightBlue,
                   onTap: () async {
                     Navigator.pop(context);
@@ -59,7 +60,7 @@ class BottomSheetWidget {
                 buildIconButton(
                   context,
                   icon: Icons.camera_alt,
-                  label: '카메라',
+                  label: 'camera',  // 'chat.add_content.camera' 키와 매칭
                   backgroundColor: Colors.blueAccent,
                   onTap: () async {
                     Navigator.pop(context);
@@ -74,7 +75,7 @@ class BottomSheetWidget {
                 buildIconButton(
                   context,
                   icon: Icons.person,
-                  label: '사용자',
+                  label: 'user',   // 'chat.add_content.user' 키와 매칭
                   backgroundColor: Colors.purple,
                   onTap: () {
                     Navigator.pop(context);
@@ -89,7 +90,7 @@ class BottomSheetWidget {
                 buildIconButton(
                   context,
                   icon: Icons.card_travel,
-                  label: '패키지',
+                  label: 'package',  // 'chat.add_content.package' 키와 매칭
                   backgroundColor: Colors.orange,
                   onTap: () {
                     Navigator.pop(context);
@@ -104,7 +105,7 @@ class BottomSheetWidget {
                 buildIconButton(
                   context,
                   icon: Icons.map,
-                  label: '지도',
+                  label: 'map',  // 'chat.add_content.map' 키와 매칭
                   backgroundColor: Color(0xFF03C75A),
                   onTap: () {
                     Navigator.pop(context);
@@ -123,12 +124,12 @@ class BottomSheetWidget {
   }
 
   Widget buildIconButton(
-    BuildContext context, {
-    required IconData icon,
-    required String label,
-    required VoidCallback onTap,
-    required Color backgroundColor,
-  }) {
+      BuildContext context, {
+        required IconData icon,
+        required String label,
+        required VoidCallback onTap,
+        required Color backgroundColor,
+      }) {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -142,7 +143,7 @@ class BottomSheetWidget {
         ),
         SizedBox(height: 8.h),
         Text(
-          label,
+          'chat.add_content.$label'.tr(),
           style: TextStyle(fontSize: 12.sp),
           textAlign: TextAlign.center,
         ),
@@ -163,12 +164,12 @@ class BottomSheetWidget {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('사진 보내기'),
+          title: Text('chat.add_content.image.send'.tr()),
           content: Image.file(File(image.path)),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: Text('아니오'),
+              child: Text('chat.add_content.image.no'.tr()),
             ),
             TextButton(
               onPressed: () {
@@ -182,7 +183,7 @@ class BottomSheetWidget {
                   context: context,
                 );
               },
-              child: Text('예'),
+              child: Text('chat.add_content.image.yes'.tr()),
             ),
           ],
         );
