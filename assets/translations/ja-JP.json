@@ -45,10 +45,19 @@
   "menu": {
     "travel_recommendation": "旅行のおすすめ",
     "guide_ranking": "ガイドランキング",
-    "local tour": "地域探訪",
+    "local_tour": "地域探訪",
     "recommended_places": "おすすめスポット",
     "travel_gallery": "旅行ギャラリー",
     "Congestion of popular tourist attractions": "人気観光地の混雑度"
+  },
+  "regional": {
+    "select_region": "地域を選択してください",
+    "no_spots": "選択した地域のおすすめスポットがありません"
+  },
+  "region_selector": {
+    "city": "市/道を選択",
+    "district": "市/郡/区を選択",
+    "all": "すべて"
   },
   "navigation": {
     "home": "ホーム",
@@ -97,7 +106,8 @@
     "retry": "再試行",
     "success": "成功",
     "failed": "失敗",
-    "notice": "お知らせ"
+    "notice": "お知らせ",
+    "Read_it_all": "読切"
   },
   "search": {
     "title": "旅行パッケージ",
@@ -266,7 +276,27 @@
     "pending_approval": "承認待ち",
     "confirmed": "予約確定",
     "package_not_found": "パッケージが見つかりません",
-    "package_load_error": "パッケージ読み込みエラー: {0}"
+    "package_load_error": "パッケージ読み込みエラー: {0}",
+    "error": {
+      "invalid_participants": "参加人数が無効です",
+      "date_full": "この日付は既に予約が満席です",
+      "not_found": "予約が見つかりません"
+    },
+    "notification": {
+      "title": {
+        "reservation_change": "予約状態変更",
+        "new_request": "新規予約リクエスト"
+      },
+      "message": {
+        "reservation_change": "{package}パッケージの予約が{status}されました",
+        "new_request": "{name}様が{package}パッケージの予約を申請しました（{count}名）"
+      }
+    },
+    "status": {
+      "approved": "承認",
+      "rejected": "拒否",
+      "pending": "保留中です"
+    }
   },
   "review": {
     "count": "レビュー{count}件",
@@ -398,6 +428,46 @@
       "confirm_title": "{name}さんとのチャットを退出しますか？",
       "cancel": "キャンセル",
       "confirm": "退出"
+    }
+  },
+  "user_profile": {
+    "title": {
+      "with_name": "のプロフィール",
+      "default": "プロフィール"
+    },
+    "loading": "読み込み中...",
+    "error": "エラーが発生しました。",
+    "user_not_found": "ユーザー情報が見つかりません。",
+    "guide_badge": "ガイド",
+    "default_intro": "よろしくお願いします。",
+    "background": {
+      "change_title": "背景画像を変更",
+      "change_message": "背景画像を変更しますか？",
+      "remove_title": "背景画像を削除",
+      "remove_message": "背景画像を削除しますか？",
+      "remove_error": "背景画像の削除に失敗しました。再試行してください。",
+      "yes": "はい",
+      "no": "いいえ",
+      "cancel": "キャンセル",
+      "confirm": "確認"
+    },
+    "guide_stats": {
+      "average_rating": "平均評価: {rating}",
+      "review_count": "{count}件のレビュー",
+      "review_error": "レビュー情報の読み込み中にエラーが発生しました。",
+      "no_reviews": "レビューがありません。",
+      "packages": {
+        "title": "ガイドパッケージ",
+        "view_more": "もっと見る"
+      }
+    },
+    "reviews": {
+      "recent_title": "最近書かれたレビュー",
+      "view_more": "もっと見る",
+      "package_prefix": "パッケージ:",
+      "no_reviews": "レビューがありません。",
+      "rating": "評価: {rating} / 5",
+      "created_at": "作成日: {date}"
     }
   }
 }

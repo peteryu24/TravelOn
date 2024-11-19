@@ -138,7 +138,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                   _buildMenuItem(
                     CupertinoIcons.map_pin_ellipse,
-                    'menu.local tour'.tr(),
+                    'menu.local_tour'.tr(),  // 키가 정확히 일치하는지 확인
                     '/regional-exploration',
                   ),
                   _buildMenuItem(
