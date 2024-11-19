@@ -477,12 +477,19 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                       return Card(
                         child: Column(
                           children: [
-                            Image.network(
-                              package.mainImage ?? 'assets/images/default_image.png',
-                              width: 130.w,
-                              height: 130.h,
-                              fit: BoxFit.cover,
-                            ),
+                            package.mainImage != null
+                              ? Image.network(
+                                  package.mainImage!,
+                                  width: 130.w,
+                                  height: 130.h,
+                                  fit: BoxFit.cover,
+                                )
+                              : Image.asset(
+                                  'assets/images/default_image.png',
+                                  width: 130.w,
+                                  height: 130.h,
+                                  fit: BoxFit.cover,
+                                ),
                             Text(
                               package.title,
                               style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.bold),

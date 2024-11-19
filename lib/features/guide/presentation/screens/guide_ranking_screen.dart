@@ -48,10 +48,7 @@ class _GuideRankingScreenState extends State<GuideRankingScreen> {
                 margin: EdgeInsets.only(bottom: 16.h),
                 child: ListTile(
                   onTap: () {
-                    context.push(
-                      '/guide-packages/${ranking.guideId}',
-                      extra: ranking.guideName,
-                    );
+                    context.push('/user-profile/${ranking.guideId}');
                   },
                   leading: CircleAvatar(
                     radius: 25,
