@@ -13,6 +13,7 @@ import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart' hide AuthProvider;
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:travel_on_final/core/theme/colors.dart';
 import 'package:travel_on_final/firebase_options.dart';
 
 // Providers
@@ -200,7 +201,7 @@ class MyApp extends StatelessWidget {
         supportedLocales: context.supportedLocales,
         locale: context.locale,
         theme: ThemeData(
-          primaryColor: Colors.blue,
+          primaryColor: AppColors.travelonBlueColor,
           colorScheme: ColorScheme.fromSwatch(primarySwatch: Colors.blue)
               .copyWith(secondary: Colors.blueAccent),
         ),

@@ -41,6 +41,7 @@ dependencies:
   timeago: ^3.7.0
   google_sign_in: ^6.2.2
   kakao_flutter_sdk_user: ^1.9.6
+  flutter_native_splash: ^2.4.3
 
 dev_dependencies:
   flutter_test:
@@ -55,14 +56,6 @@ flutter:
   uses-material-design: true
   assets:
     - assets/images/
-    - assets/images/travel-on-login.png
-    - assets/images/default_profile.png
-    - assets/images/default_image.png
-    - assets/images/logo/google.png
-    - assets/images/logo/naver.png
-    - assets/images/logo/facebook.png
-    - assets/images/logo/kakaotalk.png
-    - assets/images/logo/apple.png
-    - .env
     - assets/translations/
     - test/assets/translations/
+    - .env

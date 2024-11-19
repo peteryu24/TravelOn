@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:travel_on_final/core/theme/colors.dart';
 import 'package:travel_on_final/features/auth/presentation/providers/auth_provider.dart';
 import 'package:travel_on_final/features/home/presentation/providers/home_provider.dart';
 import 'package:travel_on_final/features/home/presentation/widgets/next_trip_card.dart';
@@ -54,12 +55,14 @@ class _HomeScreenState extends State<HomeScreen> {
         scrolledUnderElevation: 0,
         elevation: 0,
         centerTitle: true,
-        title: Text(
-          'app.name'.tr(),
-          style: TextStyle(
-            fontSize: 24.sp,
-            fontWeight: FontWeight.bold,
-            color: Colors.blue,
+        title: SizedBox(
+          height: 40.h,
+          child: Image.asset(
+            'assets/images/travel_on_bg.png',
+            fit: BoxFit.contain,
+            errorBuilder: (context, error, stackTrace) {
+              return const Text('Travel On');
+            },
           ),
         ),
         actions: [
@@ -237,7 +240,7 @@ class _HomeScreenState extends State<HomeScreen> {
               color: Colors.grey.shade100,
               borderRadius: BorderRadius.circular(12.r),
             ),
-            child: Icon(icon, color: Colors.blue, size: 20.r),
+            child: Icon(icon, color: Colors.blueAccent, size: 20.r),
           ),
         ),
         SizedBox(height: 4.h),

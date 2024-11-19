@@ -1,6 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:travel_on_final/core/theme/colors.dart';
 import '../../data/datasources/tourism_density_api.dart';
 import '../../data/models/tourism_density_model.dart';
 import '../../../../core/constants/region_codes.dart';
@@ -16,7 +17,7 @@ class _TourismDensityWidgetState extends State<TourismDensityWidget> {
   final TourismDensityApi _api = TourismDensityApi();
   List<TourismDensityModel> allSpots = [];
   List<TourismDensityModel> filteredSpots = [];
-  String selectedRegion = '전체';
+  String selectedRegion = 'regions.all'.tr();
   bool isLoading = false;
 
   @override
@@ -37,7 +38,7 @@ class _TourismDensityWidgetState extends State<TourismDensityWidget> {
       print('Error fetching hot spots: $e');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('데이터를 불러오는데 실패했습니다: $e')),
+          SnackBar(content: Text('common.error.load_failed'.tr())),
         );
       }
     } finally {
@@ -49,7 +50,7 @@ class _TourismDensityWidgetState extends State<TourismDensityWidget> {
 
   void filterSpots() {
     setState(() {
-      filteredSpots = selectedRegion == '전체'
+      filteredSpots = selectedRegion == 'regions.all'.tr()
           ? List.from(allSpots)
           : allSpots.where((spot) => spot.location == selectedRegion).toList();
     });
@@ -85,8 +86,9 @@ class _TourismDensityWidgetState extends State<TourismDensityWidget> {
               scrollDirection: Axis.horizontal,
               itemCount: ['전체', ...RegionCodes.regions].length,
               itemBuilder: (context, index) {
-                final region =
-                    index == 0 ? 'regions.all'.tr() : RegionCodes.regions[index - 1];
+                final region = index == 0
+                    ? 'regions.all'.tr()
+                    : RegionCodes.regions[index - 1];
                 return GestureDetector(
                   onTap: () {
                     setState(() {
@@ -100,7 +102,7 @@ class _TourismDensityWidgetState extends State<TourismDensityWidget> {
                     margin: EdgeInsets.only(right: 8.w),
                     decoration: BoxDecoration(
                       color: selectedRegion == region
-                          ? Colors.blue
+                          ? AppColors.travelonLightBlueColor
                           : Colors.grey[200],
                       borderRadius: BorderRadius.circular(20.r),
                     ),
@@ -212,7 +214,8 @@ class _TourismDensityWidgetState extends State<TourismDensityWidget> {
         SizedBox(width: 4.w),
         Text(
           density != null
-              ? 'density.percent'.tr(namedArgs: {'value': density.toStringAsFixed(1)})
+              ? 'density.percent'
+                  .tr(namedArgs: {'value': density.toStringAsFixed(1)})
               : 'density.percent'.tr(namedArgs: {'value': '0.0'}),
           style: TextStyle(
             color: isHigh ? Colors.red : Colors.blue,

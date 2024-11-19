@@ -97,7 +97,11 @@
     "retry": "重试",
     "success": "成功",
     "failed": "失败",
-    "notice": "通知"
+    "notice": "通知",
+    "error": {
+      "no_data": "未找到数据",
+      "load_failed": "加载数据失败"
+    }
   },
   "search": {
     "result_count": "搜索结果: {count}个",

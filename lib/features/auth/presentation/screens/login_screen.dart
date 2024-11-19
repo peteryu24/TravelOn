@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:travel_on_final/core/theme/colors.dart';
 import 'package:travel_on_final/features/auth/presentation/providers/auth_provider.dart';
 import 'package:travel_on_final/features/auth/presentation/widgets/text_field_widget.dart';
 import 'package:travel_on_final/features/auth/presentation/widgets/password_field_widget.dart';
@@ -97,7 +98,7 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   String _getLanguageLabel(Locale locale) {
-    switch(locale.languageCode) {
+    switch (locale.languageCode) {
       case 'ko':
         return '🇰🇷한국어';
       case 'en':
@@ -110,7 +111,6 @@ class _LoginScreenState extends State<LoginScreen> {
         return 'Language';
     }
   }
-
 
   Future<void> _saveCredentialsToPrefs() async {
     if (_saveCredentials) {
@@ -136,9 +136,8 @@ class _LoginScreenState extends State<LoginScreen> {
           await _saveCredentialsToPrefs();
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(
-                  'login.welcome'.tr(namedArgs: {'name': authProvider.currentUser!.name})
-              ),
+              content: Text('login.welcome'
+                  .tr(namedArgs: {'name': authProvider.currentUser!.name})),
             ),
           );
           context.go('/');
@@ -162,7 +161,6 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('login.title'.tr(), style: TextStyle(fontSize: 20.sp)),
         actions: [_buildLanguageSelector()],
       ),
       body: SingleChildScrollView(
@@ -171,9 +169,13 @@ class _LoginScreenState extends State<LoginScreen> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Image.asset(
-              'assets/images/travel-on-login.png',
+              'assets/images/travelon_small.png',
               height: 200.h,
               width: 200.w,
+              errorBuilder: (context, error, stackTrace) {
+                print('Error loading image: $error');
+                return Icon(Icons.error, size: 100.sp, color: Colors.grey);
+              },
             ),
             TextFieldWidget(
               controller: _emailController,
@@ -212,7 +214,8 @@ class _LoginScreenState extends State<LoginScreen> {
                   onPressed: _navigateToSignup,
                   child: Text(
                     'login.signup'.tr(),
-                    style: TextStyle(color: Colors.blue, fontSize: 14.sp),
+                    style: TextStyle(
+                        color: AppColors.travelonBlueColor, fontSize: 14.sp),
                   ),
                 ),
                 Text('·',
@@ -224,7 +227,8 @@ class _LoginScreenState extends State<LoginScreen> {
                   onPressed: _resetPassword,
                   child: Text(
                     'login.reset_password'.tr(),
-                    style: TextStyle(color: Colors.blue, fontSize: 14.sp),
+                    style: TextStyle(
+                        color: AppColors.travelonBlueColor, fontSize: 14.sp),
                   ),
                 ),
               ],
@@ -233,7 +237,7 @@ class _LoginScreenState extends State<LoginScreen> {
             ElevatedButton(
               onPressed: _isLoading ? null : _login,
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blue[500],
+                backgroundColor: AppColors.travelonBlueColor,
                 padding: EdgeInsets.symmetric(horizontal: 40.w, vertical: 14.h),
               ),
               child: _isLoading
@@ -364,9 +368,8 @@ class _LoginScreenState extends State<LoginScreen> {
       if (authProvider.isAuthenticated && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(
-                'login.welcome'.tr(namedArgs: {'name': authProvider.currentUser!.name})
-            ),
+            content: Text('login.welcome'
+                .tr(namedArgs: {'name': authProvider.currentUser!.name})),
           ),
         );
         context.go('/');
@@ -388,9 +391,8 @@ class _LoginScreenState extends State<LoginScreen> {
       if (authProvider.isAuthenticated && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(
-                'login.welcome'.tr(namedArgs: {'name': authProvider.currentUser!.name})
-            ),
+            content: Text('login.welcome'
+                .tr(namedArgs: {'name': authProvider.currentUser!.name})),
           ),
         );
         context.go('/');
@@ -412,9 +414,8 @@ class _LoginScreenState extends State<LoginScreen> {
       if (authProvider.isAuthenticated && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(
-                'login.welcome'.tr(namedArgs: {'name': authProvider.currentUser!.name})
-            ),
+            content: Text('login.welcome'
+                .tr(namedArgs: {'name': authProvider.currentUser!.name})),
           ),
         );
         context.go('/');

@@ -97,7 +97,11 @@
     "retry": "Retry",
     "success": "Success",
     "failed": "Failed",
-    "notice": "Notice"
+    "notice": "Notice",
+    "error": {
+      "no_data": "No data found",
+      "load_failed": "Failed to load data"
+    }
   },
   "search": {
     "title": "Travel Packages",
