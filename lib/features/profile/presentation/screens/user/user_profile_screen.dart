@@ -11,6 +11,8 @@ import 'package:travel_on_final/features/chat/domain/usecases/create_chat_id.dar
 import 'package:image_picker/image_picker.dart';
 import 'package:go_router/go_router.dart';
 
+// 머지용
+
 class UserProfileScreen extends StatefulWidget {
   final String userId;
 
@@ -477,12 +479,19 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                       return Card(
                         child: Column(
                           children: [
-                            Image.network(
-                              package.mainImage ?? 'assets/images/default_image.png',
-                              width: 130.w,
-                              height: 130.h,
-                              fit: BoxFit.cover,
-                            ),
+                            package.mainImage != null
+                              ? Image.network(
+                                  package.mainImage!,
+                                  width: 130.w,
+                                  height: 130.h,
+                                  fit: BoxFit.cover,
+                                )
+                              : Image.asset(
+                                  'assets/images/default_image.png',
+                                  width: 130.w,
+                                  height: 130.h,
+                                  fit: BoxFit.cover,
+                                ),
                             Text(
                               package.title,
                               style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.bold),

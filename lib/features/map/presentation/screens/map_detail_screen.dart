@@ -60,7 +60,7 @@ class MapDetailScreen extends StatelessWidget {
       body: Column(
         children: [
           Container(
-            height: 650.h,
+            height: 550.h,
             child: NaverMap(
               options: NaverMapViewOptions(
                 initialCameraPosition: NCameraPosition(
