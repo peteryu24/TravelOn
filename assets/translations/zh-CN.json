@@ -45,10 +45,19 @@
   "menu": {
     "travel_recommendation": "旅游推荐",
     "guide_ranking": "导游排名",
-    "local tour": "地域探訪",
+    "local_tour": "地域探訪",
     "recommended_places": "推荐景点",
     "travel_gallery": "旅行相册",
     "Congestion of popular tourist attractions": "热门旅游景点拥挤程度"
+  },
+  "regional": {
+    "select_region": "请选择地区",
+    "no_spots": "所选地区没有推荐景点"
+  },
+  "region_selector": {
+    "city": "选择城市/道",
+    "district": "选择区域",
+    "all": "全部"
   },
   "navigation": {
     "home": "首页",
@@ -97,7 +106,8 @@
     "retry": "重试",
     "success": "成功",
     "failed": "失败",
-    "notice": "通知"
+    "notice": "通知",
+    "Read_it_all": "全部读出"
   },
   "search": {
     "result_count": "搜索结果: {count}个",
@@ -264,7 +274,28 @@
     "pending_approval": "等待确认",
     "confirmed": "已确认",
     "package_not_found": "未找到套餐",
-    "package_load_error": "套餐加载错误: {0}"
+    "package_load_error": "套餐加载错误: {0}",
+    "error": {
+      "invalid_participants": "参与人数无效",
+      "date_full": "该日期已预订满",
+      "not_found": "未找到预订"
+    },
+    "notification": {
+      "title": {
+        "reservation_change": "预订状态变更",
+        "new_request": "新预订请求"
+      },
+      "message": {
+        "reservation_change": "{package}套餐的预订已{status}",
+        "new_request": "{name}申请预订{package}套餐（{count}人）"
+      }
+    },
+    "status": {
+      "approved": "批准",
+      "rejected": "拒绝",
+      "pending": "待决"
+
+    }
   },
   "review": {
     "count": "{count}条评论",
@@ -396,6 +427,46 @@
       "confirm_title": "要退出与{name}的聊天室吗？",
       "cancel": "取消",
       "confirm": "退出"
+    }
+  },
+  "user_profile": {
+    "title": {
+      "with_name": "的个人资料",
+      "default": "个人资料"
+    },
+    "loading": "加载中...",
+    "error": "发生错误。",
+    "user_not_found": "未找到用户信息。",
+    "guide_badge": "导游",
+    "default_intro": "很高兴认识你。",
+    "background": {
+      "change_title": "更改背景图片",
+      "change_message": "是否要更改背景图片？",
+      "remove_title": "删除背景图片",
+      "remove_message": "是否要删除背景图片？",
+      "remove_error": "删除背景图片失败，请重试。",
+      "yes": "是",
+      "no": "否",
+      "cancel": "取消",
+      "confirm": "确认"
+    },
+    "guide_stats": {
+      "average_rating": "平均评分：{rating}",
+      "review_count": "{count}条评论",
+      "review_error": "加载评论信息时出错。",
+      "no_reviews": "暂无评论数据。",
+      "packages": {
+        "title": "导游套餐",
+        "view_more": "查看更多"
+      }
+    },
+    "reviews": {
+      "recent_title": "最近的评论",
+      "view_more": "查看更多",
+      "package_prefix": "套餐:",
+      "no_reviews": "尚未写评论。",
+      "rating": "评分：{rating} / 5",
+      "created_at": "创建时间：{date}"
     }
   }
 }

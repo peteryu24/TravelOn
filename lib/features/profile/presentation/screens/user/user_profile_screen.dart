@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
@@ -71,7 +72,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     } catch (e) {
       print('배경 이미지 제거 실패: $e');
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('배경 이미지 제거에 실패했습니다. 다시 시도해주세요.')),
+        SnackBar(content: Text('user_profile.background.remove_error'.tr())),
       );
     }
   }
@@ -81,16 +82,16 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text("배경 이미지 제거"),
-          content: Text("배경 이미지를 제거하시겠습니까?"),
+          title: Text('user_profile.background.remove_title'.tr()),
+          content: Text('user_profile.background.remove_message'.tr()),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(false),
-              child: Text("아니오"),
+              child: Text('user_profile.background.no'.tr()),
             ),
             TextButton(
               onPressed: () => Navigator.of(context).pop(true),
-              child: Text("예"),
+              child: Text('user_profile.background.yes'.tr()),
             ),
           ],
         );
@@ -107,16 +108,16 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: Text("배경 이미지 변경"),
-          content: Text("배경 이미지를 바꾸시겠습니까?"),
+          title: Text('user_profile.background.change_title'.tr()),
+          content: Text('user_profile.background.change_message'.tr()),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(false),
-              child: Text("취소"),
+              child: Text('user_profile.background.cancel'.tr()),
             ),
             TextButton(
               onPressed: () => Navigator.of(context).pop(true),
-              child: Text("확인"),
+              child: Text('user_profile.background.confirm'.tr()),
             ),
           ],
         );
@@ -151,7 +152,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                       ),
                     ),
                     TextSpan(
-                      text: "님의 프로필",
+                      text: 'user_profile.title.with_name'.tr(),
                       style: TextStyle(
                         fontSize: 16.sp,
                         color: Colors.black,
@@ -162,7 +163,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
               );
             }
             else {
-              return Text("프로필");
+              return Text('user_profile.title.default'.tr(),);
             }
           },
         ),
@@ -173,9 +174,9 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
-            return Center(child: Text("오류가 발생했습니다."));
+            return Center(child: Text('user_profile.error'.tr()));
           } else if (!snapshot.hasData || snapshot.data == null) {
-            return Center(child: Text("사용자 정보를 찾을 수 없습니다."));
+            return Center(child: Text('user_profile.user_not_found'.tr()));
           }
 
           final user = snapshot.data!;
@@ -219,7 +220,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                             borderRadius: BorderRadius.circular(8.r),
                           ),
                           child: Text(
-                            '가이드',
+                            'user_profile.guide_badge'.tr(),
                             style: TextStyle(
                               color: Colors.white,
                               fontWeight: FontWeight.bold,
@@ -283,7 +284,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                               borderRadius: BorderRadius.circular(8.r),
                             ),
                             child: Text(
-                              user.introduction ?? '반갑습니다.',
+                              user.introduction ?? 'user_profile.default_intro'.tr(),
                               textAlign: TextAlign.center,
                               style: TextStyle(
                                 fontSize: 16.sp,
@@ -406,9 +407,9 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                       if (snapshot.connectionState == ConnectionState.waiting) {
                         return CircularProgressIndicator();
                       } else if (snapshot.hasError) {
-                        return Text("리뷰 정보를 불러오는 중 오류 발생");
+                        return Text("user_profile.guide_stats.review_error".tr());
                       } else if (!snapshot.hasData) {
-                        return Text("리뷰 데이터가 없습니다.");
+                        return Text("user_profile.guide_stats.no_reviews".tr());
                       } else {
                         final reviewStats = snapshot.data!;
                         final totalReviews = reviewStats['totalReviews'] as int;

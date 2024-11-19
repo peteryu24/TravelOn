@@ -25,9 +25,9 @@ class HomeRepositoryImpl implements HomeRepository {
 
       final futureReservations = reservations.where((doc) {
         final reservationDate =
-            (doc.data()['reservationDate'] as Timestamp).toDate();
+        (doc.data()['reservationDate'] as Timestamp).toDate();
         return DateTime(reservationDate.year, reservationDate.month,
-                reservationDate.day)
+            reservationDate.day)
             .isAfter(DateTime(now.year, now.month, now.day - 1));
       }).toList()
         ..sort((a, b) => (a.data()['reservationDate'] as Timestamp)
@@ -39,18 +39,28 @@ class HomeRepositoryImpl implements HomeRepository {
       final nextTrip = futureReservations.first.data();
       final tripDate = (nextTrip['reservationDate'] as Timestamp).toDate();
       final tripDateOnly =
-          DateTime(tripDate.year, tripDate.month, tripDate.day);
+      DateTime(tripDate.year, tripDate.month, tripDate.day);
 
-      // bool 값을 명시적으로 할당
+      // 패키지 정보 가져오기
+      final packageDoc = await _firestore
+          .collection('packages')
+          .doc(nextTrip['packageId'])
+          .get();
+
+      final packageData = packageDoc.data();
+
       final bool isTodayTrip = tripDateOnly.year == today.year &&
           tripDateOnly.month == today.month &&
           tripDateOnly.day == today.day;
 
       return NextTripEntity(
-        packageTitle: nextTrip['packageTitle'],
+        packageTitle: packageData?['title'] ?? nextTrip['packageTitle'],
+        packageTitleEn: packageData?['titleEn'],
+        packageTitleJa: packageData?['titleJa'],
+        packageTitleZh: packageData?['titleZh'],
         tripDate: tripDate,
         dDay: isTodayTrip ? null : tripDateOnly.difference(today).inDays,
-        isTodayTrip: isTodayTrip, // 명시적으로 bool 값 전달
+        isTodayTrip: isTodayTrip,
       );
     } catch (e) {
       print('Error getting next trip: $e');

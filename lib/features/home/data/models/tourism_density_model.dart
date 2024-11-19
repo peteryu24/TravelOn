@@ -19,15 +19,20 @@ class TourismDensityModel extends TourismDensity {
   }
 
   static String _determineCategory(String name) {
+    String category;
     if (name.contains('궁') || name.contains('문'))
-      return 'tourist_category.palace'.tr();
-    if (name.contains('해수욕장') || name.contains('해변'))
-      return 'tourist_category.beach'.tr();
-    if (name.contains('산') || name.contains('공원'))
-      return 'tourist_category.nature'.tr();
-    if (name.contains('타워') || name.contains('전망대'))
-      return 'tourist_category.observatory'.tr();
-    return 'tourist_category.attraction'.tr();
+      category = 'tourist_category.palace';
+    else if (name.contains('해수욕장') || name.contains('해변'))
+      category = 'tourist_category.beach';
+    else if (name.contains('산') || name.contains('공원'))
+      category = 'tourist_category.nature';
+    else if (name.contains('타워') || name.contains('전망대'))
+      category = 'tourist_category.observatory';
+    else
+      category = 'tourist_category.attraction';
+
+    print('Category Key: $category'); // 디버깅 출력
+    return category.tr(); // 여기서 번역을 수행
   }
 
   Map<String, dynamic> toJson() {

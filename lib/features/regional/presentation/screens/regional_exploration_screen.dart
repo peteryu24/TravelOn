@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/regional_provider.dart';
@@ -14,7 +15,7 @@ class RegionalExplorationScreen extends StatelessWidget {
       builder: (context, provider, child) {
         return Scaffold(
           appBar: AppBar(
-            title: const Text('지역탐방'),
+            title: Text('menu.local_tour'.tr()),
           ),
           body: Column(
             children: [
