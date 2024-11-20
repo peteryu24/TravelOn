@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
@@ -19,7 +20,8 @@ class ReservationCalendarScreen extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  State<ReservationCalendarScreen> createState() => _ReservationCalendarScreenState();
+  State<ReservationCalendarScreen> createState() =>
+      _ReservationCalendarScreenState();
 }
 
 class _ReservationCalendarScreenState extends State<ReservationCalendarScreen> {
@@ -70,22 +72,21 @@ class _ReservationCalendarScreenState extends State<ReservationCalendarScreen> {
           .where('status', isEqualTo: 'approved')
           .get();
 
-      final approvedDates = snapshot.docs.map((doc) =>
-          (doc.data()['reservationDate'] as Timestamp).toDate()
-      ).toList();
+      final approvedDates = snapshot.docs
+          .map((doc) => (doc.data()['reservationDate'] as Timestamp).toDate())
+          .toList();
 
       if (mounted) {
         setState(() {
           for (var date = start;
-          date.isBefore(end.add(const Duration(days: 1)));
-          date = date.add(const Duration(days: 1))) {
+              date.isBefore(end.add(const Duration(days: 1)));
+              date = date.add(const Duration(days: 1))) {
             if (!date.isBefore(now)) {
               final dateKey = _getDateKey(date);
               final hasApprovedReservation = approvedDates.any((approvedDate) =>
-              approvedDate.year == date.year &&
+                  approvedDate.year == date.year &&
                   approvedDate.month == date.month &&
-                  approvedDate.day == date.day
-              );
+                  approvedDate.day == date.day);
               _availabilityCache[dateKey] = !hasApprovedReservation;
             }
           }
@@ -118,7 +119,7 @@ class _ReservationCalendarScreenState extends State<ReservationCalendarScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            '인원 선택',
+            'reservation_calendar.participants.title'.tr(),
             style: TextStyle(
               fontSize: 16.sp,
               fontWeight: FontWeight.bold,
@@ -129,20 +130,23 @@ class _ReservationCalendarScreenState extends State<ReservationCalendarScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               // 여기도 저장된 변수 사용
-              Text('$_minParticipants명 ~ $_maxParticipants명'),
+              Text('reservation_calendar.participants.range'.tr(namedArgs: {
+                'min': _minParticipants.toString(),
+                'max': _maxParticipants.toString()
+              })),
               Row(
                 children: [
                   IconButton(
                     // 여기도 수정
                     onPressed: _selectedParticipants > _minParticipants
                         ? () {
-                      setState(() {
-                        final newValue = _selectedParticipants - 1;
-                        if (newValue >= _minParticipants) {
-                          _selectedParticipants = newValue;
-                        }
-                      });
-                    }
+                            setState(() {
+                              final newValue = _selectedParticipants - 1;
+                              if (newValue >= _minParticipants) {
+                                _selectedParticipants = newValue;
+                              }
+                            });
+                          }
                         : null,
                     icon: Icon(
                       Icons.remove_circle_outline,
@@ -152,20 +156,19 @@ class _ReservationCalendarScreenState extends State<ReservationCalendarScreen> {
                     ),
                   ),
                   Text(
-                    '$_selectedParticipants명',
-                    style: TextStyle(
-                      fontSize: 16.sp,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    'reservation_calendar.participants.count'.tr(
+                        namedArgs: {'count': _selectedParticipants.toString()}),
+                    style:
+                        TextStyle(fontSize: 16.sp, fontWeight: FontWeight.bold),
                   ),
                   IconButton(
                     // 여기도 수정
                     onPressed: _selectedParticipants < _maxParticipants
                         ? () {
-                      setState(() {
-                        _selectedParticipants++;
-                      });
-                    }
+                            setState(() {
+                              _selectedParticipants++;
+                            });
+                          }
                         : null,
                     icon: Icon(
                       Icons.add_circle_outline,
@@ -190,7 +193,7 @@ class _ReservationCalendarScreenState extends State<ReservationCalendarScreen> {
 
     if (!authProvider.isAuthenticated) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('로그인이 필요합니다')),
+        SnackBar(content: Text('profile.auth.login_required'.tr())),
       );
       context.push('/login');
       return;
@@ -198,21 +201,25 @@ class _ReservationCalendarScreenState extends State<ReservationCalendarScreen> {
 
     if (_selectedParticipants < _minParticipants) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('최소 $_minParticipants명 이상 선택해주세요')),
+        SnackBar(
+            content: Text('reservation_calendar.participants.min_error'
+                .tr(namedArgs: {'min': _minParticipants.toString()}))),
       );
       return;
     }
 
     if (_selectedParticipants > _maxParticipants) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('최대 $_maxParticipants명까지 선택 가능합니다')),
+        SnackBar(
+            content: Text('reservation_calendar.participants.max_error'
+                .tr(namedArgs: {'max': _maxParticipants.toString()}))),
       );
       return;
     }
 
     if (_selectedDay == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('날짜를 선택해주세요')),
+        SnackBar(content: Text('reservation_calendar.date.select_error'.tr())),
       );
       return;
     }
@@ -220,7 +227,9 @@ class _ReservationCalendarScreenState extends State<ReservationCalendarScreen> {
     if (_selectedParticipants < widget.package.minParticipants ||
         _selectedParticipants > widget.package.maxParticipants) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('올바른 인원을 선택해주세요')),
+        SnackBar(
+            content:
+                Text('reservation_calendar.participants.invalid_error'.tr())),
       );
       return;
     }
@@ -240,14 +249,16 @@ class _ReservationCalendarScreenState extends State<ReservationCalendarScreen> {
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('예약이 신청되었습니다')),
+          SnackBar(content: Text('reservation_calendar.request.success'.tr())),
         );
         context.pop();
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('예약 신청 중 오류가 발생했습니다: $e')),
+          SnackBar(
+              content: Text('reservation_calendar.request.error'
+                  .tr(namedArgs: {'error': e.toString()}))),
         );
       }
     }
@@ -257,14 +268,13 @@ class _ReservationCalendarScreenState extends State<ReservationCalendarScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('예약 날짜 선택'),
+        title: Text('reservation_calendar.title'.tr()),
       ),
       body: SafeArea(
         child: SingleChildScrollView(
           child: Column(
             children: [
-              if (_isLoading)
-                const LinearProgressIndicator(),
+              if (_isLoading) const LinearProgressIndicator(),
               TableCalendar(
                 firstDay: DateTime.now(),
                 lastDay: DateTime.now().add(const Duration(days: 365)),
@@ -281,7 +291,10 @@ class _ReservationCalendarScreenState extends State<ReservationCalendarScreen> {
 
                   if (!_isValidDepartureDay(selectedDay)) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('선택할 수 없는 출발일입니다')),
+                      SnackBar(
+                          content: Text(
+                              'reservation_calendar.date.unavailable_error'
+                                  .tr())),
                     );
                     return;
                   }
@@ -297,7 +310,9 @@ class _ReservationCalendarScreenState extends State<ReservationCalendarScreen> {
                   } else {
                     if (mounted) {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('선택한 날짜는 예약이 마감되었습니다')),
+                        SnackBar(
+                            content: Text(
+                                'reservation_calendar.date.booked_error'.tr())),
                       );
                     }
                   }
@@ -315,16 +330,19 @@ class _ReservationCalendarScreenState extends State<ReservationCalendarScreen> {
                     return Container(
                       margin: EdgeInsets.all(4.w),
                       decoration: BoxDecoration(
-                        color: isDepartureDay ? Colors.blue.shade50 : Colors.grey.shade200,
+                        color: isDepartureDay
+                            ? Colors.blue.shade50
+                            : Colors.grey.shade200,
                         shape: BoxShape.circle,
                       ),
                       child: Center(
                         child: Text(
                           '${date.day}',
                           style: TextStyle(
-                            color: isDepartureDay && !date.isBefore(DateTime.now())
-                                ? Colors.black
-                                : Colors.grey,
+                            color:
+                                isDepartureDay && !date.isBefore(DateTime.now())
+                                    ? Colors.black
+                                    : Colors.grey,
                           ),
                         ),
                       ),
@@ -373,9 +391,12 @@ class _ReservationCalendarScreenState extends State<ReservationCalendarScreen> {
                   ),
                   todayTextStyle: const TextStyle(color: Colors.blue),
                   disabledTextStyle: const TextStyle(color: Colors.grey),
-                  defaultDecoration: const BoxDecoration(shape: BoxShape.circle),
-                  weekendDecoration: const BoxDecoration(shape: BoxShape.circle),
-                  outsideDecoration: const BoxDecoration(shape: BoxShape.circle),
+                  defaultDecoration:
+                      const BoxDecoration(shape: BoxShape.circle),
+                  weekendDecoration:
+                      const BoxDecoration(shape: BoxShape.circle),
+                  outsideDecoration:
+                      const BoxDecoration(shape: BoxShape.circle),
                 ),
                 headerStyle: const HeaderStyle(
                   formatButtonVisible: false,
@@ -389,38 +410,50 @@ class _ReservationCalendarScreenState extends State<ReservationCalendarScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        '선택한 날짜: ${DateFormat('yyyy년 MM월 dd일').format(_selectedDay!)}',
-                        style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold),
+                        'reservation_calendar.date.selected'.tr(namedArgs: {
+                          'date':
+                              DateFormat('yyyy년 MM월 dd일').format(_selectedDay!)
+                        }),
+                        style: TextStyle(
+                            fontSize: 18.sp, fontWeight: FontWeight.bold),
                       ),
                       SizedBox(height: 8.h),
                       Text(
-                        '패키지: ${widget.package.title}',
+                        'reservation_calendar.date.package'.tr(
+                            namedArgs: {'title': _getLocalizedTitle(context, widget.package)}
+                        ),
                         style: TextStyle(fontSize: 16.sp),
                       ),
+
                       SizedBox(height: 4.h),
-                      Text(
-                        '${widget.package.nights}박${widget.package.nights + 1}일',
-                        style: TextStyle(fontSize: 16.sp),
-                      ),
                       Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('출발 요일: ', style: TextStyle(fontSize: 16.sp)),
+                          Text(
+                            'reservation_calendar.date.duration'.tr(namedArgs: {
+                              'nights': widget.package.nights.toString(),
+                              'days': (widget.package.nights + 1).toString()
+                            }),
+                            style: TextStyle(fontSize: 16.sp),
+                          ),
+                          SizedBox(width: 10,),
                           Expanded(
                             child: Wrap(
                               spacing: 4,
                               runSpacing: 4,
                               children: widget.package.departureDays.map((day) {
-                                final weekday = ['월', '화', '수', '목', '금', '토', '일'][day - 1];
+                                final weekdayKey = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'][day - 1];
                                 return Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 8, vertical: 4),
                                   decoration: BoxDecoration(
                                     color: Colors.blue.shade50,
                                     borderRadius: BorderRadius.circular(12),
-                                    border: Border.all(color: Colors.blue.shade200),
+                                    border:
+                                        Border.all(color: Colors.blue.shade200),
                                   ),
                                   child: Text(
-                                    weekday,
+                                    'reservation_calendar.date.weekdays.$weekdayKey'.tr(),
                                     style: TextStyle(
                                       fontSize: 14.sp,
                                       color: Colors.blue.shade900,
@@ -435,7 +468,9 @@ class _ReservationCalendarScreenState extends State<ReservationCalendarScreen> {
                       ),
                       SizedBox(height: 4.h),
                       Text(
-                        '가격: ₩${NumberFormat('#,###').format(widget.package.price.toInt())}',
+                        'reservation_calendar.price'.tr(
+                            namedArgs: {'price': NumberFormat('#,###').format(widget.package.price.toInt())}
+                        ),
                         style: TextStyle(fontSize: 16.sp),
                       ),
                       SizedBox(height: 16.h),
@@ -448,22 +483,37 @@ class _ReservationCalendarScreenState extends State<ReservationCalendarScreen> {
           ),
         ),
       ),
-      bottomNavigationBar: _selectedDay != null  // 예약 버튼을 bottomNavigationBar로 이동
-          ? Padding(
-        padding: EdgeInsets.all(16.0.w),
-        child: ElevatedButton(
-          onPressed: () => _requestReservation(context),
-          style: ElevatedButton.styleFrom(
-            padding: EdgeInsets.symmetric(vertical: 16.h),
-            minimumSize: Size(double.infinity, 50.h),
-          ),
-          child: Text(
-            '예약 신청하기',
-            style: TextStyle(fontSize: 16.sp),
-          ),
-        ),
-      )
-          : null,
+      bottomNavigationBar:
+          _selectedDay != null // 예약 버튼을 bottomNavigationBar로 이동
+              ? Padding(
+                  padding: EdgeInsets.all(16.0.w),
+                  child: ElevatedButton(
+                    onPressed: () => _requestReservation(context),
+                    style: ElevatedButton.styleFrom(
+                      padding: EdgeInsets.symmetric(vertical: 16.h),
+                      minimumSize: Size(double.infinity, 50.h),
+                    ),
+                    child: Text(
+                      'reservation_calendar.submit'.tr(),
+                      style: TextStyle(fontSize: 16.sp),
+                    ),
+                  ),
+                )
+              : null,
     );
+  }
+
+  String _getLocalizedTitle(BuildContext context, TravelPackage package) {
+    final locale = context.locale.languageCode;
+    switch (locale) {
+      case 'en':
+        return package.titleEn ?? package.title;
+      case 'ja':
+        return package.titleJa ?? package.title;
+      case 'zh':
+        return package.titleZh ?? package.title;
+      default:
+        return package.title;
+    }
   }
 }

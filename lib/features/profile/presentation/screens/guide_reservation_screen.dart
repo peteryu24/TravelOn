@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
@@ -156,8 +157,16 @@ class _GuideReservationsScreenState extends State<GuideReservationsScreen> with 
 
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(status == 'approved' ? '예약이 승인되었습니다.' : '예약이 거절되었습니다.'),
-          ),
+            content: Text(
+                'reservations.notification.message.reservation_change'.tr(
+                    namedArgs: {
+                      'package': '',  // 패키지명이 필요 없다면 빈 문자열
+                      'status': status == 'approved'
+                          ? 'reservations.status.approved'.tr()
+                          : 'reservations.status.rejected'.tr()
+                    }
+                )
+            ),          ),
         );
       }
     } catch (e) {

@@ -473,5 +473,40 @@
       "rating": "評価: {rating} / 5",
       "created_at": "作成日: {date}"
     }
+  },
+  "reservation_calendar": {
+    "title": "予約日選択",
+    "participants": {
+      "title": "人数選択",
+      "range": "{min}名 ~ {max}名",
+      "count": "{count}名",
+      "min_error": "最低{min}名以上選択してください",
+      "max_error": "最大{max}名まで選択可能です",
+      "invalid_error": "正しい人数を選択してください"
+    },
+    "date": {
+      "select_error": "日付を選択してください",
+      "unavailable_error": "選択できない出発日です",
+      "booked_error": "この日は予約が満席です",
+      "selected": "選択した日付: {date}",
+      "package": "パッケージ: {title}",
+      "duration": "{nights}泊{days}日",
+      "departure_days": "出発曜日:",
+      "weekdays": {
+        "mon": "月",
+        "tue": "火",
+        "wed": "水",
+        "thu": "木",
+        "fri": "金",
+        "sat": "土",
+        "sun": "日"
+      }
+    },
+    "price": "料金: ¥{price}",
+    "submit": "予約を申し込む",
+    "request": {
+      "success": "予約申し込みが完了しました",
+      "error": "予約申し込み中にエラーが発生しました: {error}"
+    }
   }
 }

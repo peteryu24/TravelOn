@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/regional_provider.dart';
@@ -15,8 +16,8 @@ class RegionSelector extends StatelessWidget {
           child: Column(
             children: [
               DropdownButtonFormField<String>(
-                decoration: const InputDecoration(
-                  labelText: '시/도 선택',
+                decoration: InputDecoration(
+                  labelText: 'region_selector.city'.tr(),
                   border: OutlineInputBorder(),
                   contentPadding:
                       EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -34,8 +35,8 @@ class RegionSelector extends StatelessWidget {
               if (provider.selectedCity != null &&
                   provider.selectedCity != '전체')
                 DropdownButtonFormField<String>(
-                  decoration: const InputDecoration(
-                    labelText: '시/군/구 선택',
+                  decoration: InputDecoration(
+                    labelText: 'region_selector.district'.tr(),
                     border: OutlineInputBorder(),
                     contentPadding:
                         EdgeInsets.symmetric(horizontal: 12, vertical: 8),
