@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import '../widgets/package_list.dart';
 import '../widgets/region_filter.dart';
 import '../providers/travel_provider.dart';
+import 'package:travel_on_final/core/providers/theme_provider.dart';
 
 class DetailScreen extends StatefulWidget {
   const DetailScreen({super.key});
@@ -78,8 +79,6 @@ class _DetailScreenState extends State<DetailScreen> {
     );
   }
 
-
-
   // AppBar 액션 버튼들
   List<Widget> _buildActions() {
     if (_isSearching) {
@@ -127,7 +126,8 @@ class _DetailScreenState extends State<DetailScreen> {
                 const Spacer(),
                 if (provider.selectedRegion != 'all')
                   Text(
-                    'search.region'.tr(args: [_getRegionText(provider.selectedRegion)]),
+                    'search.region'
+                        .tr(args: [_getRegionText(provider.selectedRegion)]),
                     style: TextStyle(
                       fontSize: 14.sp,
                       color: Colors.grey,
@@ -143,7 +143,9 @@ class _DetailScreenState extends State<DetailScreen> {
             padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
             color: Colors.grey[100],
             child: Text(
-              'search.selected_region'.tr(namedArgs: {'region': _getRegionText(provider.selectedRegion)}),
+              'search.selected_region'.tr(namedArgs: {
+                'region': _getRegionText(provider.selectedRegion)
+              }),
               style: TextStyle(
                 fontSize: 14.sp,
                 color: Colors.grey,
@@ -161,29 +163,23 @@ class _DetailScreenState extends State<DetailScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.white,
         scrolledUnderElevation: 0,
         elevation: 0,
         centerTitle: true,
         leading: _isSearching
             ? IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: _stopSearch,
-        )
+                icon: const Icon(Icons.arrow_back, color: Colors.black),
+                onPressed: _stopSearch,
+              )
             : null,
-        title: _isSearching
-            ? _buildSearchField() // 검색 중이면 검색창 표시
-            : Text(
-          'search.title'.tr(), // 기본 제목
-          style: TextStyle(
-            color: Colors.black,
-          ),
+        title: Text(
+          'search.title'.tr(), // 이 부분이 "패키지 검색" 등으로 나오도록 translation 파일 확인 필요
         ),
         actions: _buildActions(),
       ),
       body: Column(
         children: [
-          _buildSortSelector(),  // 정렬 선택기를 상단에 배치
+          _buildSortSelector(), // 정렬 선택기를 상단에 배치
           _buildSearchInfo(),
           const Expanded(
             child: PackageList(),
@@ -212,17 +208,16 @@ class _DetailScreenState extends State<DetailScreen> {
     }
   }
 
-
   Widget _buildSortSelector() {
+    final isDarkMode = Provider.of<ThemeProvider>(context).isDarkMode;
     return Consumer<TravelProvider>(
       builder: (context, provider, _) {
         return Container(
           padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
           decoration: BoxDecoration(
-            color: Colors.white,
             border: Border(
               bottom: BorderSide(
-                color: Colors.grey[200]!,
+                color: isDarkMode ? Colors.grey[800]! : Colors.grey[200]!,
                 width: 1,
               ),
             ),
@@ -234,7 +229,8 @@ class _DetailScreenState extends State<DetailScreen> {
                   showModalBottomSheet(
                     context: context,
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.vertical(top: Radius.circular(16.r)),
+                      borderRadius:
+                          BorderRadius.vertical(top: Radius.circular(16.r)),
                     ),
                     builder: (context) {
                       return Container(
@@ -243,9 +239,12 @@ class _DetailScreenState extends State<DetailScreen> {
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             ListTile(
-                              title: Text('sort.latest'.tr().replaceAll('sort.', '')), // 'sort.' 제거
-                              trailing: provider.currentSort == SortOption.latest
-                                  ? Icon(Icons.check, color: Colors.blue)
+                              title: Text('sort.latest'
+                                  .tr()
+                                  .replaceAll('sort.', '')), // 'sort.' 제거
+                              trailing: provider.currentSort ==
+                                      SortOption.latest
+                                  ? const Icon(Icons.check, color: Colors.blue)
                                   : null,
                               onTap: () {
                                 provider.sortPackages(SortOption.latest);
@@ -253,9 +252,11 @@ class _DetailScreenState extends State<DetailScreen> {
                               },
                             ),
                             ListTile(
-                              title: Text('sort.popular'.tr().replaceAll('sort.', '')),
-                              trailing: provider.currentSort == SortOption.popular
-                                  ? Icon(Icons.check, color: Colors.blue)
+                              title: Text(
+                                  'sort.popular'.tr().replaceAll('sort.', '')),
+                              trailing: provider.currentSort ==
+                                      SortOption.popular
+                                  ? const Icon(Icons.check, color: Colors.blue)
                                   : null,
                               onTap: () {
                                 provider.sortPackages(SortOption.popular);
@@ -263,9 +264,12 @@ class _DetailScreenState extends State<DetailScreen> {
                               },
                             ),
                             ListTile(
-                              title: Text('sort.price_low'.tr().replaceAll('sort.', '')),
-                              trailing: provider.currentSort == SortOption.priceLow
-                                  ? Icon(Icons.check, color: Colors.blue)
+                              title: Text('sort.price_low'
+                                  .tr()
+                                  .replaceAll('sort.', '')),
+                              trailing: provider.currentSort ==
+                                      SortOption.priceLow
+                                  ? const Icon(Icons.check, color: Colors.blue)
                                   : null,
                               onTap: () {
                                 provider.sortPackages(SortOption.priceLow);
@@ -273,9 +277,12 @@ class _DetailScreenState extends State<DetailScreen> {
                               },
                             ),
                             ListTile(
-                              title: Text('sort.price_high'.tr().replaceAll('sort.', '')),
-                              trailing: provider.currentSort == SortOption.priceHigh
-                                  ? Icon(Icons.check, color: Colors.blue)
+                              title: Text('sort.price_high'
+                                  .tr()
+                                  .replaceAll('sort.', '')),
+                              trailing: provider.currentSort ==
+                                      SortOption.priceHigh
+                                  ? const Icon(Icons.check, color: Colors.blue)
                                   : null,
                               onTap: () {
                                 provider.sortPackages(SortOption.priceHigh);
@@ -283,9 +290,12 @@ class _DetailScreenState extends State<DetailScreen> {
                               },
                             ),
                             ListTile(
-                              title: Text('sort.high_rating'.tr().replaceAll('sort.', '')),
-                              trailing: provider.currentSort == SortOption.highRating
-                                  ? Icon(Icons.check, color: Colors.blue)
+                              title: Text('sort.high_rating'
+                                  .tr()
+                                  .replaceAll('sort.', '')),
+                              trailing: provider.currentSort ==
+                                      SortOption.highRating
+                                  ? const Icon(Icons.check, color: Colors.blue)
                                   : null,
                               onTap: () {
                                 provider.sortPackages(SortOption.highRating);
@@ -293,9 +303,12 @@ class _DetailScreenState extends State<DetailScreen> {
                               },
                             ),
                             ListTile(
-                              title: Text('sort.most_reviews'.tr().replaceAll('sort.', '')),
-                              trailing: provider.currentSort == SortOption.mostReviews
-                                  ? Icon(Icons.check, color: Colors.blue)
+                              title: Text('sort.most_reviews'
+                                  .tr()
+                                  .replaceAll('sort.', '')),
+                              trailing: provider.currentSort ==
+                                      SortOption.mostReviews
+                                  ? const Icon(Icons.check, color: Colors.blue)
                                   : null,
                               onTap: () {
                                 provider.sortPackages(SortOption.mostReviews);
@@ -309,7 +322,8 @@ class _DetailScreenState extends State<DetailScreen> {
                   );
                 },
                 child: Container(
-                  padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
+                  padding:
+                      EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
                   decoration: BoxDecoration(
                     color: Colors.grey[100],
                     borderRadius: BorderRadius.circular(20.r),
@@ -319,7 +333,8 @@ class _DetailScreenState extends State<DetailScreen> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
-                        _getSortText(provider.currentSort).replaceAll('sort.', ''),
+                        _getSortText(provider.currentSort)
+                            .replaceAll('sort.', ''),
                         style: TextStyle(
                           color: Colors.black,
                           fontSize: 14.sp,
@@ -327,7 +342,8 @@ class _DetailScreenState extends State<DetailScreen> {
                         ),
                       ),
                       SizedBox(width: 4.w),
-                      Icon(Icons.arrow_drop_down, color: Colors.black, size: 20.sp),
+                      Icon(Icons.arrow_drop_down,
+                          color: Colors.black, size: 20.sp),
                     ],
                   ),
                 ),

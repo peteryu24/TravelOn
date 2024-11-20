@@ -32,6 +32,7 @@ import 'package:travel_on_final/features/search/presentation/providers/travel_pr
 import 'package:travel_on_final/features/gallery/presentation/providers/gallery_provider.dart';
 import 'package:travel_on_final/features/recommendation/presentation/providers/recommendation_provider.dart';
 import 'package:travel_on_final/features/regional/presentation/providers/regional_provider.dart';
+import 'core/providers/theme_provider.dart';
 
 // Repositories & UseCases
 import 'package:travel_on_final/features/auth/data/repositories/auth_repository_impl.dart';
@@ -94,7 +95,7 @@ Future<void> main() async {
   );
 
   // Shared Preferences 초기화
-  await SharedPreferences.getInstance();
+  final prefs = await SharedPreferences.getInstance();
 
   runApp(
     EasyLocalization(
@@ -145,7 +146,8 @@ Future<void> main() async {
                 ChatProvider(context.read<NavigationProvider>()),
           ),
           ChangeNotifierProvider(
-            create: (context) => ReservationProvider(FirebaseFirestore.instance),
+            create: (context) =>
+                ReservationProvider(FirebaseFirestore.instance),
           ),
           ChangeNotifierProvider(
             create: (context) => ReviewProvider(
@@ -179,6 +181,9 @@ Future<void> main() async {
               ),
             ),
           ),
+          ChangeNotifierProvider(
+            create: (_) => ThemeProvider(prefs),
+          ),
         ],
         child: const MyApp(),
       ),
@@ -191,6 +196,8 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = context.watch<ThemeProvider>().isDarkMode;
+
     return ScreenUtilInit(
       designSize: const Size(375, 812),
       child: MaterialApp.router(
@@ -201,10 +208,115 @@ class MyApp extends StatelessWidget {
         supportedLocales: context.supportedLocales,
         locale: context.locale,
         theme: ThemeData(
-          primaryColor: AppColors.travelonBlueColor,
-          colorScheme: ColorScheme.fromSwatch(primarySwatch: Colors.blue)
-              .copyWith(secondary: Colors.blueAccent),
+          useMaterial3: true,
+          colorScheme: ColorScheme.fromSeed(
+            seedColor: AppColors.travelonLightBlueColor,
+            brightness: Brightness.light,
+            background: Colors.white,
+            surface: Colors.white,
+            primary: AppColors.travelonLightBlueColor,
+            secondary: Colors.blueAccent,
+            onSurface: Colors.black87,
+            onPrimary: Colors.white,
+          ),
+          elevatedButtonTheme: ElevatedButtonThemeData(
+            style: ButtonStyle(
+              backgroundColor:
+                  WidgetStateProperty.all(AppColors.travelonLightBlueColor),
+              foregroundColor: WidgetStateProperty.all(Colors.white),
+              textStyle: WidgetStateProperty.all(
+                const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  inherit: true,
+                ),
+              ),
+              padding: WidgetStateProperty.all(
+                const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              ),
+            ),
+          ),
+          cardTheme: const CardTheme(
+            elevation: 2,
+            margin: EdgeInsets.symmetric(vertical: 4),
+            color: Colors.white,
+          ),
+          appBarTheme: const AppBarTheme(
+            backgroundColor: Colors.white,
+            foregroundColor: Colors.black,
+            elevation: 0,
+            iconTheme: IconThemeData(color: Colors.black),
+          ),
+          bottomNavigationBarTheme: const BottomNavigationBarThemeData(
+            backgroundColor: Colors.white,
+            selectedItemColor: AppColors.travelonLightBlueColor,
+            unselectedItemColor: Colors.grey,
+          ),
         ),
+        darkTheme: ThemeData(
+          useMaterial3: true,
+          colorScheme: ColorScheme.fromSeed(
+            seedColor: AppColors.travelonBlueColor,
+            brightness: Brightness.dark,
+            background: const Color(0xFF1A1A1A),
+            surface: const Color(0xFF2C2C2C),
+            primary: AppColors.travelonBlueColor,
+            secondary: Colors.blueAccent,
+            onSurface: Colors.white,
+            onPrimary: Colors.white,
+            onBackground: Colors.white,
+          ),
+          scaffoldBackgroundColor: const Color(0xFF1A1A1A),
+          cardTheme: CardTheme(
+            elevation: 2,
+            margin: const EdgeInsets.symmetric(vertical: 4),
+            color: const Color(0xFF2C2C2C),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+          ),
+          appBarTheme: const AppBarTheme(
+            backgroundColor: Color(0xFF1A1A1A),
+            foregroundColor: Colors.white,
+            elevation: 0,
+            iconTheme: IconThemeData(color: Colors.white70),
+          ),
+          iconTheme: const IconThemeData(
+            color: Colors.white70,
+          ),
+          textTheme: const TextTheme(
+            bodyLarge: TextStyle(color: Colors.white),
+            bodyMedium: TextStyle(color: Colors.white70),
+            titleLarge: TextStyle(color: Colors.white),
+            titleMedium: TextStyle(color: Colors.white),
+            titleSmall: TextStyle(color: Colors.white70),
+          ),
+          dividerTheme: const DividerThemeData(
+            color: Colors.white24,
+          ),
+          elevatedButtonTheme: ElevatedButtonThemeData(
+            style: ButtonStyle(
+              backgroundColor:
+                  WidgetStateProperty.all(AppColors.travelonBlueColor),
+              foregroundColor: WidgetStateProperty.all(Colors.white),
+              textStyle: WidgetStateProperty.all(
+                const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  inherit: true,
+                ),
+              ),
+              padding: WidgetStateProperty.all(
+                const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              ),
+            ),
+          ),
+          bottomNavigationBarTheme: const BottomNavigationBarThemeData(
+            backgroundColor: Color(0xFF1A1A1A),
+            selectedItemColor: AppColors.travelonBlueColor,
+            unselectedItemColor: Colors.grey,
+            elevation: 0,
+          ),
+        ),
+        themeMode: isDarkMode ? ThemeMode.dark : ThemeMode.light,
       ),
     );
   }
