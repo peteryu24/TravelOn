@@ -118,7 +118,7 @@ class _DetailScreenState extends State<DetailScreen> {
             child: Row(
               children: [
                 Text(
-                  'search.result_count'.tr(args: [matchCount.toString()]),
+                  'search.result_count'.tr(namedArgs: {'count': matchCount.toString()}),
                   style: TextStyle(
                     fontSize: 14.sp,
                     color: Colors.grey,
@@ -127,7 +127,7 @@ class _DetailScreenState extends State<DetailScreen> {
                 const Spacer(),
                 if (provider.selectedRegion != 'all')
                   Text(
-                    'search.region'.tr(args: [_getRegionText(provider.selectedRegion)]),
+                    'search.region'.tr(namedArgs: {'region': _getRegionText(provider.selectedRegion)}),
                     style: TextStyle(
                       fontSize: 14.sp,
                       color: Colors.grey,
