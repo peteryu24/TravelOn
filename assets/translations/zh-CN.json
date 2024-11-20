@@ -107,7 +107,11 @@
     "success": "成功",
     "failed": "失败",
     "notice": "通知",
-    "Read_it_all": "全部读出"
+    "Read_it_all": "全部读出",
+    "error": {
+      "no_data": "未找到数据",
+      "load_failed": "加载数据失败"
+    }
   },
   "search": {
     "result_count": "搜索结果: {count}个",

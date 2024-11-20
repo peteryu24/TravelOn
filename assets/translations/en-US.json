@@ -45,7 +45,7 @@
   "menu": {
     "travel_recommendation": "Travel Recommendation",
     "guide_ranking": "Guide Ranking",
-    "local_tour": "local tour",
+    "local_tour": "Local Tour",
     "recommended_places": "Recommended Places",
     "travel_gallery": "Travel Gallery",
     "Congestion of popular tourist attractions": "Tourist Attraction Congestion"
@@ -108,7 +108,11 @@
     "failed": "Failed",
     "notice": "Notice",
     "Read_it_all": "Read_it_all"
-
+,
+    "error": {
+      "no_data": "No data found",
+      "load_failed": "Failed to load data"
+    }
   },
   "search": {
     "title": "Travel Packages",

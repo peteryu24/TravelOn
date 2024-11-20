@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:travel_on_final/core/theme/colors.dart';
 import 'package:travel_on_final/features/search/presentation/providers/travel_provider.dart';
 
 class RegionFilter extends StatelessWidget {
   final Function(String) onRegionChanged;
 
   const RegionFilter({
-    Key? key,
+    super.key,
     required this.onRegionChanged,
-  }) : super(key: key);
+  });
 
   String _getRegionText(String region) {
     switch (region) {
@@ -42,22 +43,6 @@ class RegionFilter extends StatelessWidget {
     return Consumer<TravelProvider>(
       builder: (context, provider, child) => PopupMenuButton<String>(
         offset: const Offset(0, 40),
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-          margin: const EdgeInsets.only(right: 8),
-          decoration: BoxDecoration(
-            color: Colors.blue.shade100,
-            borderRadius: BorderRadius.circular(20),
-          ),
-          child: Text(
-            _getRegionText(provider.selectedRegion),
-            style: TextStyle(
-              color: Colors.blue.shade900,
-              fontWeight: FontWeight.bold,
-              fontSize: 14,
-            ),
-          ),
-        ),
         itemBuilder: (context) => [
           const PopupMenuItem(
             value: 'all',
@@ -105,6 +90,22 @@ class RegionFilter extends StatelessWidget {
           ),
         ],
         onSelected: onRegionChanged,
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+          margin: const EdgeInsets.only(right: 8),
+          decoration: BoxDecoration(
+            color: AppColors.travelonLightBlueColor,
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Text(
+            _getRegionText(provider.selectedRegion),
+            style: const TextStyle(
+              color: AppColors.travelonDarkBlueColor,
+              fontWeight: FontWeight.bold,
+              fontSize: 14,
+            ),
+          ),
+        ),
       ),
     );
   }

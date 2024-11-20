@@ -107,7 +107,11 @@
     "success": "성공",
     "failed": "실패",
     "notice": "알림",
-    "Read_it_all": "모두 읽음"
+    "Read_it_all": "모두 읽음",
+    "error": {
+      "no_data": "데이터를 찾을 수 없습니다",
+      "load_failed": "데이터를 불러오는데 실패했습니다"
+    }
   },
   "search": {
     "title": "여행 패키지",

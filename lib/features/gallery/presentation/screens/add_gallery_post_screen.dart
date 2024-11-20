@@ -68,8 +68,8 @@ class _AddGalleryPostScreenState extends State<AddGalleryPostScreen> {
       if (_selectedPackageId != null) {
         final selectedReservation = _confirmedReservations.firstWhere(
           (r) => r.packageId == _selectedPackageId,
-          orElse: () =>
-              throw Exception('gallery.post.add_post.upload.package_not_found'.tr()),
+          orElse: () => throw Exception(
+              'gallery.post.add_post.upload.package_not_found'.tr()),
         );
         selectedPackageTitle = selectedReservation.packageTitle;
       }
@@ -121,7 +121,7 @@ class _AddGalleryPostScreenState extends State<AddGalleryPostScreen> {
                   )
                 : Text(
                     'gallery.post.add_post.share'.tr(),
-                    style: TextStyle(fontWeight: FontWeight.bold),
+                    style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
           ),
         ],
@@ -229,7 +229,8 @@ class _AddGalleryPostScreenState extends State<AddGalleryPostScreen> {
                     DropdownButtonFormField<String>(
                       value: _selectedPackageId,
                       decoration: InputDecoration(
-                        labelText: 'gallery.post.add_post.package_tag.label'.tr(),
+                        labelText:
+                            'gallery.post.add_post.package_tag.label'.tr(),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(8.r),
                         ),
@@ -250,7 +251,8 @@ class _AddGalleryPostScreenState extends State<AddGalleryPostScreen> {
                       items: [
                         DropdownMenuItem(
                           value: null,
-                          child: Text('gallery.post.add_post.package_tag.none'.tr()),
+                          child: Text(
+                              'gallery.post.add_post.package_tag.none'.tr()),
                         ),
                         ..._confirmedReservations.map((reservation) {
                           return DropdownMenuItem(

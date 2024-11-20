@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:travel_on_final/core/providers/navigation_provider.dart';
+import 'package:travel_on_final/core/theme/colors.dart';
 
 class CustomBottomNavigationBar extends StatelessWidget {
   final int selectedIndex;
@@ -20,6 +21,8 @@ class CustomBottomNavigationBar extends StatelessWidget {
 
     return BottomNavigationBar(
       type: BottomNavigationBarType.fixed,
+      selectedItemColor: AppColors.travelonBlueColor,
+      unselectedItemColor: Colors.grey,
       selectedLabelStyle: const TextStyle(
         fontSize: 12,
         fontWeight: FontWeight.w400,

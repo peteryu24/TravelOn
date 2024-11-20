@@ -8,7 +8,8 @@ import '../providers/home_provider.dart';
 class NextTripCard extends StatelessWidget {
   const NextTripCard({super.key});
 
-  String _getLocalizedTitle(BuildContext context, String title, String? titleEn, String? titleJa, String? titleZh) {
+  String _getLocalizedTitle(BuildContext context, String title, String? titleEn,
+      String? titleJa, String? titleZh) {
     final locale = context.locale.languageCode;
     switch (locale) {
       case 'en':
@@ -38,9 +39,8 @@ class NextTripCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'home.next_trip.greeting'.tr(namedArgs: {
-              'name': user?.name ?? 'common.guest'.tr()
-            }),
+            'home.next_trip.greeting'
+                .tr(namedArgs: {'name': user?.name ?? 'common.guest'.tr()}),
             style: TextStyle(fontSize: 18.sp),
           ),
           if (homeProvider.isLoading)
@@ -49,24 +49,24 @@ class NextTripCard extends StatelessWidget {
             Text(
               homeProvider.nextTrip!.isTodayTrip
                   ? 'home.next_trip.today'.tr(namedArgs: {
-                'title': _getLocalizedTitle(
-                  context,
-                  homeProvider.nextTrip!.packageTitle,
-                  homeProvider.nextTrip!.packageTitleEn,
-                  homeProvider.nextTrip!.packageTitleJa,
-                  homeProvider.nextTrip!.packageTitleZh,
-                )
-              })
+                      'title': _getLocalizedTitle(
+                        context,
+                        homeProvider.nextTrip!.packageTitle,
+                        homeProvider.nextTrip!.packageTitleEn,
+                        homeProvider.nextTrip!.packageTitleJa,
+                        homeProvider.nextTrip!.packageTitleZh,
+                      )
+                    })
                   : 'home.next_trip.countdown'.tr(namedArgs: {
-                'title': _getLocalizedTitle(
-                  context,
-                  homeProvider.nextTrip!.packageTitle,
-                  homeProvider.nextTrip!.packageTitleEn,
-                  homeProvider.nextTrip!.packageTitleJa,
-                  homeProvider.nextTrip!.packageTitleZh,
-                ),
-                'days': homeProvider.nextTrip!.dDay.toString()
-              }),
+                      'title': _getLocalizedTitle(
+                        context,
+                        homeProvider.nextTrip!.packageTitle,
+                        homeProvider.nextTrip!.packageTitleEn,
+                        homeProvider.nextTrip!.packageTitleJa,
+                        homeProvider.nextTrip!.packageTitleZh,
+                      ),
+                      'days': homeProvider.nextTrip!.dDay.toString()
+                    }),
               style: TextStyle(
                 fontSize: 20.sp,
                 fontWeight: FontWeight.bold,

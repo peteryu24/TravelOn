@@ -107,7 +107,11 @@
     "success": "成功",
     "failed": "失敗",
     "notice": "お知らせ",
-    "Read_it_all": "読切"
+    "Read_it_all": "読切",
+    "error": {
+      "no_data": "データが見つかりません",
+      "load_failed": "データの読み込みに失敗しました"
+    }
   },
   "search": {
     "title": "旅行パッケージ",
@@ -143,7 +147,7 @@
     },
     "booking": {
       "book_now": "予約する",
-      "closed": "本日の予約は終了"
+      "closed": "��日の予約は終了"
     }
   },
   "profile": {
@@ -335,7 +339,7 @@
     "percent": "混雑度 {value}%"
   },
   "recommendation": {
-    "title": "オーダーメイド旅行のおすすめ",
+    "title": "オ���ダーメイド旅行の���すすめ",
     "empty": "おすすめの旅行パッケージはありません。\n旅行パッケージがいいですね、もっとたくさんおすすめしてもらってみてください！\n",
     "rank": "第{rank}位"
   },

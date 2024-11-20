@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:travel_on_final/core/theme/colors.dart';
 import 'package:travel_on_final/features/auth/domain/usecases/reset_password_usecase.dart';
 
 class ResetPasswordScreen extends StatefulWidget {
-  const ResetPasswordScreen({Key? key}) : super(key: key);
+  const ResetPasswordScreen({super.key});
 
   @override
   _ResetPasswordScreenState createState() => _ResetPasswordScreenState();
@@ -16,7 +17,8 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
 
   Future<void> _sendResetPasswordEmail() async {
     setState(() => _isLoading = true);
-    final resetPasswordUseCase = Provider.of<ResetPasswordUseCase>(context, listen: false);
+    final resetPasswordUseCase =
+        Provider.of<ResetPasswordUseCase>(context, listen: false);
     try {
       await resetPasswordUseCase.call(_emailController.text);
       _showConfirmationDialog();
@@ -31,15 +33,15 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        title: Text('메일 전송 완료'),
-        content: Text('비밀번호 재설정 메일을 보냈습니다.'),
+        title: const Text('메일 전송 완료'),
+        content: const Text('비밀번호 재설정 메일을 보냈습니다.'),
         actions: [
           TextButton(
             onPressed: () {
               Navigator.of(context).pop();
               Navigator.of(context).pop();
             },
-            child: Text('확인'),
+            child: const Text('확인'),
           ),
         ],
       ),
@@ -50,12 +52,12 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        title: Text('오류'),
+        title: const Text('오류'),
         content: Text(message),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: Text('확인'),
+            child: const Text('확인'),
           ),
         ],
       ),
@@ -65,7 +67,8 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('비밀번호 재설정', style: TextStyle(fontSize: 20.sp))),
+      appBar:
+          AppBar(title: Text('비밀번호 재설정', style: TextStyle(fontSize: 20.sp))),
       body: Padding(
         padding: EdgeInsets.all(16.0.w),
         child: Column(
@@ -74,14 +77,15 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
             Container(
               padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
               decoration: BoxDecoration(
-                border: Border.all(color: Colors.blue),
+                border: Border.all(color: AppColors.travelonBlueColor),
                 borderRadius: BorderRadius.circular(8.r),
               ),
               child: TextField(
                 controller: _emailController,
                 decoration: InputDecoration(
                   labelText: '이메일',
-                  labelStyle: TextStyle(color: Colors.blue, fontSize: 14.sp),
+                  labelStyle: TextStyle(
+                      color: AppColors.travelonBlueColor, fontSize: 14.sp),
                   border: InputBorder.none,
                 ),
               ),
@@ -90,11 +94,11 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
             ElevatedButton(
               onPressed: _isLoading ? null : _sendResetPasswordEmail,
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blue,
+                backgroundColor: AppColors.travelonBlueColor,
                 padding: EdgeInsets.symmetric(horizontal: 50.w, vertical: 16.h),
               ),
               child: _isLoading
-                  ? CircularProgressIndicator(color: Colors.white)
+                  ? const CircularProgressIndicator(color: Colors.white)
                   : Text(
                       '비밀번호 재설정',
                       style: TextStyle(color: Colors.white, fontSize: 14.sp),

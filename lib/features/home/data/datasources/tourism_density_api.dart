@@ -1,6 +1,7 @@
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:easy_localization/easy_localization.dart';
 import '../models/tourism_density_model.dart';
 import '../../../../core/constants/region_codes.dart';
 
@@ -75,9 +76,9 @@ class TourismDensityApi {
 
       final nameMatch = RegExp(r'<tAtsNm>([^<]+)</tAtsNm>').firstMatch(itemXml);
       final rateMatch =
-      RegExp(r'<cnctrRate>([^<]+)</cnctrRate>').firstMatch(itemXml);
+          RegExp(r'<cnctrRate>([^<]+)</cnctrRate>').firstMatch(itemXml);
       final dateMatch =
-      RegExp(r'<baseYmd>([^<]+)</baseYmd>').firstMatch(itemXml);
+          RegExp(r'<baseYmd>([^<]+)</baseYmd>').firstMatch(itemXml);
 
       if (nameMatch != null && rateMatch != null && dateMatch != null) {
         final name = nameMatch.group(1)!;
