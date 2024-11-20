@@ -241,7 +241,7 @@ class ProfileScreen extends StatelessWidget {
                             print('로그아웃 실패: $e');
                           }
                         },
-                        child: const Text('로그아웃',
+                        child: Text('profile.logout'.tr(),
                             style: TextStyle(color: Colors.redAccent)),
                       ),
                     ),
