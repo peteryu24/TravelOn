@@ -1,6 +1,6 @@
 const axios = require('axios');
 const pool = require('../config/db');
-const tossConfig = require('../config/toss'); 
+const { encryptedSecretKey } = require('../config/toss'); 
 
 const cancelPayment = async (req, res) => {
   const { buyer, orderName, cancelReason } = req.body;
@@ -30,7 +30,7 @@ const cancelPayment = async (req, res) => {
       { cancelReason },
       {
         headers: {
-          'Authorization': tossConfig.encryptedSecretKey,
+          'Authorization': encryptedSecretKey,
           'Content-Type': 'application/json',
         },
       }
