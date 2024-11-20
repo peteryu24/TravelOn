@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:travel_on_final/core/theme/colors.dart';
 import 'package:travel_on_final/features/chat/presentation/screens/search/guide_search_screen.dart';
 import 'package:travel_on_final/features/auth/presentation/providers/auth_provider.dart';
 import 'package:travel_on_final/features/chat/presentation/providers/chat_provider.dart';
@@ -110,7 +111,9 @@ class _ChatListScreenState extends State<ChatListScreen> {
               padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
               margin: EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),
               decoration: BoxDecoration(
-                border: Border.all(color: Colors.blue),
+                border: Border.all(
+                  color: isDarkMode ? AppColors.travelonBlueColor : Colors.blue,
+                ),
                 borderRadius: BorderRadius.circular(8.r),
               ),
               child: Row(
@@ -121,14 +124,23 @@ class _ChatListScreenState extends State<ChatListScreen> {
                       focusNode: _focusNode,
                       decoration: InputDecoration(
                         labelText: 'chat.search.label'.tr(),
-                        labelStyle:
-                            TextStyle(color: Colors.blue, fontSize: 14.sp),
+                        labelStyle: TextStyle(
+                          color: isDarkMode
+                              ? AppColors.travelonBlueColor
+                              : Colors.blue,
+                          fontSize: 14.sp,
+                        ),
                         border: InputBorder.none,
                       ),
                     ),
                   ),
                   IconButton(
-                    icon: const Icon(Icons.search, color: Colors.blue),
+                    icon: Icon(
+                      Icons.search,
+                      color: isDarkMode
+                          ? AppColors.travelonBlueColor
+                          : Colors.blue,
+                    ),
                     onPressed: _applySearchFilter,
                   ),
                 ],
