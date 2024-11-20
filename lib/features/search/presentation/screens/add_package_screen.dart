@@ -208,8 +208,8 @@ class _AddPackageScreenState extends State<AddPackageScreen> {
           Text('출발 요일', style: TextStyle(fontSize: 16.sp)),
           const SizedBox(height: 8),
           Wrap(
-            spacing: 6,
-            runSpacing: 6,
+            spacing: 4,
+            runSpacing: 4,
             children: _weekDays.map((day) {
               final isSelected = _selectedDepartureDays.contains(day['value']);
               return ChoiceChip(
