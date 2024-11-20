@@ -2,7 +2,6 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
-import 'package:go_router/go_router.dart';
 import '../widgets/package_list.dart';
 import '../widgets/region_filter.dart';
 import '../providers/travel_provider.dart';
@@ -117,7 +116,8 @@ class _DetailScreenState extends State<DetailScreen> {
             child: Row(
               children: [
                 Text(
-                  'search.result_count'.tr(args: [matchCount.toString()]),
+                  'search.result_count'
+                      .tr(namedArgs: {'count': matchCount.toString()}),
                   style: TextStyle(
                     fontSize: 14.sp,
                     color: Colors.grey,
@@ -126,8 +126,9 @@ class _DetailScreenState extends State<DetailScreen> {
                 const Spacer(),
                 if (provider.selectedRegion != 'all')
                   Text(
-                    'search.region'
-                        .tr(args: [_getRegionText(provider.selectedRegion)]),
+                    'search.region'.tr(namedArgs: {
+                      'region': _getRegionText(provider.selectedRegion)
+                    }),
                     style: TextStyle(
                       fontSize: 14.sp,
                       color: Colors.grey,
