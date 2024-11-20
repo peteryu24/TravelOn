@@ -36,15 +36,17 @@ class ProfileScreen extends StatelessWidget {
                       padding: const EdgeInsets.all(16.0),
                       child: Row(
                         children: [
-                          CircleAvatar(
-                            radius: 30,
-                            backgroundColor: Colors.grey[200],
-                            backgroundImage: user?.profileImageUrl != null &&
-                                user!.profileImageUrl!.isNotEmpty
-                                ? NetworkImage(user.profileImageUrl!)
-                                : const AssetImage(
-                                'assets/images/default_profile.png')
-                            as ImageProvider,
+                          GestureDetector(
+                            onTap: () => context.push('/user-profile/${user?.id}'),
+                            child: CircleAvatar(
+                              radius: 30,
+                              backgroundColor: Colors.grey[200],
+                              backgroundImage: user?.profileImageUrl != null &&
+                                      user!.profileImageUrl!.isNotEmpty
+                                  ? NetworkImage(user.profileImageUrl!)
+                                  : const AssetImage(
+                                      'assets/images/default_profile.png') as ImageProvider,
+                            ),
                           ),
                           const SizedBox(width: 16),
                           Expanded(
