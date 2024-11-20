@@ -10,6 +10,7 @@ app.use(cors());
 
 app.use('/confirm', require('./routes/confirm'));
 app.use('/verifyPayment', require('./routes/verifyPayment'));
+app.use('/cancel', require('./routes/cancelPayment'));
 
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
