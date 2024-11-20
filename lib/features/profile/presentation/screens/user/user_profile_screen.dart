@@ -236,11 +236,13 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                       top: 30.h,
                       child: Column(
                         children: [
-                          CircleAvatar(
-                            radius: 70.r,
-                            backgroundImage: user.profileImageUrl != null && user.profileImageUrl!.isNotEmpty
-                                ? NetworkImage(user.profileImageUrl!)
-                                : AssetImage('assets/images/default_profile.png') as ImageProvider,
+                          Container(
+                            child: CircleAvatar(
+                              radius: 70.r,
+                              backgroundImage: user.profileImageUrl != null && user.profileImageUrl!.isNotEmpty
+                                  ? NetworkImage(user.profileImageUrl!)
+                                  : AssetImage('assets/images/default_profile.png') as ImageProvider,
+                            ),
                           ),
                           SizedBox(height: 10.h),
                           GestureDetector(
@@ -400,7 +402,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                       ),
                   ],
                 ),
-                Divider(),
+                SizedBox(height: 15.h,),
                 if (user.isGuide) ...[
                   FutureBuilder<Map<String, dynamic>>(
                     future: context.read<TravelProvider>().getGuideReviewStats(user.id),
@@ -421,7 +423,9 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                           children: [
                             Text('user_profile.guide_stats.average_rating'.tr(
                                 namedArgs: {'rating': averageRating.toStringAsFixed(1)}
-                            )),
+                            ),
+                            style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.bold),
+                            ),
                             SizedBox(height: 6.h),
                             Text(
                               'review.stats.count'.tr(namedArgs: {'count': totalReviews.toString()}),
