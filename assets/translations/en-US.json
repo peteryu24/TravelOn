@@ -122,7 +122,7 @@
     "region": "Region: {region}"
   },
   "sort": {
-    "latest": "Latest",
+    "latest": "Basic order",
     "price_high": "Highest Price",
     "price_low": "Lowest Price",
     "popular": "Popular",

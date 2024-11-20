@@ -121,7 +121,7 @@
     "region": "地域: {region}"
   },
   "sort": {
-    "latest": "新着順",
+    "latest": "基本順",
     "price_high": "価格が高い順",
     "price_low": "価格が低い順",
     "popular": "人気順",
