@@ -341,7 +341,7 @@
   },
   "recommendation": {
     "title": "Travel Recommendations",
-    "empty": "I don't have any travel packages to recommend.\nLikes travel packages and get more recommendations!",
+    "empty": "I don't have any travel packages to recommend.Likes travel packages and get more recommendations!",
     "rank": "Rank {rank}"
   },
   "tourist_category": {
