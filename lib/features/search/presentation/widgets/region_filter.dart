@@ -1,17 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:provider/provider.dart';
+import 'package:travel_on_final/core/providers/theme_provider.dart';
 
 class RegionFilter extends StatelessWidget {
   final Function(String) onRegionChanged;
 
   const RegionFilter({
-    Key? key,
+    super.key,
     required this.onRegionChanged,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Provider.of<ThemeProvider>(context).isDarkMode;
     return PopupMenuButton<String>(
+      color: isDarkMode ? const Color(0xFF1A1A1A) : Colors.white,
       icon: const Icon(Icons.filter_list),
       onSelected: onRegionChanged,
       itemBuilder: (BuildContext context) => [

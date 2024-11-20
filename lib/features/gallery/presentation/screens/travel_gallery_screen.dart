@@ -13,7 +13,6 @@ class TravelGalleryScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.white,
         scrolledUnderElevation: 0,
         elevation: 0,
         centerTitle: true,

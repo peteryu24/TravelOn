@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_naver_map/flutter_naver_map.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:travel_on_final/features/map/domain/entities/travel_point.dart';
@@ -9,10 +10,10 @@ class NaverRouteMapScreen extends StatefulWidget {
   final int totalDays;
 
   const NaverRouteMapScreen({
-    Key? key,
+    super.key,
     required this.points,
     required this.totalDays,
-  }) : super(key: key);
+  });
 
   @override
   State<NaverRouteMapScreen> createState() => _NaverRouteMapScreenState();
@@ -25,13 +26,13 @@ class _NaverRouteMapScreenState extends State<NaverRouteMapScreen> {
   final List<NOverlay> _pathOverlays = [];
 
   final List<Color> dayColors = [
-    Colors.blue,    // 1일차
-    Colors.red,     // 2일차
-    Colors.green,   // 3일차
-    Colors.purple,  // 4일차
-    Colors.orange,  // 5일차
-    Colors.brown,   // 6일차
-    Colors.teal,    // 7일차
+    Colors.blue, // 1일차
+    Colors.red, // 2일차
+    Colors.green, // 3일차
+    Colors.purple, // 4일차
+    Colors.orange, // 5일차
+    Colors.brown, // 6일차
+    Colors.teal, // 7일차
   ];
 
   String _formatDistance(int meters) {
@@ -47,7 +48,7 @@ class _NaverRouteMapScreenState extends State<NaverRouteMapScreen> {
     int minutes = (seconds % 3600) ~/ 60;
 
     if (hours > 0) {
-      return '$hours시간 ${minutes}분';
+      return '$hours시간 $minutes분';
     }
     return '$minutes분';
   }
@@ -78,9 +79,7 @@ class _NaverRouteMapScreenState extends State<NaverRouteMapScreen> {
 
       // 일차별로 경로 생성
       for (int day = 1; day <= widget.totalDays; day++) {
-        final dayPoints = widget.points
-            .where((p) => p.day == day)
-            .toList()
+        final dayPoints = widget.points.where((p) => p.day == day).toList()
           ..sort((a, b) => a.order.compareTo(b.order));
 
         if (dayPoints.length < 2) continue;
@@ -90,7 +89,7 @@ class _NaverRouteMapScreenState extends State<NaverRouteMapScreen> {
           final end = dayPoints[i + 1];
 
           final uri = Uri.parse(
-              'https://naveropenapi.apigw.ntruss.com/map-direction/v1/driving')
+                  'https://naveropenapi.apigw.ntruss.com/map-direction/v1/driving')
               .replace(queryParameters: {
             'start': '${start.location.longitude},${start.location.latitude}',
             'goal': '${end.location.longitude},${end.location.latitude}',
@@ -109,10 +108,12 @@ class _NaverRouteMapScreenState extends State<NaverRouteMapScreen> {
             final data = json.decode(response.body);
             if (data['route']?['trafast']?[0]?['path'] != null) {
               final path = data['route']['trafast'][0]['path'] as List;
-              final coords = path.map((point) => NLatLng(
-                (point[1] as num).toDouble(),
-                (point[0] as num).toDouble(),
-              )).toList();
+              final coords = path
+                  .map((point) => NLatLng(
+                        (point[1] as num).toDouble(),
+                        (point[0] as num).toDouble(),
+                      ))
+                  .toList();
 
               final pathOverlay = NPathOverlay(
                 id: 'path_${day}_$i',
@@ -151,7 +152,7 @@ class _NaverRouteMapScreenState extends State<NaverRouteMapScreen> {
 
   NLatLngBounds _calculateBounds(List<TravelPoint> points) {
     if (points.isEmpty) {
-      return NLatLngBounds(
+      return const NLatLngBounds(
         southWest: NLatLng(33.0, 124.0),
         northEast: NLatLng(38.0, 132.0),
       );
@@ -207,7 +208,13 @@ class _NaverRouteMapScreenState extends State<NaverRouteMapScreen> {
                       color: dayColors[(day - 1) % dayColors.length],
                     ),
                     const SizedBox(width: 8),
-                    Text('$day일차'),
+                    Text(
+                      '$day일차',
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontSize: 12.sp,
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -224,8 +231,8 @@ class _NaverRouteMapScreenState extends State<NaverRouteMapScreen> {
         title: const Text('여행 코스'),
         actions: [
           if (totalDistance.isNotEmpty)
-            Padding(
-              padding: const EdgeInsets.all(8.0),
+            const Padding(
+              padding: EdgeInsets.all(8.0),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [

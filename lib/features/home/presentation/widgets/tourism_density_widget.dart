@@ -1,6 +1,8 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:provider/provider.dart';
+import 'package:travel_on_final/core/providers/theme_provider.dart';
 import 'package:travel_on_final/core/theme/colors.dart';
 import '../../data/datasources/tourism_density_api.dart';
 import '../../data/models/tourism_density_model.dart';
@@ -58,6 +60,7 @@ class _TourismDensityWidgetState extends State<TourismDensityWidget> {
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Provider.of<ThemeProvider>(context).isDarkMode;
     return Container(
       margin: EdgeInsets.symmetric(vertical: 16.h, horizontal: 16.w),
       child: Column(
@@ -103,7 +106,9 @@ class _TourismDensityWidgetState extends State<TourismDensityWidget> {
                     decoration: BoxDecoration(
                       color: selectedRegion == region
                           ? AppColors.travelonLightBlueColor
-                          : Colors.grey[200],
+                          : isDarkMode
+                              ? Colors.grey[800]
+                              : Colors.grey[200],
                       borderRadius: BorderRadius.circular(20.r),
                     ),
                     child: Text(
@@ -111,7 +116,9 @@ class _TourismDensityWidgetState extends State<TourismDensityWidget> {
                       style: TextStyle(
                         color: selectedRegion == region
                             ? Colors.white
-                            : Colors.black,
+                            : isDarkMode
+                                ? Colors.white
+                                : Colors.black,
                         fontWeight: selectedRegion == region
                             ? FontWeight.bold
                             : FontWeight.normal,
@@ -162,11 +169,12 @@ class _TourismDensityWidgetState extends State<TourismDensityWidget> {
   }
 
   Widget _buildSpotCard(TourismDensityModel spot) {
+    final isDarkMode = Provider.of<ThemeProvider>(context).isDarkMode;
     return Container(
       width: 160.w,
       margin: EdgeInsets.only(right: 12.w),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: isDarkMode ? Colors.grey[800] : Colors.white,
         borderRadius: BorderRadius.circular(12.r),
         boxShadow: [
           BoxShadow(
@@ -182,15 +190,16 @@ class _TourismDensityWidgetState extends State<TourismDensityWidget> {
           Text(
             spot.name,
             style: TextStyle(
+              color: isDarkMode ? Colors.white : Colors.black,
               fontWeight: FontWeight.bold,
               fontSize: 15.sp,
             ),
           ),
           SizedBox(height: 4.h),
           Text(
-            '${spot.location} · ${spot.category}',
+            '${spot.location} · ${categoryTranslate(spot.category)}',
             style: TextStyle(
-              color: Colors.grey[600],
+              color: isDarkMode ? Colors.white70 : Colors.grey[600],
               fontSize: 12.sp,
             ),
           ),
@@ -225,5 +234,19 @@ class _TourismDensityWidgetState extends State<TourismDensityWidget> {
         ),
       ],
     );
+  }
+}
+
+String categoryTranslate(String category) {
+  if (category == 'palace') {
+    return 'tourist_category.palace'.tr();
+  } else if (category == 'beach') {
+    return 'tourist_category.beach'.tr();
+  } else if (category == 'nature') {
+    return 'tourist_category.nature'.tr();
+  } else if (category == 'observatory') {
+    return 'tourist_category.observatory'.tr();
+  } else {
+    return 'tourist_category.attraction'.tr();
   }
 }

@@ -7,6 +7,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:travel_on_final/features/chat/presentation/screens/search/guide_search_screen.dart';
 import 'package:travel_on_final/features/auth/presentation/providers/auth_provider.dart';
 import 'package:travel_on_final/features/chat/presentation/providers/chat_provider.dart';
+import 'package:travel_on_final/core/providers/theme_provider.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:travel_on_final/core/providers/navigation_provider.dart';
 
@@ -20,7 +21,7 @@ class ChatListScreen extends StatefulWidget {
 class _ChatListScreenState extends State<ChatListScreen> {
   final TextEditingController _searchController = TextEditingController();
   final FocusNode _focusNode = FocusNode();
-  bool _isGuideSearch = false;
+  final bool _isGuideSearch = false;
   String _searchText = '';
   late NavigationProvider navigationProvider;
 
@@ -81,11 +82,10 @@ class _ChatListScreenState extends State<ChatListScreen> {
   Widget build(BuildContext context) {
     final authProvider = Provider.of<AuthProvider>(context);
     final chatProvider = Provider.of<ChatProvider>(context, listen: false);
-
+    final isDarkMode = Provider.of<ThemeProvider>(context).isDarkMode;
     if (authProvider.currentUser == null) {
       return Scaffold(
         appBar: AppBar(
-          backgroundColor: Colors.white,
           scrolledUnderElevation: 0,
           elevation: 0,
           centerTitle: true,
@@ -99,7 +99,6 @@ class _ChatListScreenState extends State<ChatListScreen> {
       onTap: _clearFocus,
       child: Scaffold(
         appBar: AppBar(
-          backgroundColor: Colors.white,
           scrolledUnderElevation: 0,
           elevation: 0,
           centerTitle: true,
@@ -129,7 +128,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
                     ),
                   ),
                   IconButton(
-                    icon: Icon(Icons.search, color: Colors.blue),
+                    icon: const Icon(Icons.search, color: Colors.blue),
                     onPressed: _applySearchFilter,
                   ),
                 ],
@@ -154,7 +153,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
                     ),
                     child: Text(
                       'chat.search.guide'.tr(),
-                      style: TextStyle(
+                      style: const TextStyle(
                         color: Colors.white,
                       ),
                     ),
@@ -274,22 +273,39 @@ class _ChatListScreenState extends State<ChatListScreen> {
                             child: ListTile(
                               leading: GestureDetector(
                                 onTap: () {
-                                  GoRouter.of(context).push('/user-profile/$otherUserId');
+                                  GoRouter.of(context)
+                                      .push('/user-profile/$otherUserId');
                                 },
                                 child: CircleAvatar(
                                   radius: 20,
-                                  backgroundImage: (chatData['userProfileImages']?[otherUserId] == null ||
-                                          chatData['userProfileImages']?[otherUserId].isEmpty)
-                                      ? const AssetImage('assets/images/default_profile.png')
+                                  backgroundImage: (chatData[
+                                                      'userProfileImages']
+                                                  ?[otherUserId] ==
+                                              null ||
+                                          chatData['userProfileImages']
+                                                  ?[otherUserId]
+                                              .isEmpty)
+                                      ? const AssetImage(
+                                          'assets/images/default_profile.png')
                                       : null,
-                                  child: (chatData['userProfileImages']?[otherUserId] != null &&
-                                          chatData['userProfileImages']?[otherUserId].isNotEmpty)
+                                  child: (chatData['userProfileImages']
+                                                  ?[otherUserId] !=
+                                              null &&
+                                          chatData['userProfileImages']
+                                                  ?[otherUserId]
+                                              .isNotEmpty)
                                       ? CachedNetworkImage(
-                                          imageUrl: chatData['userProfileImages'][otherUserId],
-                                          placeholder: (context, url) => Center(
-                                            child: CircularProgressIndicator(strokeWidth: 2),
+                                          imageUrl:
+                                              chatData['userProfileImages']
+                                                  [otherUserId],
+                                          placeholder: (context, url) =>
+                                              const Center(
+                                            child: CircularProgressIndicator(
+                                                strokeWidth: 2),
                                           ),
-                                          imageBuilder: (context, imageProvider) => CircleAvatar(
+                                          imageBuilder:
+                                              (context, imageProvider) =>
+                                                  CircleAvatar(
                                             backgroundImage: imageProvider,
                                             radius: 20,
                                           ),
@@ -356,11 +372,13 @@ class _ChatListScreenState extends State<ChatListScreen> {
                             child: Container(
                               height: 1,
                               decoration: BoxDecoration(
-                                color: Colors.grey[300],
+                                color: isDarkMode
+                                    ? Colors.grey[800]
+                                    : Colors.grey[300],
                                 boxShadow: [
                                   BoxShadow(
                                     color: Colors.black.withOpacity(0.1),
-                                    offset: Offset(0, 1),
+                                    offset: const Offset(0, 1),
                                     blurRadius: 4,
                                   ),
                                 ],

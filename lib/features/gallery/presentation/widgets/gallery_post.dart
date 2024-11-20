@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
+import 'package:travel_on_final/core/providers/theme_provider.dart';
 import 'package:travel_on_final/features/auth/presentation/providers/auth_provider.dart';
 import '../providers/gallery_provider.dart';
 import 'comment_bottom_sheet.dart';
@@ -116,10 +117,12 @@ class _GalleryPostState extends State<GalleryPost> {
   }
 
   void _showComments() {
+    final isDarkMode =
+        Provider.of<ThemeProvider>(context, listen: false).isDarkMode;
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      backgroundColor: Colors.white,
+      backgroundColor: isDarkMode ? Colors.grey.shade900 : Colors.white,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20.r)),
       ),
@@ -148,11 +151,9 @@ class _GalleryPostState extends State<GalleryPost> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(
-                isScrapped
-                    ? 'gallery.post.scrap_success'.tr()
-                    : 'gallery.post.scrap_canceled'.tr()
-            ),
+            content: Text(isScrapped
+                ? 'gallery.post.scrap_success'.tr()
+                : 'gallery.post.scrap_canceled'.tr()),
           ),
         );
       }
@@ -338,7 +339,8 @@ class _GalleryPostState extends State<GalleryPost> {
           Padding(
             padding: EdgeInsets.symmetric(horizontal: 10.w),
             child: Text(
-              'gallery.post.likes_count'.tr(namedArgs: {'count': likeCount.toString()}),
+              'gallery.post.likes_count'
+                  .tr(namedArgs: {'count': likeCount.toString()}),
               style: const TextStyle(fontWeight: FontWeight.bold),
             ),
           ),
@@ -359,9 +361,9 @@ class _GalleryPostState extends State<GalleryPost> {
                 TextButton(
                   onPressed: _showComments,
                   child: Text(
-                    'gallery.post.comments_count'.tr(
-                        namedArgs: {'count': widget.comments.length.toString()}
-                    ),
+                    'gallery.post.comments_count'.tr(namedArgs: {
+                      'count': widget.comments.length.toString()
+                    }),
                     style: TextStyle(
                       color: Colors.grey[600],
                       fontSize: 14.sp,
@@ -371,7 +373,6 @@ class _GalleryPostState extends State<GalleryPost> {
             ],
           ),
         ),
-        Divider(height: 20.h),
       ],
     );
   }

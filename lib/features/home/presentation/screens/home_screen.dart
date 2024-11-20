@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:travel_on_final/core/providers/theme_provider.dart';
 import 'package:travel_on_final/core/theme/colors.dart';
 import 'package:travel_on_final/features/auth/presentation/providers/auth_provider.dart';
 import 'package:travel_on_final/features/home/presentation/providers/home_provider.dart';
@@ -51,7 +52,6 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.white,
         scrolledUnderElevation: 0,
         elevation: 0,
         centerTitle: true,
@@ -141,7 +141,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                   _buildMenuItem(
                     CupertinoIcons.map_pin_ellipse,
-                    'menu.local_tour'.tr(),  // 키가 정확히 일치하는지 확인
+                    'menu.local_tour'.tr(), // 키가 정확히 일치하는지 확인
                     '/regional-exploration',
                   ),
                   _buildMenuItem(
@@ -224,6 +224,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildMenuItem(IconData icon, String label, String route) {
+    final isDarkMode = Provider.of<ThemeProvider>(context).isDarkMode;
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       mainAxisSize: MainAxisSize.min,
@@ -237,10 +238,11 @@ class _HomeScreenState extends State<HomeScreen> {
           child: Container(
             padding: EdgeInsets.all(10.r),
             decoration: BoxDecoration(
-              color: Colors.grey.shade100,
+              color: isDarkMode ? Colors.grey.shade800 : Colors.grey.shade100,
               borderRadius: BorderRadius.circular(12.r),
             ),
-            child: Icon(icon, color: Colors.blueAccent, size: 20.r),
+            child:
+                Icon(icon, color: AppColors.travelonLightBlueColor, size: 20.r),
           ),
         ),
         SizedBox(height: 4.h),
@@ -248,7 +250,7 @@ class _HomeScreenState extends State<HomeScreen> {
           label,
           style: TextStyle(
             fontSize: 11.sp,
-            color: Colors.grey.shade800,
+            color: isDarkMode ? Colors.grey.shade400 : Colors.grey.shade800,
           ),
           textAlign: TextAlign.center,
           maxLines: 2, // 1에서 2로 변경
