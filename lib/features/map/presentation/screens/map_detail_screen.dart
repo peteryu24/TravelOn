@@ -10,43 +10,48 @@ class MapDetailScreen extends StatelessWidget {
   final String address;
 
   const MapDetailScreen({
-    Key? key,
+    super.key,
     required this.latitude,
     required this.longitude,
     required this.name,
     required this.address,
-  }) : super(key: key);
+  });
 
   // 네이버 지도 검색 메서드
-  Future<void> _openNaverMap(String name, String address, BuildContext context) async {
+  Future<void> _openNaverMap(
+      String name, String address, BuildContext context) async {
     String locationPrefix = '';
     if (address.isNotEmpty) {
       final addressParts = address.split(' ');
       if (addressParts.length >= 3) {
-        locationPrefix = '${addressParts[0]} ${addressParts[1]} ${addressParts[2]} ';
+        locationPrefix =
+            '${addressParts[0]} ${addressParts[1]} ${addressParts[2]} ';
       } else if (addressParts.length >= 2) {
         locationPrefix = '${addressParts[0]} ${addressParts[1]} ';
       }
     }
 
     final searchQuery = Uri.encodeComponent('$locationPrefix$name');
-    final mapAppUrl = 'nmap://search?query=$searchQuery&appname=com.example.travel_on_final';
+    final mapAppUrl =
+        'nmap://search?query=$searchQuery&appname=com.example.travel_on_final';
     final mapWebUrl = 'https://map.naver.com/v5/search/$searchQuery';
 
     try {
       if (await canLaunchUrl(Uri.parse(mapAppUrl))) {
-        await launchUrl(Uri.parse(mapAppUrl), mode: LaunchMode.externalApplication);
+        await launchUrl(Uri.parse(mapAppUrl),
+            mode: LaunchMode.externalApplication);
       } else if (await canLaunchUrl(Uri.parse(mapWebUrl))) {
-        await launchUrl(Uri.parse(mapWebUrl), mode: LaunchMode.externalApplication);
+        await launchUrl(Uri.parse(mapWebUrl),
+            mode: LaunchMode.externalApplication);
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('지도를 열 수 없습니다.')),
+          const SnackBar(content: Text('지도를 열 수 없습니다.')),
         );
       }
     } catch (e) {
       print('Error launching map: $e');
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('지도를 열 수 없습니다.')),
+        const SnackBar(content: Text('지도를 열 수 없습니다.')),
       );
     }
   }
@@ -56,10 +61,10 @@ class MapDetailScreen extends StatelessWidget {
     late NaverMapController mapController;
 
     return Scaffold(
-      appBar: AppBar(title: Text('위치 상세')),
+      appBar: AppBar(title: const Text('위치 상세')),
       body: Column(
         children: [
-          Container(
+          SizedBox(
             height: 550.h,
             child: NaverMap(
               options: NaverMapViewOptions(
@@ -87,13 +92,15 @@ class MapDetailScreen extends StatelessWidget {
                   children: [
                     Text(
                       '위치 상세 정보',
-                      style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                          fontSize: 18.sp, fontWeight: FontWeight.bold),
                     ),
                     SizedBox(height: 16.h),
                     ElevatedButton(
                       onPressed: () => _openNaverMap(name, address, context),
                       style: ElevatedButton.styleFrom(
-                        padding: EdgeInsets.symmetric(vertical: 12.h, horizontal: 16.w),
+                        padding: EdgeInsets.symmetric(
+                            vertical: 12.h, horizontal: 16.w),
                         backgroundColor: Colors.white,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8.r),
@@ -104,14 +111,14 @@ class MapDetailScreen extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Image.asset(
-                            'assets/images/logo/naver.png',
+                            'assets/images/naver_square.png',
                             height: 24.w,
                             width: 24.w,
                             fit: BoxFit.contain,
                           ),
                           SizedBox(width: 8.w),
                           Text(
-                            '$name',
+                            name,
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: 18.sp,
