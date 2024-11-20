@@ -10,13 +10,11 @@ import 'package:intl/intl.dart';
 class UserPackageScreen extends StatelessWidget {
   final String userId;
 
-  const UserPackageScreen({required this.userId, Key? key}) : super(key: key);
+  const UserPackageScreen({required this.userId, super.key});
 
   Future<String> _fetchGuideName(String userId) async {
-    final userDoc = await FirebaseFirestore.instance
-        .collection('users')
-        .doc(userId)
-        .get();
+    final userDoc =
+        await FirebaseFirestore.instance.collection('users').doc(userId).get();
 
     if (userDoc.exists) {
       return userDoc.data()?['name'] ?? "가이드";
@@ -35,13 +33,14 @@ class UserPackageScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
+        scrolledUnderElevation: 0,
         title: FutureBuilder<String>(
           future: _fetchGuideName(userId),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return Text("로딩 중...");
+              return const Text("로딩 중...");
             } else if (snapshot.hasError) {
-              return Text("에러 발생");
+              return const Text("에러 발생");
             } else {
               return Text.rich(
                 TextSpan(
@@ -58,7 +57,6 @@ class UserPackageScreen extends StatelessWidget {
                       text: "님의 패키지 목록",
                       style: TextStyle(
                         fontSize: 16.sp,
-                        color: Colors.black,
                       ),
                     ),
                   ],
@@ -69,7 +67,7 @@ class UserPackageScreen extends StatelessWidget {
         ),
       ),
       body: userPackages.isEmpty
-          ? Center(
+          ? const Center(
               child: Text("등록된 패키지가 없습니다."),
             )
           : Padding(
@@ -79,7 +77,7 @@ class UserPackageScreen extends StatelessWidget {
                   children: [
                     GridView.builder(
                       shrinkWrap: true,
-                      physics: NeverScrollableScrollPhysics(),
+                      physics: const NeverScrollableScrollPhysics(),
                       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                         crossAxisCount: 2,
                         crossAxisSpacing: 10.w,
@@ -89,8 +87,8 @@ class UserPackageScreen extends StatelessWidget {
                       itemCount: userPackages.length,
                       itemBuilder: (context, index) {
                         final package = userPackages[index];
-                        final formattedPrice = NumberFormat('#,###')
-                            .format(package.price.toInt());
+                        final formattedPrice =
+                            NumberFormat('#,###').format(package.price.toInt());
 
                         return GestureDetector(
                           onTap: () {
@@ -98,15 +96,24 @@ class UserPackageScreen extends StatelessWidget {
                           },
                           child: Card(
                             elevation: 2,
+                            clipBehavior: Clip.antiAlias,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Image.network(
-                                  package.mainImage ??
-                                      'assets/images/default_image.png',
-                                  width: double.infinity,
-                                  height: 150.h,
-                                  fit: BoxFit.cover,
+                                ClipRRect(
+                                  borderRadius: const BorderRadius.vertical(
+                                    top: Radius.circular(8),
+                                  ),
+                                  child: Image.network(
+                                    package.mainImage ??
+                                        'assets/images/default_image.png',
+                                    width: double.infinity,
+                                    height: 150.h,
+                                    fit: BoxFit.cover,
+                                  ),
                                 ),
                                 Padding(
                                   padding: EdgeInsets.all(8.w),
@@ -148,4 +155,3 @@ class UserPackageScreen extends StatelessWidget {
     );
   }
 }
-

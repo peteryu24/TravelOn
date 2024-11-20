@@ -144,6 +144,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
 
     return Scaffold(
       appBar: AppBar(
+        scrolledUnderElevation: 0,
         title: FutureBuilder<UserModel?>(
           future: userFuture,
           builder: (context, snapshot) {
@@ -514,63 +515,76 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                       ),
                     ],
                   ),
-                  GridView.builder(
-                    itemCount: travelProvider.packages
-                        .where((package) => package.guideId == user.id)
-                        .take(6)
-                        .length,
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    gridDelegate:
-                        const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2,
-                    ),
-                    itemBuilder: (context, index) {
-                      final guidePackages = travelProvider.packages
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 16.w),
+                    child: GridView.builder(
+                      itemCount: travelProvider.packages
                           .where((package) => package.guideId == user.id)
-                          .toList();
-                      final package = guidePackages[index];
-                      final formattedPrice =
-                          NumberFormat('#,###').format(package.price.toInt());
-                      return Card(
-                        child: Column(
-                          children: [
-                            package.mainImage != null
-                                ? Image.network(
-                                    package.mainImage!,
-                                    width: 130.w,
-                                    height: 130.h,
-                                    fit: BoxFit.cover,
-                                  )
-                                : Image.asset(
-                                    'assets/images/default_image.png',
-                                    width: 130.w,
-                                    height: 130.h,
-                                    fit: BoxFit.cover,
+                          .take(6)
+                          .length,
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2,
+                        crossAxisSpacing: 8.w,
+                        mainAxisSpacing: 8.h,
+                      ),
+                      itemBuilder: (context, index) {
+                        final guidePackages = travelProvider.packages
+                            .where((package) => package.guideId == user.id)
+                            .toList();
+                        final package = guidePackages[index];
+                        final formattedPrice =
+                            NumberFormat('#,###').format(package.price.toInt());
+                        return Card(
+                          child: Padding(
+                            padding: EdgeInsets.all(8.w),
+                            child: Column(
+                              children: [
+                                Container(
+                                  width: 100.w,
+                                  height: 90.h,
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(8.r),
                                   ),
-                            Text(
-                              // 현재 언어에 따른 제목 표시
-                              package.getTitle(context.locale.languageCode),
-                              style: TextStyle(
-                                  fontSize: 14.sp, fontWeight: FontWeight.bold),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(8.r),
+                                    child: package.mainImage != null
+                                        ? Image.network(
+                                            package.mainImage!,
+                                            fit: BoxFit.cover,
+                                          )
+                                        : Image.asset(
+                                            'assets/images/default_image.png',
+                                            fit: BoxFit.cover,
+                                          ),
+                                  ),
+                                ),
+                                SizedBox(height: 8.h),
+                                Text(
+                                  package.getTitle(context.locale.languageCode),
+                                  style: TextStyle(
+                                      fontSize: 14.sp,
+                                      fontWeight: FontWeight.bold),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                Text(
+                                  '₩$formattedPrice',
+                                  style: TextStyle(
+                                    fontSize: 14.sp,
+                                    color: Colors.blueAccent,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ],
                             ),
-                            Text(
-                              // 원화 심볼 고정
-                              '₩$formattedPrice',
-                              style: TextStyle(
-                                fontSize: 14.sp,
-                                color: Colors.blueAccent,
-                                fontWeight: FontWeight.w600,
-                              ),
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ],
-                        ),
-                      );
-                    },
+                          ),
+                        );
+                      },
+                    ),
                   ),
                 ] else ...[
                   Row(
