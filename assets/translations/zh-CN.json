@@ -119,7 +119,7 @@
     "region": "地区: {region}"
   },
   "sort": {
-    "latest": "最新",
+    "latest": "基本順序",
     "price_high": "价格从高到低",
     "price_low": "价格从低到高",
     "popular": "人气",
