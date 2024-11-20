@@ -68,8 +68,8 @@ class _ChatScreenState extends State<ChatScreen> {
 
   @override
   void dispose() {
-    chatProvider?.stopListeningToMessages(); // 스트림 해제
-    chatProvider = null; // Provider 참조 해제
+    chatProvider?.stopListeningToMessages();
+    chatProvider = null;
     messageController.dispose();
     super.dispose();
   }

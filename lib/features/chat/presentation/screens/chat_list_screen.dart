@@ -272,38 +272,30 @@ class _ChatListScreenState extends State<ChatListScreen> {
                                   chatId, authProvider.currentUser!.id);
                             },
                             child: ListTile(
-                              leading: CircleAvatar(
-                                radius: 20,
-                                backgroundImage: (chatData['userProfileImages']
-                                                ?[otherUserId] ==
-                                            null ||
-                                        chatData['userProfileImages']
-                                                [otherUserId]
-                                            .isEmpty)
-                                    ? const AssetImage(
-                                        'assets/images/default_profile.png')
-                                    : null,
-                                child: (chatData['userProfileImages']
-                                                ?[otherUserId] !=
-                                            null &&
-                                        chatData['userProfileImages']
-                                                [otherUserId]
-                                            .isNotEmpty)
-                                    ? CachedNetworkImage(
-                                        imageUrl: chatData['userProfileImages']
-                                            [otherUserId],
-                                        placeholder: (context, url) => Center(
-                                          child: CircularProgressIndicator(
-                                              strokeWidth: 2),
-                                        ),
-                                        imageBuilder:
-                                            (context, imageProvider) =>
-                                                CircleAvatar(
-                                          backgroundImage: imageProvider,
-                                          radius: 20,
-                                        ),
-                                      )
-                                    : null,
+                              leading: GestureDetector(
+                                onTap: () {
+                                  GoRouter.of(context).push('/user-profile/$otherUserId');
+                                },
+                                child: CircleAvatar(
+                                  radius: 20,
+                                  backgroundImage: (chatData['userProfileImages']?[otherUserId] == null ||
+                                          chatData['userProfileImages']?[otherUserId].isEmpty)
+                                      ? const AssetImage('assets/images/default_profile.png')
+                                      : null,
+                                  child: (chatData['userProfileImages']?[otherUserId] != null &&
+                                          chatData['userProfileImages']?[otherUserId].isNotEmpty)
+                                      ? CachedNetworkImage(
+                                          imageUrl: chatData['userProfileImages'][otherUserId],
+                                          placeholder: (context, url) => Center(
+                                            child: CircularProgressIndicator(strokeWidth: 2),
+                                          ),
+                                          imageBuilder: (context, imageProvider) => CircleAvatar(
+                                            backgroundImage: imageProvider,
+                                            radius: 20,
+                                          ),
+                                        )
+                                      : null,
+                                ),
                               ),
                               title: Row(
                                 children: [
