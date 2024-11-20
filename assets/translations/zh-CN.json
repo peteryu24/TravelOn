@@ -339,7 +339,7 @@
   },
   "recommendation": {
     "title": "定製旅行推薦",
-    "empty": "沒有推薦的旅行套餐。\n喜歡旅行套餐，請接受更多的推薦吧！",
+    "empty": "沒有推薦的旅行套餐。喜歡旅行套餐，請接受更多的推薦吧！",
     "rank": "第{rank}名"
   },
   "tourist_category": {
