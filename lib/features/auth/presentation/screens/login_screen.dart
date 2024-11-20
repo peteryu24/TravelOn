@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:travel_on_final/core/providers/theme_provider.dart';
 import 'package:travel_on_final/core/theme/colors.dart';
 import 'package:travel_on_final/features/auth/presentation/providers/auth_provider.dart';
 import 'package:travel_on_final/features/auth/presentation/widgets/text_field_widget.dart';
@@ -39,6 +40,7 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Widget _buildLanguageSelector() {
+    final isDarkMode = Provider.of<ThemeProvider>(context).isDarkMode;
     return Row(
       children: [
         Text(
@@ -46,6 +48,7 @@ class _LoginScreenState extends State<LoginScreen> {
           style: TextStyle(fontSize: 14.sp),
         ),
         PopupMenuButton<Locale>(
+          color: isDarkMode ? Colors.grey[900] : Colors.white,
           icon: const Icon(Icons.language),
           onSelected: (Locale locale) {
             context.setLocale(locale);

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:travel_on_final/core/theme/colors.dart';
 import '../providers/regional_provider.dart';
 
 class CategoryFilter extends StatelessWidget {
@@ -19,9 +20,21 @@ class CategoryFilter extends StatelessWidget {
               return Padding(
                 padding: const EdgeInsets.only(right: 8),
                 child: ChoiceChip(
-                  label: Text(category),
+                  label: Text(
+                    category,
+                    style: TextStyle(
+                      color: provider.selectedCategory == category
+                          ? Colors.white
+                          : Colors.black,
+                      fontWeight: provider.selectedCategory == category
+                          ? FontWeight.bold
+                          : FontWeight.normal,
+                    ),
+                  ),
+                  checkmarkColor: Colors.white,
                   selected: provider.selectedCategory == category,
-                  selectedColor: Colors.blue.shade100,
+                  selectedColor: AppColors.travelonBlueColor,
+                  backgroundColor: Colors.white,
                   onSelected: (bool selected) {
                     if (selected) {
                       provider.setCategory(category);

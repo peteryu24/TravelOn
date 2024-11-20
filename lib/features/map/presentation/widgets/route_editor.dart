@@ -1,5 +1,8 @@
 import 'dart:math' show max;
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:travel_on_final/core/providers/theme_provider.dart';
+import 'package:travel_on_final/core/theme/colors.dart';
 import 'package:travel_on_final/features/map/domain/entities/travel_point.dart';
 import 'package:travel_on_final/features/map/presentation/screens/place_search_screen.dart';
 
@@ -9,11 +12,11 @@ class RouteEditor extends StatefulWidget {
   final int totalDays;
 
   const RouteEditor({
-    Key? key,
+    super.key,
     required this.points,
     required this.onPointsChanged,
     required this.totalDays,
-  }) : super(key: key);
+  });
 
   @override
   State<RouteEditor> createState() => _RouteEditorState();
@@ -25,6 +28,7 @@ class _RouteEditorState extends State<RouteEditor> {
   @override
   Widget build(BuildContext context) {
     final currentDayPoints = _getPointsByDay(_selectedDay);
+    final isDarkMode = Provider.of<ThemeProvider>(context).isDarkMode;
 
     return Column(
       children: [
@@ -39,7 +43,20 @@ class _RouteEditorState extends State<RouteEditor> {
               return Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 4.0),
                 child: ChoiceChip(
-                  label: Text('$day일차'),
+                  backgroundColor: Colors.transparent,
+                  checkmarkColor: Colors.white,
+                  label: Text(
+                    '$day일차',
+                    style: TextStyle(
+                      color: isDarkMode
+                          ? Colors.white
+                          : _selectedDay == day
+                              ? Colors.white
+                              : Colors.black,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  selectedColor: AppColors.travelonBlueColor,
                   selected: _selectedDay == day,
                   onSelected: (selected) {
                     if (selected) {
@@ -83,14 +100,16 @@ class _RouteEditorState extends State<RouteEditor> {
         // 선택된 일차의 장소 목록
         Expanded(
           child: ListView.builder(
-            itemCount: currentDayPoints.length,  // 현재 일차의 장소만
+            itemCount: currentDayPoints.length, // 현재 일차의 장소만
             itemBuilder: (context, index) {
-              final point = currentDayPoints[index];  // 현재 일차의 장소
+              final point = currentDayPoints[index]; // 현재 일차의 장소
               return ListTile(
                 leading: Icon(
-                  point.type == PointType.hotel ? Icons.hotel :
-                  point.type == PointType.restaurant ? Icons.restaurant :
-                  Icons.photo_camera,
+                  point.type == PointType.hotel
+                      ? Icons.hotel
+                      : point.type == PointType.restaurant
+                          ? Icons.restaurant
+                          : Icons.photo_camera,
                   color: Colors.blue,
                 ),
                 title: Text('${index + 1}. ${point.name}'),
@@ -104,7 +123,8 @@ class _RouteEditorState extends State<RouteEditor> {
                       final dayPoints = _getPointsByDay(_selectedDay);
                       for (var i = 0; i < dayPoints.length; i++) {
                         final point = dayPoints[i];
-                        final index = widget.points.indexWhere((p) => p.id == point.id);
+                        final index =
+                            widget.points.indexWhere((p) => p.id == point.id);
                         if (index != -1) {
                           widget.points[index] = point.copyWith(order: i);
                         }
@@ -123,9 +143,7 @@ class _RouteEditorState extends State<RouteEditor> {
 
   // 해당 일차의 포인트들만 필터링
   List<TravelPoint> _getPointsByDay(int day) {
-    return widget.points
-        .where((point) => point.day == day)
-        .toList()
+    return widget.points.where((point) => point.day == day).toList()
       ..sort((a, b) => a.order.compareTo(b.order));
   }
 
@@ -144,8 +162,9 @@ class _RouteEditorState extends State<RouteEditor> {
       setState(() {
         // 현재 선택된 일차의 마지막 순서 구하기
         final currentDayPoints = _getPointsByDay(_selectedDay);
-        final lastOrder = currentDayPoints.isEmpty ? 0 :
-        currentDayPoints.map((p) => p.order).reduce(max) + 1;
+        final lastOrder = currentDayPoints.isEmpty
+            ? 0
+            : currentDayPoints.map((p) => p.order).reduce(max) + 1;
 
         // 새로운 포인트 추가
         widget.points.add(result.copyWith(

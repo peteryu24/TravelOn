@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:travel_on_final/core/providers/theme_provider.dart';
 import 'package:travel_on_final/features/auth/data/models/user_model.dart';
 import 'package:travel_on_final/features/auth/presentation/providers/auth_provider.dart';
 import 'package:travel_on_final/features/review/domain/entities/review.dart';
@@ -16,7 +17,7 @@ import 'package:go_router/go_router.dart';
 class UserProfileScreen extends StatefulWidget {
   final String userId;
 
-  const UserProfileScreen({required this.userId, Key? key}) : super(key: key);
+  const UserProfileScreen({required this.userId, super.key});
 
   @override
   _UserProfileScreenState createState() => _UserProfileScreenState();
@@ -40,7 +41,8 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     showPasswordDialog(context);
   }
 
-  Future<void> _pickBackgroundImage(UserModel user, AuthProvider authProvider) async {
+  Future<void> _pickBackgroundImage(
+      UserModel user, AuthProvider authProvider) async {
     final picker = ImagePicker();
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
 
@@ -58,7 +60,8 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     }
   }
 
-  Future<void> _removeBackgroundImage(UserModel user, AuthProvider authProvider) async {
+  Future<void> _removeBackgroundImage(
+      UserModel user, AuthProvider authProvider) async {
     try {
       await authProvider.updateUserProfile(
         name: user.name,
@@ -80,7 +83,8 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     }
   }
 
-  void _showRemoveBackgroundDialog(UserModel user, AuthProvider authProvider) async {
+  void _showRemoveBackgroundDialog(
+      UserModel user, AuthProvider authProvider) async {
     final result = await showDialog<bool>(
       context: context,
       builder: (BuildContext context) {
@@ -134,6 +138,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     final authProvider = context.watch<AuthProvider>();
     final reviewProvider = context.watch<ReviewProvider>();
     final travelProvider = context.watch<TravelProvider>();
+    final isDarkMode = Provider.of<ThemeProvider>(context).isDarkMode;
 
     final isCurrentUser = authProvider.currentUser?.id == widget.userId;
 
@@ -142,7 +147,8 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
         title: FutureBuilder<UserModel?>(
           future: userFuture,
           builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.done && snapshot.hasData) {
+            if (snapshot.connectionState == ConnectionState.done &&
+                snapshot.hasData) {
               return RichText(
                 text: TextSpan(
                   children: [
@@ -158,15 +164,16 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                       text: 'user_profile.title.with_name'.tr(),
                       style: TextStyle(
                         fontSize: 16.sp,
-                        color: Colors.black,
+                        color: isDarkMode ? Colors.white : Colors.black,
                       ),
                     ),
                   ],
                 ),
               );
-            }
-            else {
-              return Text('user_profile.title.default'.tr(),);
+            } else {
+              return Text(
+                'user_profile.title.default'.tr(),
+              );
             }
           },
         ),
@@ -175,7 +182,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
         future: userFuture,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
+            return const Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
             return Center(child: Text('user_profile.error'.tr()));
           } else if (!snapshot.hasData || snapshot.data == null) {
@@ -194,17 +201,22 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                       width: double.infinity,
                       height: 330.h,
                       decoration: BoxDecoration(
-                        color: user.backgroundImageUrl == null || user.backgroundImageUrl!.isEmpty
-                            ? Colors.lightBlue.shade100
+                        color: user.backgroundImageUrl == null ||
+                                user.backgroundImageUrl!.isEmpty
+                            ? isDarkMode
+                                ? Colors.blue.shade100
+                                : Colors.lightBlue.shade100
                             : null,
-                        image: user.backgroundImageUrl != null && user.backgroundImageUrl!.isNotEmpty
+                        image: user.backgroundImageUrl != null &&
+                                user.backgroundImageUrl!.isNotEmpty
                             ? DecorationImage(
                                 image: NetworkImage(user.backgroundImageUrl!),
                                 fit: BoxFit.cover,
                               )
                             : null,
                       ),
-                      child: user.backgroundImageUrl != null && user.backgroundImageUrl!.isNotEmpty
+                      child: user.backgroundImageUrl != null &&
+                              user.backgroundImageUrl!.isNotEmpty
                           ? Container(
                               decoration: BoxDecoration(
                                 color: Colors.black.withOpacity(0.3),
@@ -217,7 +229,8 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                         top: 20.h,
                         left: 20.w,
                         child: Container(
-                          padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 5.h),
+                          padding: EdgeInsets.symmetric(
+                              horizontal: 10.w, vertical: 5.h),
                           decoration: BoxDecoration(
                             color: Colors.blueAccent,
                             borderRadius: BorderRadius.circular(8.r),
@@ -239,9 +252,12 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                           Container(
                             child: CircleAvatar(
                               radius: 70.r,
-                              backgroundImage: user.profileImageUrl != null && user.profileImageUrl!.isNotEmpty
+                              backgroundImage: user.profileImageUrl != null &&
+                                      user.profileImageUrl!.isNotEmpty
                                   ? NetworkImage(user.profileImageUrl!)
-                                  : AssetImage('assets/images/default_profile.png') as ImageProvider,
+                                  : const AssetImage(
+                                          'assets/images/default_profile.png')
+                                      as ImageProvider,
                             ),
                           ),
                           SizedBox(height: 10.h),
@@ -254,10 +270,11 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                             child: Row(
                               children: [
                                 AnimatedSwitcher(
-                                  duration: Duration(milliseconds: 300),
+                                  duration: const Duration(milliseconds: 300),
                                   child: Container(
                                     key: ValueKey<bool>(showName),
-                                    padding: EdgeInsets.symmetric(vertical: 5.h, horizontal: 10.w),
+                                    padding: EdgeInsets.symmetric(
+                                        vertical: 5.h, horizontal: 10.w),
                                     decoration: BoxDecoration(
                                       color: Colors.black.withOpacity(0.7),
                                       borderRadius: BorderRadius.circular(8.r),
@@ -270,7 +287,9 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                                           showName ? user.name : user.email,
                                           style: TextStyle(
                                             fontSize: showName ? 20.sp : 12.sp,
-                                            fontWeight: showName ? FontWeight.bold : FontWeight.normal,
+                                            fontWeight: showName
+                                                ? FontWeight.bold
+                                                : FontWeight.normal,
                                             color: Colors.white,
                                           ),
                                         ),
@@ -283,13 +302,15 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                           ),
                           SizedBox(height: 5.h),
                           Container(
-                            padding: EdgeInsets.symmetric(vertical: 5.h, horizontal: 10.w),
+                            padding: EdgeInsets.symmetric(
+                                vertical: 5.h, horizontal: 10.w),
                             decoration: BoxDecoration(
                               color: Colors.black.withOpacity(0.7),
                               borderRadius: BorderRadius.circular(8.r),
                             ),
                             child: Text(
-                              user.introduction ?? 'user_profile.default_intro'.tr(),
+                              user.introduction ??
+                                  'user_profile.default_intro'.tr(),
                               textAlign: TextAlign.center,
                               style: TextStyle(
                                 fontSize: 16.sp,
@@ -320,7 +341,9 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                                 shape: BoxShape.circle,
                               ),
                               child: IconButton(
-                                icon: Icon(showEditOptions ? Icons.close : Icons.list, color: Colors.white),
+                                icon: Icon(
+                                    showEditOptions ? Icons.close : Icons.list,
+                                    color: Colors.white),
                                 onPressed: () {
                                   setState(() {
                                     showEditOptions = !showEditOptions;
@@ -338,7 +361,8 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                                   shape: BoxShape.circle,
                                 ),
                                 child: IconButton(
-                                  icon: Icon(Icons.edit_note, color: Colors.white),
+                                  icon: const Icon(Icons.edit_note,
+                                      color: Colors.white),
                                   onPressed: _onEditProfileButtonPressed,
                                 ),
                               ),
@@ -351,9 +375,11 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                                   shape: BoxShape.circle,
                                 ),
                                 child: IconButton(
-                                  icon: Icon(Icons.edit, color: Colors.white),
+                                  icon: const Icon(Icons.edit,
+                                      color: Colors.white),
                                   onPressed: () async {
-                                    final shouldChange = await _showConfirmationDialog(context);
+                                    final shouldChange =
+                                        await _showConfirmationDialog(context);
                                     if (shouldChange) {
                                       _pickBackgroundImage(user, authProvider);
                                     }
@@ -369,8 +395,10 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                                   shape: BoxShape.circle,
                                 ),
                                 child: IconButton(
-                                  icon: Icon(Icons.delete, color: Colors.white),
-                                  onPressed: () => _showRemoveBackgroundDialog(user, authProvider),
+                                  icon: const Icon(Icons.delete,
+                                      color: Colors.white),
+                                  onPressed: () => _showRemoveBackgroundDialog(
+                                      user, authProvider),
                                 ),
                               ),
                             ],
@@ -389,11 +417,14 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                             shape: BoxShape.circle,
                           ),
                           child: IconButton(
-                            icon: Icon(Icons.chat_bubble, color: Colors.white),
+                            icon: const Icon(Icons.chat_bubble,
+                                color: Colors.white),
                             onPressed: () {
-                              final currentUserId = authProvider.currentUser?.id;
+                              final currentUserId =
+                                  authProvider.currentUser?.id;
                               if (currentUserId != null) {
-                                final chatId = CreateChatId().call(currentUserId, user.id);
+                                final chatId =
+                                    CreateChatId().call(currentUserId, user.id);
                                 context.push('/chat/$chatId');
                               }
                             },
@@ -402,45 +433,60 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                       ),
                   ],
                 ),
-                SizedBox(height: 15.h,),
+                SizedBox(
+                  height: 15.h,
+                ),
                 if (user.isGuide) ...[
                   FutureBuilder<Map<String, dynamic>>(
-                    future: context.read<TravelProvider>().getGuideReviewStats(user.id),
+                    future: context
+                        .read<TravelProvider>()
+                        .getGuideReviewStats(user.id),
                     builder: (context, snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
-                        return CircularProgressIndicator();
+                        return const CircularProgressIndicator();
                       } else if (snapshot.hasError) {
-                        return Text("user_profile.guide_stats.review_error".tr());
+                        return Text(
+                            "user_profile.guide_stats.review_error".tr());
                       } else if (!snapshot.hasData) {
                         return Text("user_profile.guide_stats.no_reviews".tr());
                       } else {
                         final reviewStats = snapshot.data!;
                         final totalReviews = reviewStats['totalReviews'] as int;
-                        final averageRating = reviewStats['averageRating'] as double;
+                        final averageRating =
+                            reviewStats['averageRating'] as double;
 
                         return Column(
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
-                            Text('user_profile.guide_stats.average_rating'.tr(
-                                namedArgs: {'rating': averageRating.toStringAsFixed(1)}
-                            ),
-                            style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.bold),
+                            Text(
+                              'user_profile.guide_stats.average_rating'.tr(
+                                  namedArgs: {
+                                    'rating': averageRating.toStringAsFixed(1)
+                                  }),
+                              style: TextStyle(
+                                  fontSize: 14.sp, fontWeight: FontWeight.bold),
                             ),
                             SizedBox(height: 6.h),
                             Text(
-                              'review.stats.count'.tr(namedArgs: {'count': totalReviews.toString()}),
-                              style: TextStyle(fontSize: 14.sp, color: Colors.grey),
+                              'review.stats.count'.tr(namedArgs: {
+                                'count': totalReviews.toString()
+                              }),
+                              style: TextStyle(
+                                  fontSize: 14.sp, color: Colors.grey),
                             ),
                             SizedBox(height: 8.h),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: List.generate(5, (index) {
                                 if (index < averageRating.floor()) {
-                                  return Icon(Icons.star, color: Colors.amber, size: 24.w);
+                                  return Icon(Icons.star,
+                                      color: Colors.amber, size: 24.w);
                                 } else if (index < averageRating) {
-                                  return Icon(Icons.star_half, color: Colors.amber, size: 24.w);
+                                  return Icon(Icons.star_half,
+                                      color: Colors.amber, size: 24.w);
                                 } else {
-                                  return Icon(Icons.star_border, color: Colors.grey, size: 24.w);
+                                  return Icon(Icons.star_border,
+                                      color: Colors.grey, size: 24.w);
                                 }
                               }),
                             ),
@@ -455,13 +501,16 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                     children: [
                       Text(
                         "user_profile.guide_stats.packages.title".tr(),
-                        style: TextStyle(fontSize: 20.sp, fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                            fontSize: 20.sp, fontWeight: FontWeight.bold),
                       ),
                       TextButton(
                         onPressed: () {
                           context.push('/user-packages/${user.id}');
                         },
-                        child: Text("user_profile.guide_stats.packages.view_more".tr(),),
+                        child: Text(
+                          "user_profile.guide_stats.packages.view_more".tr(),
+                        ),
                       ),
                     ],
                   ),
@@ -471,8 +520,9 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                         .take(6)
                         .length,
                     shrinkWrap: true,
-                    physics: NeverScrollableScrollPhysics(),
-                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    physics: const NeverScrollableScrollPhysics(),
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 2,
                     ),
                     itemBuilder: (context, index) {
@@ -480,33 +530,35 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                           .where((package) => package.guideId == user.id)
                           .toList();
                       final package = guidePackages[index];
-                      final formattedPrice = NumberFormat('#,###').format(package.price.toInt());
+                      final formattedPrice =
+                          NumberFormat('#,###').format(package.price.toInt());
                       return Card(
                         child: Column(
                           children: [
                             package.mainImage != null
                                 ? Image.network(
-                              package.mainImage!,
-                              width: 130.w,
-                              height: 130.h,
-                              fit: BoxFit.cover,
-                            )
+                                    package.mainImage!,
+                                    width: 130.w,
+                                    height: 130.h,
+                                    fit: BoxFit.cover,
+                                  )
                                 : Image.asset(
-                              'assets/images/default_image.png',
-                              width: 130.w,
-                              height: 130.h,
-                              fit: BoxFit.cover,
-                            ),
+                                    'assets/images/default_image.png',
+                                    width: 130.w,
+                                    height: 130.h,
+                                    fit: BoxFit.cover,
+                                  ),
                             Text(
                               // 현재 언어에 따른 제목 표시
                               package.getTitle(context.locale.languageCode),
-                              style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.bold),
+                              style: TextStyle(
+                                  fontSize: 14.sp, fontWeight: FontWeight.bold),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                             ),
                             Text(
                               // 원화 심볼 고정
-                              '₩${formattedPrice}',
+                              '₩$formattedPrice',
                               style: TextStyle(
                                 fontSize: 14.sp,
                                 color: Colors.blueAccent,
@@ -520,50 +572,55 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                       );
                     },
                   ),
-                ]
-                else ...[
+                ] else ...[
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
                         "최근에 작성한 리뷰",
-                        style: TextStyle(fontSize: 20.sp, fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                            fontSize: 20.sp, fontWeight: FontWeight.bold),
                       ),
                       TextButton(
                         onPressed: () {
                           context.push('/user-reviews/${user.id}');
                         },
-                        child: Text("더보기"),
+                        child: const Text("더보기"),
                       ),
                     ],
                   ),
                   Selector<ReviewProvider, List<Review>>(
-                    selector: (_, provider) => provider.userReviews.take(5).toList(),
+                    selector: (_, provider) =>
+                        provider.userReviews.take(5).toList(),
                     builder: (context, userReviews, child) {
                       if (userReviews.isEmpty) {
-                        return Center(child: Text("작성한 리뷰가 없습니다."));
+                        return const Center(child: Text("작성한 리뷰가 없습니다."));
                       }
 
                       return ListView.builder(
                         itemCount: userReviews.length,
                         shrinkWrap: true,
-                        physics: NeverScrollableScrollPhysics(),
+                        physics: const NeverScrollableScrollPhysics(),
                         itemBuilder: (context, index) {
                           final review = userReviews[index];
-                          final package = context.read<TravelProvider>().packages.firstWhere(
+                          final package = context
+                              .read<TravelProvider>()
+                              .packages
+                              .firstWhere(
                                 (pkg) => pkg.id == review.packageId,
                                 orElse: () => null as dynamic,
                               );
 
                           return Card(
-                            margin: EdgeInsets.symmetric(vertical: 8.h, horizontal: 16.w),
+                            margin: EdgeInsets.symmetric(
+                                vertical: 8.h, horizontal: 16.w),
                             elevation: 3,
                             child: Padding(
                               padding: EdgeInsets.all(12.w),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  if (package != null) ...[
+                                  ...[
                                     Text(
                                       "패키지: ${package.title}",
                                       style: TextStyle(
@@ -586,15 +643,20 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                                   ),
                                   SizedBox(height: 8.h),
                                   Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
                                     children: [
                                       Text(
                                         "평점: ${review.rating} / 5",
-                                        style: TextStyle(fontSize: 14.sp, color: Colors.grey),
+                                        style: TextStyle(
+                                            fontSize: 14.sp,
+                                            color: Colors.grey),
                                       ),
                                       Text(
                                         "작성일: ${DateFormat('yyyy.MM.dd').format(review.createdAt)}",
-                                        style: TextStyle(fontSize: 14.sp, color: Colors.grey),
+                                        style: TextStyle(
+                                            fontSize: 14.sp,
+                                            color: Colors.grey),
                                       ),
                                     ],
                                   ),

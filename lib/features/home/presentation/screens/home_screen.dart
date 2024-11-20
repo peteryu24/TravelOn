@@ -69,7 +69,10 @@ class _HomeScreenState extends State<HomeScreen> {
           Stack(
             children: [
               IconButton(
-                icon: const Icon(Icons.notifications),
+                icon: Icon(
+                  Icons.notifications,
+                  color: Colors.amber[800],
+                ),
                 onPressed: () {
                   Navigator.push(
                     context,

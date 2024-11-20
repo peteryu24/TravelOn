@@ -3,6 +3,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
+import 'package:travel_on_final/core/providers/theme_provider.dart';
 import 'package:travel_on_final/features/auth/presentation/providers/auth_provider.dart';
 import 'package:travel_on_final/features/review/presentation/provider/review_provider.dart';
 import 'package:travel_on_final/features/review/presentation/screens/add_review_screen.dart';
@@ -13,9 +14,9 @@ class ReviewDetailScreen extends StatefulWidget {
   final TravelPackage package;
 
   const ReviewDetailScreen({
-    Key? key,
+    super.key,
     required this.package,
-  }) : super(key: key);
+  });
 
   @override
   State<ReviewDetailScreen> createState() => _ReviewDetailScreenState();
@@ -24,6 +25,7 @@ class ReviewDetailScreen extends StatefulWidget {
 class _ReviewDetailScreenState extends State<ReviewDetailScreen> {
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Provider.of<ThemeProvider>(context).isDarkMode;
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -50,7 +52,7 @@ class _ReviewDetailScreenState extends State<ReviewDetailScreen> {
             children: [
               Container(
                 padding: EdgeInsets.all(16.w),
-                color: Colors.grey[100],
+                color: isDarkMode ? Colors.grey[900] : Colors.grey[100],
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [

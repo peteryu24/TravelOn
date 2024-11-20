@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:travel_on_final/core/providers/theme_provider.dart';
 import 'package:travel_on_final/core/theme/colors.dart';
 import 'package:travel_on_final/features/auth/presentation/providers/auth_provider.dart';
 import 'package:travel_on_final/features/home/presentation/screens/home_screen.dart';
@@ -332,7 +333,10 @@ class _AddPackageScreenState extends State<AddPackageScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('새 패키지 등록')),
+      appBar: AppBar(
+        title: const Text('새 패키지 등록'),
+        scrolledUnderElevation: 0,
+      ),
       body: SingleChildScrollView(
         child: Padding(
           padding: EdgeInsets.all(16.0.w),
@@ -622,16 +626,22 @@ class _AddPackageScreenState extends State<AddPackageScreen> {
   }
 
   Widget _buildLanguageChip(String code, String label) {
+    final isDarkMode = Provider.of<ThemeProvider>(context).isDarkMode;
     return FilterChip(
       label: Text(
         label,
-        style: const TextStyle(
-          color: Colors.white,
+        style: TextStyle(
+          color: isDarkMode
+              ? Colors.white
+              : _selectedLanguages[code]!
+                  ? Colors.white
+                  : Colors.black,
+          fontWeight: FontWeight.bold,
         ),
       ),
       selected: _selectedLanguages[code]!,
-      backgroundColor: Colors.grey.shade400,
       selectedColor: AppColors.travelonBlueColor,
+      backgroundColor: Colors.transparent,
       checkmarkColor: Colors.white,
       onSelected: (bool selected) {
         setState(() {
