@@ -171,27 +171,15 @@ class _DetailScreenState extends State<DetailScreen> {
           onPressed: _stopSearch,
         )
             : null,
-        title: Text(
-          'search.title'.tr(), // 이 부분이 "패키지 검색" 등으로 나오도록 translation 파일 확인 필요
+        title: _isSearching
+            ? _buildSearchField() // 검색 중이면 검색창 표시
+            : Text(
+          'search.title'.tr(), // 기본 제목
           style: TextStyle(
             color: Colors.black,
           ),
         ),
-        actions: [
-          if (!_isSearching)
-            IconButton(
-              icon: const Icon(Icons.search, color: Colors.black),
-              onPressed: _startSearch,
-            ),
-          Consumer<TravelProvider>(
-            builder: (context, provider, child) => RegionFilter(
-              onRegionChanged: (String region) {
-                provider.filterByRegion(region);
-              },
-            ),
-          ),
-          SizedBox(width: 8.w),
-        ],
+        actions: _buildActions(),
       ),
       body: Column(
         children: [
