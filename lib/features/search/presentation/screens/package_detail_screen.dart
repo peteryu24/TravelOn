@@ -296,15 +296,18 @@ class _PackageDetailScreenState extends State<PackageDetailScreen> {
                                 borderRadius: BorderRadius.circular(8),
                               ),
                               child: Row(
+                                mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  IconButton(  // 사람 아이콘을 IconButton으로 변경
-                                    icon: const Icon(Icons.person),
+                                  IconButton(
+                                    icon: const Icon(Icons.person,),
                                     onPressed: () {
-                                      // 가이드 프로필 페이지로 이동
                                       context.push('/user-profile/${widget.package.guideId}');
                                     },
                                   ),
                                   TextButton(
+                                    style: TextButton.styleFrom(
+                                      padding: EdgeInsets.symmetric(horizontal: 0),
+                                    ),
                                     onPressed: () {
                                       context.push('/user-profile/${widget.package.guideId}');
                                     },
@@ -315,7 +318,7 @@ class _PackageDetailScreenState extends State<PackageDetailScreen> {
                                       style: const TextStyle(
                                         fontSize: 16,
                                         fontWeight: FontWeight.bold,
-                                        color: Colors.black,  // TextButton의 기본 색상을 black으로 변경
+                                        color: Colors.black,
                                       ),
                                     ),
                                   ),

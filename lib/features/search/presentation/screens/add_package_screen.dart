@@ -173,7 +173,7 @@ class _AddPackageScreenState extends State<AddPackageScreen> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text('박 수:', style: TextStyle(fontSize: 16.sp)),
+          Text('기간:', style: TextStyle(fontSize: 16.sp)),
           DropdownButton<int>(
             value: _nights,
             isDense: true,
@@ -339,11 +339,11 @@ class _AddPackageScreenState extends State<AddPackageScreen> {
                 SizedBox(height: 16.h),
                 _buildBasicInfoSection(),
                 SizedBox(height: 16.h),
-                _buildRouteSelection(),
-                SizedBox(height: 16.h),
                 _buildNightsSelection(),
                 SizedBox(height: 16.h),
                 _buildDepartureDaysSelection(),
+                SizedBox(height: 16.h),
+                _buildRouteSelection(),
                 SizedBox(height: 16.h),
                 _buildParticipantsSection(),
                 SizedBox(height: 16.h),
