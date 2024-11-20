@@ -22,23 +22,7 @@ class _NaverRouteMapScreenState extends State<NaverRouteMapScreen> {
   NaverMapController? _mapController;
   String totalDistance = '';
   String totalDuration = '';
-  final List<NOverlay> _pathOverlays = [];  // Map 대신 List 사용
-
-  @override
-  void dispose() {
-    if (_mapController != null) {
-      for (var overlay in _pathOverlays) {
-        try {
-          _mapController?.deleteOverlay(overlay as NOverlayInfo);
-        } catch (e) {
-          // print('Error deleting overlay: $e');
-        }
-      }
-      _mapController?.dispose();
-    }
-    super.dispose();
-  }
-
+  final List<NOverlay> _pathOverlays = [];
 
   final List<Color> dayColors = [
     Colors.blue,    // 1일차
@@ -50,15 +34,12 @@ class _NaverRouteMapScreenState extends State<NaverRouteMapScreen> {
     Colors.teal,    // 7일차
   ];
 
-
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (_mapController != null) {
-        _createRoute(_mapController!);
-      }
-    });
+  String _formatDistance(int meters) {
+    if (meters >= 1000) {
+      double kilometers = meters / 1000.0;
+      return '${kilometers.toStringAsFixed(1)}km';
+    }
+    return '${meters}m';
   }
 
   String _formatDuration(int seconds) {
@@ -67,18 +48,19 @@ class _NaverRouteMapScreenState extends State<NaverRouteMapScreen> {
 
     if (hours > 0) {
       return '$hours시간 ${minutes}분';
-    } else {
-      return '$minutes분';
     }
+    return '$minutes분';
   }
 
-  String _formatDistance(int meters) {
-    if (meters >= 1000) {
-      double kilometers = meters / 1000;
-      return '${kilometers.toStringAsFixed(1)}km';
-    } else {
-      return '${meters}m';
+  @override
+  void dispose() {
+    if (_mapController != null) {
+      for (var overlay in _pathOverlays) {
+        _mapController?.deleteOverlay(overlay as NOverlayInfo);
+      }
+      _mapController?.dispose();
     }
+    super.dispose();
   }
 
   Future<void> _createRoute(NaverMapController controller) async {
@@ -96,12 +78,12 @@ class _NaverRouteMapScreenState extends State<NaverRouteMapScreen> {
 
       // 일차별로 경로 생성
       for (int day = 1; day <= widget.totalDays; day++) {
-        final dayPoints = widget.points.where((p) => p.day == day).toList()
+        final dayPoints = widget.points
+            .where((p) => p.day == day)
+            .toList()
           ..sort((a, b) => a.order.compareTo(b.order));
 
         if (dayPoints.length < 2) continue;
-
-        final routeColor = dayColors[(day - 1) % dayColors.length];
 
         for (var i = 0; i < dayPoints.length - 1; i++) {
           final start = dayPoints[i];
@@ -135,18 +117,14 @@ class _NaverRouteMapScreenState extends State<NaverRouteMapScreen> {
               final pathOverlay = NPathOverlay(
                 id: 'path_${day}_$i',
                 coords: coords,
-                color: routeColor.withOpacity(0.8),
+                color: dayColors[(day - 1) % dayColors.length],
                 width: 5,
                 outlineColor: Colors.white,
-                patternInterval: 80,
+                patternInterval: 0,
               );
 
-              try {
-                await controller.addOverlay(pathOverlay);
-                _pathOverlays.add(pathOverlay);
-              } catch (e) {
-                print('Error adding path overlay: $e');
-              }
+              await controller.addOverlay(pathOverlay);
+              _pathOverlays.add(pathOverlay);
 
               // 거리와 시간 정보 누적
               final summary = data['route']['trafast'][0]['summary'];
@@ -161,7 +139,6 @@ class _NaverRouteMapScreenState extends State<NaverRouteMapScreen> {
         totalDistance = _formatDistance(totalDistanceMeters);
         totalDuration = _formatDuration(totalDurationSeconds);
       });
-
     } catch (e) {
       print('Error creating route: $e');
       if (mounted) {
@@ -175,8 +152,8 @@ class _NaverRouteMapScreenState extends State<NaverRouteMapScreen> {
   NLatLngBounds _calculateBounds(List<TravelPoint> points) {
     if (points.isEmpty) {
       return NLatLngBounds(
-        southWest: NLatLng(37.4517, 126.8707),
-        northEast: NLatLng(37.7019, 127.1842),
+        southWest: NLatLng(33.0, 124.0),
+        northEast: NLatLng(38.0, 132.0),
       );
     }
 
@@ -193,8 +170,8 @@ class _NaverRouteMapScreenState extends State<NaverRouteMapScreen> {
     }
 
     return NLatLngBounds(
-      southWest: NLatLng(minLat, minLng),
-      northEast: NLatLng(maxLat, maxLng),
+      southWest: NLatLng(minLat - 0.01, minLng - 0.01),
+      northEast: NLatLng(maxLat + 0.01, maxLng + 0.01),
     );
   }
 
@@ -217,28 +194,24 @@ class _NaverRouteMapScreenState extends State<NaverRouteMapScreen> {
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: List.generate(widget.totalDays, (index) {
-            final day = index + 1;
-            final color = dayColors[index % dayColors.length];
-            return Padding(
-              padding: const EdgeInsets.symmetric(vertical: 4),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Container(
-                    width: 16,
-                    height: 3,
-                    color: color,
-                  ),
-                  const SizedBox(width: 8),
-                  Text(
-                    '$day일차',
-                    style: const TextStyle(fontSize: 12),
-                  ),
-                ],
+          children: [
+            for (int day = 1; day <= widget.totalDays; day++)
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 4),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      width: 16,
+                      height: 3,
+                      color: dayColors[(day - 1) % dayColors.length],
+                    ),
+                    const SizedBox(width: 8),
+                    Text('$day일차'),
+                  ],
+                ),
               ),
-            );
-          }),
+          ],
         ),
       ),
     );
@@ -249,6 +222,25 @@ class _NaverRouteMapScreenState extends State<NaverRouteMapScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('여행 코스'),
+        actions: [
+          if (totalDistance.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  // Text(
+                  //   '총 거리: $totalDistance',
+                  //   style: TextStyle(fontSize: 12),
+                  // ),
+                  // Text(
+                  //   '예상 시간: $totalDuration',
+                  //   style: TextStyle(fontSize: 12),
+                  // ),
+                ],
+              ),
+            ),
+        ],
       ),
       body: Stack(
         children: [
@@ -262,7 +254,7 @@ class _NaverRouteMapScreenState extends State<NaverRouteMapScreen> {
               ),
               contentPadding: EdgeInsets.zero,
             ),
-            onMapReady: (NaverMapController controller) {
+            onMapReady: (NaverMapController controller) async {
               setState(() {
                 _mapController = controller;
               });
@@ -283,16 +275,16 @@ class _NaverRouteMapScreenState extends State<NaverRouteMapScreen> {
                   ),
                 );
 
-                controller.addOverlay(marker);
+                await controller.addOverlay(marker);
               }
 
               if (widget.points.length > 1) {
-                _createRoute(controller);
+                await _createRoute(controller);
               }
 
               if (widget.points.isNotEmpty) {
                 final bounds = _calculateBounds(widget.points);
-                controller.updateCamera(
+                await controller.updateCamera(
                   NCameraUpdate.fitBounds(
                     bounds,
                     padding: const EdgeInsets.all(50),
