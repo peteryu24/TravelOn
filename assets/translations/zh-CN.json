@@ -468,5 +468,40 @@
       "rating": "评分：{rating} / 5",
       "created_at": "创建时间：{date}"
     }
+  },
+  "reservation_calendar": {
+    "title": "选择预订日期",
+    "participants": {
+      "title": "选择人数",
+      "range": "{min}人 ~ {max}人",
+      "count": "{count}人",
+      "min_error": "请至少选择{min}人",
+      "max_error": "最多可选择{max}人",
+      "invalid_error": "请选择正确的人数"
+    },
+    "date": {
+      "select_error": "请选择日期",
+      "unavailable_error": "该出发日期不可选",
+      "booked_error": "该日期已预订满",
+      "selected": "已选日期: {date}",
+      "package": "套餐: {title}",
+      "duration": "{nights}晚{days}天",
+      "departure_days": "出发日期:",
+      "weekdays": {
+        "mon": "周一",
+        "tue": "周二",
+        "wed": "周三",
+        "thu": "周四",
+        "fri": "周五",
+        "sat": "周六",
+        "sun": "周日"
+      }
+    },
+    "price": "价格: ￥{price}",
+    "submit": "提交预订",
+    "request": {
+      "success": "预订申请已提交",
+      "error": "预订申请过程中出现错误: {error}"
+    }
   }
 }

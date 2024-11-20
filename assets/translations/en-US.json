@@ -470,5 +470,40 @@
       "rating": "Rating: {rating} / 5",
       "created_at": "Created on: {date}"
     }
+  },
+  "reservation_calendar": {
+    "title": "Select Reservation Date",
+    "participants": {
+      "title": "Select Number of Participants",
+      "range": "{min} ~ {max} people",
+      "count": "{count} people",
+      "min_error": "Please select at least {min} people",
+      "max_error": "You can select up to {max} people",
+      "invalid_error": "Please select a valid number of participants"
+    },
+    "date": {
+      "select_error": "Please select a date",
+      "unavailable_error": "This departure date is not available",
+      "booked_error": "This date is fully booked",
+      "selected": "Selected Date: {date}",
+      "package": "Package: {title}",
+      "duration": "{nights} nights {days} days",
+      "departure_days": "Departure Days:",
+      "weekdays": {
+        "mon": "Mon",
+        "tue": "Tue",
+        "wed": "Wed",
+        "thu": "Thu",
+        "fri": "Fri",
+        "sat": "Sat",
+        "sun": "Sun"
+      }
+    },
+    "price": "Price: ${price}",
+    "submit": "Request Reservation",
+    "request": {
+      "success": "Reservation request submitted",
+      "error": "Error occurred while requesting reservation: {error}"
+    }
   }
 }

@@ -30,8 +30,8 @@ class RegionalExplorationScreen extends StatelessWidget {
                             ? Center(
                                 child: Text(
                                   provider.selectedCity == null
-                                      ? '지역을 선택해주세요'
-                                      : '선택한 지역의 추천 장소가 없습니다',
+                                      ? 'regional.select_region'.tr()
+                                      : 'regional.no_spots'.tr(),
                                 ),
                               )
                             : ListView.builder(

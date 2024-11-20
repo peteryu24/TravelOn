@@ -419,10 +419,9 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                         return Column(
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
-                            Text(
-                              "평균 별점 ${averageRating.toStringAsFixed(1)}점",
-                              style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold),
-                            ),
+                            Text('user_profile.guide_stats.average_rating'.tr(
+                                namedArgs: {'rating': averageRating.toStringAsFixed(1)}
+                            )),
                             SizedBox(height: 6.h),
                             Text(
                               "리뷰 $totalReviews개",
@@ -451,14 +450,14 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        "가이드 패키지",
+                        "user_profile.guide_stats.packages.title".tr(),
                         style: TextStyle(fontSize: 20.sp, fontWeight: FontWeight.bold),
                       ),
                       TextButton(
                         onPressed: () {
                           context.push('/user-packages/${user.id}');
                         },
-                        child: Text("더보기"),
+                        child: Text("user_profile.guide_stats.packages.view_more".tr(),),
                       ),
                     ],
                   ),

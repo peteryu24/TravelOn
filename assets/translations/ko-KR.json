@@ -469,5 +469,40 @@
       "rating": "평점: {rating} / 5",
       "created_at": "작성일: {date}"
     }
+  },
+  "reservation_calendar": {
+    "title": "예약 날짜 선택",
+    "participants": {
+      "title": "인원 선택",
+      "range": "{min}명 ~ {max}명",
+      "count": "{count}명",
+      "min_error": "최소 {min}명 이상 선택해주세요",
+      "max_error": "최대 {max}명까지 선택 가능합니다",
+      "invalid_error": "올바른 인원을 선택해주세요"
+    },
+    "date": {
+      "select_error": "날짜를 선택해주세요",
+      "unavailable_error": "선택할 수 없는 출발일입니다",
+      "booked_error": "선택한 날짜는 예약이 마감되었습니다",
+      "selected": "선택한 날짜: {date}",
+      "package": "패키지: {title}",
+      "duration": "{nights}박{days}일",
+      "departure_days": "출발 요일:",
+      "weekdays": {
+        "mon": "월",
+        "tue": "화",
+        "wed": "수",
+        "thu": "목",
+        "fri": "금",
+        "sat": "토",
+        "sun": "일"
+      }
+    },
+    "price": "가격: ₩{price}",
+    "submit": "예약 신청하기",
+    "request": {
+      "success": "예약이 신청되었습니다",
+      "error": "예약 신청 중 오류가 발생했습니다: {error}"
+    }
   }
 }
