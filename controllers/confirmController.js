@@ -11,7 +11,7 @@ const confirmPayment = async (req, res) => {
       { paymentKey, orderId, amount },
       {
         headers: {
-          'Authorization': encryptedSecretKey,
+          'Authorization': encryptedSecretKey, 
           'Content-Type': 'application/json',
         },
       }
