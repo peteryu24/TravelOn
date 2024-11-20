@@ -424,7 +424,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                             )),
                             SizedBox(height: 6.h),
                             Text(
-                              "리뷰 $totalReviews개",
+                              'review.stats.count'.tr(namedArgs: {'count': totalReviews.toString()}),
                               style: TextStyle(fontSize: 14.sp, color: Colors.grey),
                             ),
                             SizedBox(height: 8.h),
@@ -481,25 +481,27 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                         child: Column(
                           children: [
                             package.mainImage != null
-                              ? Image.network(
-                                  package.mainImage!,
-                                  width: 130.w,
-                                  height: 130.h,
-                                  fit: BoxFit.cover,
-                                )
-                              : Image.asset(
-                                  'assets/images/default_image.png',
-                                  width: 130.w,
-                                  height: 130.h,
-                                  fit: BoxFit.cover,
-                                ),
+                                ? Image.network(
+                              package.mainImage!,
+                              width: 130.w,
+                              height: 130.h,
+                              fit: BoxFit.cover,
+                            )
+                                : Image.asset(
+                              'assets/images/default_image.png',
+                              width: 130.w,
+                              height: 130.h,
+                              fit: BoxFit.cover,
+                            ),
                             Text(
-                              package.title,
+                              // 현재 언어에 따른 제목 표시
+                              package.getTitle(context.locale.languageCode),
                               style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.bold),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                             ),
                             Text(
+                              // 원화 심볼 고정
                               '₩${formattedPrice}',
                               style: TextStyle(
                                 fontSize: 14.sp,

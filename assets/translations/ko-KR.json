@@ -21,7 +21,7 @@
   "home": {
     "next_trip": {
       "greeting": "{name}님,",
-      "countdown": "{title}까지\nD-{days} 남았습니다!",
+      "countdown": "{title}까지 D-{days} 남았습니다!",
       "today": "즐거운 {title} 되세요!",
       "no_trips": "예정된 여행이 없습니다"
     },
@@ -337,7 +337,7 @@
   },
   "recommendation": {
     "title": "맞춤 여행 추천",
-    "empty": "추천할 여행 패키지가 없습니다.\n여행 패키지를 좋아요하고 더 많은 추천을 받아보세요!",
+    "empty": "추천할 여행 패키지가 없습니다.여행 패키지를 좋아요하고 더 많은 추천을 받아보세요!",
     "rank": "{rank}위"
   },
   "density": {
