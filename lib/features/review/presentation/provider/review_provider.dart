@@ -226,14 +226,7 @@ class ReviewProvider extends ChangeNotifier {
 
   Future<String?> checkReviewStatus(String userId, String packageId) async {
     try {
-      // 예약 확인
-      final hasApprovedReservation =
-      await _repository.canUserReview(userId, packageId);
-      if (!hasApprovedReservation) {
-        throw 'review.error.unauthorized'.tr();
-      }
-
-      // 이미 리뷰를 작성했는지 확인
+      // 먼저 리뷰 작성 여부 확인
       final existingReviews = await FirebaseFirestore.instance
           .collection('reviews')
           .where('userId', isEqualTo: userId)
@@ -244,8 +237,16 @@ class ReviewProvider extends ChangeNotifier {
         return 'review.error.already_reviewed'.tr();
       }
 
+      // 다음으로 예약 확인
+      final hasApprovedReservation =
+      await _repository.canUserReview(userId, packageId);
+      if (!hasApprovedReservation) {
+        return 'review.error.unauthorized'.tr();  // throw 대신 return
+      }
+
       return null;
     } catch (e) {
+      print('Review status check error: $e');  // 에러 로깅 추가
       return 'review.error.check_status'.tr();
     }
   }
