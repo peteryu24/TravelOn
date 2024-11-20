@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:travel_on_final/core/theme/colors.dart';
 import 'package:travel_on_final/features/auth/presentation/providers/auth_provider.dart';
 import 'package:travel_on_final/features/home/presentation/screens/home_screen.dart';
 import 'package:travel_on_final/features/map/domain/entities/travel_point.dart';
@@ -14,7 +15,7 @@ import '../providers/travel_provider.dart';
 import '../../domain/entities/travel_package.dart';
 
 class AddPackageScreen extends StatefulWidget {
-  const AddPackageScreen({Key? key}) : super(key: key);
+  const AddPackageScreen({super.key});
 
   @override
   State<AddPackageScreen> createState() => _AddPackageScreenState();
@@ -30,11 +31,10 @@ class _AddPackageScreenState extends State<AddPackageScreen> {
   final List<File> _descriptionImages = [];
   final _picker = ImagePicker();
   final _maxParticipantsController = TextEditingController();
-  int _nights = 1;  // 기본값 1박
-  final Set<int> _selectedDepartureDays = {};  // 선택된 출발 요일들
+  int _nights = 1; // 기본값 1박
+  final Set<int> _selectedDepartureDays = {}; // 선택된 출발 요일들
   final _minParticipantsController = TextEditingController();
   List<TravelPoint> _routePoints = [];
-
 
   final List<Map<String, dynamic>> _weekDays = [
     {'value': 1, 'label': '월'},
@@ -121,12 +121,14 @@ class _AddPackageScreenState extends State<AddPackageScreen> {
               borderSide: BorderSide(color: Color(0XFF2196F3)),
             ),
           ),
-          validator: langCode == 'ko' ? (value) {
-            if (value == null || value.isEmpty) {
-              return '한국어 제목은 필수입니다';
-            }
-            return null;
-          } : null,
+          validator: langCode == 'ko'
+              ? (value) {
+                  if (value == null || value.isEmpty) {
+                    return '한국어 제목은 필수입니다';
+                  }
+                  return null;
+                }
+              : null,
         ),
         SizedBox(height: 8.h),
         TextFormField(
@@ -140,12 +142,14 @@ class _AddPackageScreenState extends State<AddPackageScreen> {
               borderSide: BorderSide(color: Color(0XFF2196F3)),
             ),
           ),
-          validator: langCode == 'ko' ? (value) {
-            if (value == null || value.isEmpty) {
-              return '한국어 설명은 필수입니다';
-            }
-            return null;
-          } : null,
+          validator: langCode == 'ko'
+              ? (value) {
+                  if (value == null || value.isEmpty) {
+                    return '한국어 설명은 필수입니다';
+                  }
+                  return null;
+                }
+              : null,
         ),
         SizedBox(height: 16.h),
       ],
@@ -155,8 +159,12 @@ class _AddPackageScreenState extends State<AddPackageScreen> {
   @override
   void dispose() {
     // 기존 dispose 코드 제거하고 새로운 컨트롤러들 dispose
-    _titleControllers.values.forEach((controller) => controller.dispose());
-    _descriptionControllers.values.forEach((controller) => controller.dispose());
+    for (var controller in _titleControllers.values) {
+      controller.dispose();
+    }
+    for (var controller in _descriptionControllers.values) {
+      controller.dispose();
+    }
     _priceController.dispose();
     _maxParticipantsController.dispose();
     _minParticipantsController.dispose();
@@ -217,11 +225,12 @@ class _AddPackageScreenState extends State<AddPackageScreen> {
                   day['label'],
                   style: TextStyle(
                     color: isSelected ? Colors.white : Colors.black,
-                    fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                    fontWeight:
+                        isSelected ? FontWeight.bold : FontWeight.normal,
                   ),
                 ),
                 selected: isSelected,
-                showCheckmark: false,  // 체크마크 비활성화
+                showCheckmark: false, // 체크마크 비활성화
                 selectedColor: Colors.blue,
                 backgroundColor: Colors.white,
                 side: BorderSide(color: isSelected ? Colors.blue : Colors.grey),
@@ -241,7 +250,6 @@ class _AddPackageScreenState extends State<AddPackageScreen> {
       ),
     );
   }
-
 
   final List<String> _regions = [
     'seoul',
@@ -364,8 +372,6 @@ class _AddPackageScreenState extends State<AddPackageScreen> {
     );
   }
 
-
-
   Widget _buildRouteSelection() {
     return Container(
       padding: EdgeInsets.all(12.w),
@@ -378,12 +384,11 @@ class _AddPackageScreenState extends State<AddPackageScreen> {
         children: [
           Text('여행 코스', style: TextStyle(fontSize: 16.sp)),
           SizedBox(height: 8.h),
-
-          Container(
+          SizedBox(
             height: 400,
             child: RouteEditor(
               points: _routePoints,
-              totalDays: _nights + 1,  // ex) 2박3일이면 3
+              totalDays: _nights + 1, // ex) 2박3일이면 3
               onPointsChanged: (updatedPoints) {
                 setState(() {
                   _routePoints = updatedPoints;
@@ -407,16 +412,17 @@ class _AddPackageScreenState extends State<AddPackageScreen> {
         ),
         child: _mainImage != null
             ? ClipRRect(
-          borderRadius: BorderRadius.circular(8),
-          child: Image.file(_mainImage!, fit: BoxFit.cover, width: double.infinity),
-        )
-            : Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: const [
-            Icon(Icons.add_photo_alternate, size: 50),
-            Text('메인 이미지 추가'),
-          ],
-        ),
+                borderRadius: BorderRadius.circular(8),
+                child: Image.file(_mainImage!,
+                    fit: BoxFit.cover, width: double.infinity),
+              )
+            : const Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.add_photo_alternate, size: 50),
+                  Text('메인 이미지 추가'),
+                ],
+              ),
       ),
     );
   }
@@ -434,7 +440,8 @@ class _AddPackageScreenState extends State<AddPackageScreen> {
             ),
           ),
           items: _regions.map((region) {
-            return DropdownMenuItem(value: region,
+            return DropdownMenuItem(
+              value: region,
               child: Text(_getRegionLabel(region)),
             );
           }).toList(),
@@ -499,19 +506,24 @@ class _AddPackageScreenState extends State<AddPackageScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text('설명 이미지', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+        const Text('설명 이미지',
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
         SizedBox(height: 8.h),
         Wrap(
           spacing: 8,
           runSpacing: 8,
           children: [
-            ..._descriptionImages.asMap().entries.map(_buildDescriptionImageItem),
+            ..._descriptionImages
+                .asMap()
+                .entries
+                .map(_buildDescriptionImageItem),
             _buildAddImageButton(),
           ],
         ),
       ],
     );
   }
+
   Widget _buildAddImageButton() {
     return GestureDetector(
       onTap: _pickDescriptionImage,
@@ -584,25 +596,43 @@ class _AddPackageScreenState extends State<AddPackageScreen> {
 
   String _getRegionLabel(String region) {
     switch (region) {
-      case 'seoul': return '서울';
-      case 'incheon_gyeonggi': return '인천/경기';
-      case 'gangwon': return '강원';
-      case 'daejeon_chungnam': return '대전/충남';
-      case 'chungbuk': return '충북';
-      case 'gwangju_jeonnam': return '광주/전남';
-      case 'jeonbuk': return '전북';
-      case 'busan_gyeongnam': return '부산/경남';
-      case 'daegu_gyeongbuk': return '대구/경북';
-      case 'jeju': return '제주도';
-      default: return '전체';
+      case 'seoul':
+        return '서울';
+      case 'incheon_gyeonggi':
+        return '인천/경기';
+      case 'gangwon':
+        return '강원';
+      case 'daejeon_chungnam':
+        return '대전/충남';
+      case 'chungbuk':
+        return '충북';
+      case 'gwangju_jeonnam':
+        return '광주/전남';
+      case 'jeonbuk':
+        return '전북';
+      case 'busan_gyeongnam':
+        return '부산/경남';
+      case 'daegu_gyeongbuk':
+        return '대구/경북';
+      case 'jeju':
+        return '제주도';
+      default:
+        return '전체';
     }
   }
+
   Widget _buildLanguageChip(String code, String label) {
     return FilterChip(
-      label: Text(label),
+      label: Text(
+        label,
+        style: const TextStyle(
+          color: Colors.white,
+        ),
+      ),
       selected: _selectedLanguages[code]!,
-      selectedColor: Colors.blue.shade100,
-      checkmarkColor: Colors.blue,
+      backgroundColor: Colors.grey.shade400,
+      selectedColor: AppColors.travelonBlueColor,
+      checkmarkColor: Colors.white,
       onSelected: (bool selected) {
         setState(() {
           if (code == 'ko' && !selected) {

@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';
+import 'package:travel_on_final/core/providers/theme_provider.dart';
 import 'package:travel_on_final/features/auth/presentation/providers/auth_provider.dart';
 import 'package:travel_on_final/features/auth/presentation/screens/login_screen.dart';
 import 'package:travel_on_final/features/reservation/presentation/providers/reservation_provider.dart';
@@ -15,9 +16,9 @@ class ReservationCalendarScreen extends StatefulWidget {
   final TravelPackage package;
 
   const ReservationCalendarScreen({
-    Key? key,
+    super.key,
     required this.package,
-  }) : super(key: key);
+  });
 
   @override
   State<ReservationCalendarScreen> createState() =>
@@ -28,7 +29,7 @@ class _ReservationCalendarScreenState extends State<ReservationCalendarScreen> {
   // 상태 변수들
   DateTime? _selectedDay;
   DateTime _focusedDay = DateTime.now();
-  Map<String, bool> _availabilityCache = {};
+  final Map<String, bool> _availabilityCache = {};
   bool _isLoading = false;
   late int _selectedParticipants;
   late final int _minParticipants;
@@ -104,6 +105,7 @@ class _ReservationCalendarScreenState extends State<ReservationCalendarScreen> {
 
   // UI 빌더 메서드
   Widget _buildParticipantSelector() {
+    final isDarkMode = Provider.of<ThemeProvider>(context).isDarkMode;
     // widget.package.minParticipants 대신 _minParticipants 사용
     if (_selectedParticipants < _minParticipants) {
       _selectedParticipants = _minParticipants;
@@ -112,7 +114,7 @@ class _ReservationCalendarScreenState extends State<ReservationCalendarScreen> {
     return Container(
       padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
-        color: Colors.grey.shade100,
+        color: isDarkMode ? Colors.grey.shade900 : Colors.grey.shade100,
         borderRadius: BorderRadius.circular(8),
       ),
       child: Column(
@@ -266,240 +268,263 @@ class _ReservationCalendarScreenState extends State<ReservationCalendarScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('reservation_calendar.title'.tr()),
-      ),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              if (_isLoading) const LinearProgressIndicator(),
-              TableCalendar(
-                firstDay: DateTime.now(),
-                lastDay: DateTime.now().add(const Duration(days: 365)),
-                focusedDay: _focusedDay,
-                selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
-                enabledDayPredicate: (day) {
-                  if (day.isBefore(DateTime.now())) return false;
-                  if (!_isValidDepartureDay(day)) return false;
-                  final dateKey = _getDateKey(day);
-                  return _availabilityCache[dateKey] ?? true;
-                },
-                onDaySelected: (selectedDay, focusedDay) {
-                  if (selectedDay.isBefore(DateTime.now())) return;
+    final isDarkMode = Provider.of<ThemeProvider>(context).isDarkMode;
+    return Container(
+      color: isDarkMode ? const Color(0xFF1A1A1A) : Colors.white,
+      child: SafeArea(
+        top: false,
+        bottom: true,
+        child: Scaffold(
+          appBar: AppBar(
+            title: Text('reservation_calendar.title'.tr()),
+          ),
+          body: SafeArea(
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  if (_isLoading) const LinearProgressIndicator(),
+                  TableCalendar(
+                    firstDay: DateTime.now(),
+                    lastDay: DateTime.now().add(const Duration(days: 365)),
+                    focusedDay: _focusedDay,
+                    selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
+                    enabledDayPredicate: (day) {
+                      if (day.isBefore(DateTime.now())) return false;
+                      if (!_isValidDepartureDay(day)) return false;
+                      final dateKey = _getDateKey(day);
+                      return _availabilityCache[dateKey] ?? true;
+                    },
+                    onDaySelected: (selectedDay, focusedDay) {
+                      if (selectedDay.isBefore(DateTime.now())) return;
 
-                  if (!_isValidDepartureDay(selectedDay)) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                          content: Text(
-                              'reservation_calendar.date.unavailable_error'
-                                  .tr())),
-                    );
-                    return;
-                  }
+                      if (!_isValidDepartureDay(selectedDay)) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                              content: Text(
+                                  'reservation_calendar.date.unavailable_error'
+                                      .tr())),
+                        );
+                        return;
+                      }
 
-                  final dateKey = _getDateKey(selectedDay);
-                  final isAvailable = _availabilityCache[dateKey] ?? true;
+                      final dateKey = _getDateKey(selectedDay);
+                      final isAvailable = _availabilityCache[dateKey] ?? true;
 
-                  if (isAvailable) {
-                    setState(() {
-                      _selectedDay = selectedDay;
-                      _focusedDay = focusedDay;
-                    });
-                  } else {
-                    if (mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                            content: Text(
-                                'reservation_calendar.date.booked_error'.tr())),
-                      );
-                    }
-                  }
-                },
-                onPageChanged: (focusedDay) {
-                  setState(() {
-                    _focusedDay = focusedDay;
-                    _availabilityCache.clear();
-                  });
-                  _preloadAvailability();
-                },
-                calendarBuilders: CalendarBuilders(
-                  defaultBuilder: (context, date, _) {
-                    bool isDepartureDay = _isValidDepartureDay(date);
-                    return Container(
-                      margin: EdgeInsets.all(4.w),
-                      decoration: BoxDecoration(
-                        color: isDepartureDay
-                            ? Colors.blue.shade50
-                            : Colors.grey.shade200,
-                        shape: BoxShape.circle,
-                      ),
-                      child: Center(
-                        child: Text(
-                          '${date.day}',
-                          style: TextStyle(
-                            color:
-                                isDepartureDay && !date.isBefore(DateTime.now())
+                      if (isAvailable) {
+                        setState(() {
+                          _selectedDay = selectedDay;
+                          _focusedDay = focusedDay;
+                        });
+                      } else {
+                        if (mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                                content: Text(
+                                    'reservation_calendar.date.booked_error'
+                                        .tr())),
+                          );
+                        }
+                      }
+                    },
+                    onPageChanged: (focusedDay) {
+                      setState(() {
+                        _focusedDay = focusedDay;
+                        _availabilityCache.clear();
+                      });
+                      _preloadAvailability();
+                    },
+                    calendarBuilders: CalendarBuilders(
+                      defaultBuilder: (context, date, _) {
+                        bool isDepartureDay = _isValidDepartureDay(date);
+                        return Container(
+                          margin: EdgeInsets.all(4.w),
+                          decoration: BoxDecoration(
+                            color: isDepartureDay
+                                ? Colors.blue.shade50
+                                : Colors.grey.shade200,
+                            shape: BoxShape.circle,
+                          ),
+                          child: Center(
+                            child: Text(
+                              '${date.day}',
+                              style: TextStyle(
+                                color: isDepartureDay &&
+                                        !date.isBefore(DateTime.now())
                                     ? Colors.black
                                     : Colors.grey,
+                              ),
+                            ),
                           ),
-                        ),
-                      ),
-                    );
-                  },
-                  selectedBuilder: (context, date, _) {
-                    return Container(
-                      margin: EdgeInsets.all(4.w),
-                      decoration: const BoxDecoration(
+                        );
+                      },
+                      selectedBuilder: (context, date, _) {
+                        return Container(
+                          margin: EdgeInsets.all(4.w),
+                          decoration: const BoxDecoration(
+                            color: Colors.blue,
+                            shape: BoxShape.circle,
+                          ),
+                          child: Center(
+                            child: Text(
+                              '${date.day}',
+                              style: const TextStyle(color: Colors.white),
+                            ),
+                          ),
+                        );
+                      },
+                      disabledBuilder: (context, date, _) {
+                        return Container(
+                          margin: EdgeInsets.all(4.w),
+                          decoration: BoxDecoration(
+                            color: Colors.grey.shade200,
+                            shape: BoxShape.circle,
+                          ),
+                          child: Center(
+                            child: Text(
+                              '${date.day}',
+                              style: const TextStyle(color: Colors.grey),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                    calendarStyle: CalendarStyle(
+                      selectedDecoration: const BoxDecoration(
                         color: Colors.blue,
                         shape: BoxShape.circle,
                       ),
-                      child: Center(
-                        child: Text(
-                          '${date.day}',
-                          style: const TextStyle(color: Colors.white),
-                        ),
-                      ),
-                    );
-                  },
-                  disabledBuilder: (context, date, _) {
-                    return Container(
-                      margin: EdgeInsets.all(4.w),
-                      decoration: BoxDecoration(
-                        color: Colors.grey.shade200,
+                      selectedTextStyle: const TextStyle(color: Colors.white),
+                      todayDecoration: BoxDecoration(
+                        border: Border.all(color: Colors.blue),
                         shape: BoxShape.circle,
                       ),
-                      child: Center(
-                        child: Text(
-                          '${date.day}',
-                          style: const TextStyle(color: Colors.grey),
-                        ),
-                      ),
-                    );
-                  },
-                ),
-                calendarStyle: CalendarStyle(
-                  selectedDecoration: const BoxDecoration(
-                    color: Colors.blue,
-                    shape: BoxShape.circle,
+                      todayTextStyle: const TextStyle(color: Colors.blue),
+                      disabledTextStyle: const TextStyle(color: Colors.grey),
+                      defaultDecoration:
+                          const BoxDecoration(shape: BoxShape.circle),
+                      weekendDecoration:
+                          const BoxDecoration(shape: BoxShape.circle),
+                      outsideDecoration:
+                          const BoxDecoration(shape: BoxShape.circle),
+                    ),
+                    headerStyle: const HeaderStyle(
+                      formatButtonVisible: false,
+                      titleCentered: true,
+                    ),
                   ),
-                  selectedTextStyle: const TextStyle(color: Colors.white),
-                  todayDecoration: BoxDecoration(
-                    border: Border.all(color: Colors.blue),
-                    shape: BoxShape.circle,
-                  ),
-                  todayTextStyle: const TextStyle(color: Colors.blue),
-                  disabledTextStyle: const TextStyle(color: Colors.grey),
-                  defaultDecoration:
-                      const BoxDecoration(shape: BoxShape.circle),
-                  weekendDecoration:
-                      const BoxDecoration(shape: BoxShape.circle),
-                  outsideDecoration:
-                      const BoxDecoration(shape: BoxShape.circle),
-                ),
-                headerStyle: const HeaderStyle(
-                  formatButtonVisible: false,
-                  titleCentered: true,
-                ),
-              ),
-              if (_selectedDay != null) ...[
-                Padding(
-                  padding: EdgeInsets.all(16.0.w),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'reservation_calendar.date.selected'.tr(namedArgs: {
-                          'date':
-                              DateFormat('yyyy년 MM월 dd일').format(_selectedDay!)
-                        }),
-                        style: TextStyle(
-                            fontSize: 18.sp, fontWeight: FontWeight.bold),
-                      ),
-                      SizedBox(height: 8.h),
-                      Text(
-                        'reservation_calendar.date.package'.tr(
-                            namedArgs: {'title': _getLocalizedTitle(context, widget.package)}
-                        ),
-                        style: TextStyle(fontSize: 16.sp),
-                      ),
-
-                      SizedBox(height: 4.h),
-                      Row(
+                  if (_selectedDay != null) ...[
+                    Padding(
+                      padding: EdgeInsets.all(16.0.w),
+                      child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'reservation_calendar.date.duration'.tr(namedArgs: {
-                              'nights': widget.package.nights.toString(),
-                              'days': (widget.package.nights + 1).toString()
+                            'reservation_calendar.date.selected'.tr(namedArgs: {
+                              'date': DateFormat('yyyy년 MM월 dd일')
+                                  .format(_selectedDay!)
+                            }),
+                            style: TextStyle(
+                                fontSize: 18.sp, fontWeight: FontWeight.bold),
+                          ),
+                          SizedBox(height: 8.h),
+                          Text(
+                            'reservation_calendar.date.package'.tr(namedArgs: {
+                              'title':
+                                  _getLocalizedTitle(context, widget.package)
                             }),
                             style: TextStyle(fontSize: 16.sp),
                           ),
-                          SizedBox(width: 10,),
-                          Expanded(
-                            child: Wrap(
-                              spacing: 4,
-                              runSpacing: 4,
-                              children: widget.package.departureDays.map((day) {
-                                final weekdayKey = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'][day - 1];
-                                return Container(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 8, vertical: 4),
-                                  decoration: BoxDecoration(
-                                    color: Colors.blue.shade50,
-                                    borderRadius: BorderRadius.circular(12),
-                                    border:
-                                        Border.all(color: Colors.blue.shade200),
-                                  ),
-                                  child: Text(
-                                    'reservation_calendar.date.weekdays.$weekdayKey'.tr(),
-                                    style: TextStyle(
-                                      fontSize: 14.sp,
-                                      color: Colors.blue.shade900,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                );
-                              }).toList(),
-                            ),
+                          SizedBox(height: 4.h),
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'reservation_calendar.date.duration'
+                                    .tr(namedArgs: {
+                                  'nights': widget.package.nights.toString(),
+                                  'days': (widget.package.nights + 1).toString()
+                                }),
+                                style: TextStyle(fontSize: 16.sp),
+                              ),
+                              const SizedBox(
+                                width: 10,
+                              ),
+                              Expanded(
+                                child: Wrap(
+                                  spacing: 4,
+                                  runSpacing: 4,
+                                  children:
+                                      widget.package.departureDays.map((day) {
+                                    final weekdayKey = [
+                                      'mon',
+                                      'tue',
+                                      'wed',
+                                      'thu',
+                                      'fri',
+                                      'sat',
+                                      'sun'
+                                    ][day - 1];
+                                    return Container(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 8, vertical: 4),
+                                      decoration: BoxDecoration(
+                                        color: Colors.blue.shade50,
+                                        borderRadius: BorderRadius.circular(12),
+                                        border: Border.all(
+                                            color: Colors.blue.shade200),
+                                      ),
+                                      child: Text(
+                                        'reservation_calendar.date.weekdays.$weekdayKey'
+                                            .tr(),
+                                        style: TextStyle(
+                                          fontSize: 14.sp,
+                                          color: Colors.blue.shade900,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    );
+                                  }).toList(),
+                                ),
+                              ),
+                            ],
                           ),
+                          SizedBox(height: 4.h),
+                          Text(
+                            'reservation_calendar.price'.tr(namedArgs: {
+                              'price': NumberFormat('#,###')
+                                  .format(widget.package.price.toInt())
+                            }),
+                            style: TextStyle(fontSize: 16.sp),
+                          ),
+                          SizedBox(height: 16.h),
+                          _buildParticipantSelector(),
                         ],
                       ),
-                      SizedBox(height: 4.h),
-                      Text(
-                        'reservation_calendar.price'.tr(
-                            namedArgs: {'price': NumberFormat('#,###').format(widget.package.price.toInt())}
-                        ),
-                        style: TextStyle(fontSize: 16.sp),
-                      ),
-                      SizedBox(height: 16.h),
-                      _buildParticipantSelector(),
-                    ],
-                  ),
-                ),
-              ],
-            ],
+                    ),
+                  ],
+                ],
+              ),
+            ),
           ),
+          bottomNavigationBar:
+              _selectedDay != null // 예약 버튼을 bottomNavigationBar로 이동
+                  ? Padding(
+                      padding: EdgeInsets.all(16.0.w),
+                      child: ElevatedButton(
+                        onPressed: () => _requestReservation(context),
+                        style: ElevatedButton.styleFrom(
+                          padding: EdgeInsets.symmetric(vertical: 16.h),
+                          minimumSize: Size(double.infinity, 50.h),
+                        ),
+                        child: Text(
+                          'reservation_calendar.submit'.tr(),
+                          style: TextStyle(fontSize: 16.sp),
+                        ),
+                      ),
+                    )
+                  : null,
         ),
       ),
-      bottomNavigationBar:
-          _selectedDay != null // 예약 버튼을 bottomNavigationBar로 이동
-              ? Padding(
-                  padding: EdgeInsets.all(16.0.w),
-                  child: ElevatedButton(
-                    onPressed: () => _requestReservation(context),
-                    style: ElevatedButton.styleFrom(
-                      padding: EdgeInsets.symmetric(vertical: 16.h),
-                      minimumSize: Size(double.infinity, 50.h),
-                    ),
-                    child: Text(
-                      'reservation_calendar.submit'.tr(),
-                      style: TextStyle(fontSize: 16.sp),
-                    ),
-                  ),
-                )
-              : null,
     );
   }
 

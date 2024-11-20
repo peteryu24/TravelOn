@@ -2,10 +2,11 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
+import 'package:go_router/go_router.dart';
+import 'package:travel_on_final/core/providers/theme_provider.dart';
 import '../widgets/package_list.dart';
 import '../widgets/region_filter.dart';
 import '../providers/travel_provider.dart';
-import 'package:travel_on_final/core/providers/theme_provider.dart';
 
 class DetailScreen extends StatefulWidget {
   const DetailScreen({super.key});
@@ -54,23 +55,27 @@ class _DetailScreenState extends State<DetailScreen> {
 
   // 검색창 위젯
   Widget _buildSearchField() {
+    final isDarkMode = Provider.of<ThemeProvider>(context).isDarkMode;
     return TextField(
       controller: _searchController,
       autofocus: true,
       decoration: InputDecoration(
         hintText: 'search.hint'.tr(),
         border: InputBorder.none,
-        hintStyle: TextStyle(color: Colors.grey[400]),
+        hintStyle:
+            TextStyle(color: isDarkMode ? Colors.grey[400] : Colors.grey[400]),
         contentPadding: EdgeInsets.symmetric(horizontal: 16.w),
         suffixIcon: IconButton(
-          icon: const Icon(Icons.clear),
+          icon: Icon(Icons.clear,
+              color: isDarkMode ? Colors.white : Colors.black),
           onPressed: () {
             _searchController.clear();
             context.read<TravelProvider>().clearSearch();
           },
         ),
       ),
-      style: TextStyle(color: Colors.black, fontSize: 16.0.sp),
+      style: TextStyle(
+          color: isDarkMode ? Colors.white : Colors.black, fontSize: 16.sp),
       onChanged: (query) {
         context.read<TravelProvider>().search(query);
       },
@@ -102,6 +107,7 @@ class _DetailScreenState extends State<DetailScreen> {
 
   // 검색 결과 카운트 위젯
   Widget _buildSearchInfo() {
+    final isDarkMode = Provider.of<ThemeProvider>(context).isDarkMode;
     return Consumer<TravelProvider>(
       builder: (context, provider, child) {
         if (provider.isLoading) {
@@ -112,7 +118,7 @@ class _DetailScreenState extends State<DetailScreen> {
           final matchCount = provider.packages.length;
           return Container(
             padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
-            color: Colors.grey[100],
+            color: isDarkMode ? Colors.grey[900] : Colors.grey[100],
             child: Row(
               children: [
                 Text(
@@ -120,7 +126,7 @@ class _DetailScreenState extends State<DetailScreen> {
                       .tr(namedArgs: {'count': matchCount.toString()}),
                   style: TextStyle(
                     fontSize: 14.sp,
-                    color: Colors.grey,
+                    color: isDarkMode ? Colors.grey[300] : Colors.grey,
                   ),
                 ),
                 const Spacer(),
@@ -131,7 +137,7 @@ class _DetailScreenState extends State<DetailScreen> {
                     }),
                     style: TextStyle(
                       fontSize: 14.sp,
-                      color: Colors.grey,
+                      color: isDarkMode ? Colors.grey[300] : Colors.grey,
                     ),
                   ),
               ],
@@ -142,14 +148,14 @@ class _DetailScreenState extends State<DetailScreen> {
         if (provider.selectedRegion != 'all') {
           return Container(
             padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
-            color: Colors.grey[100],
+            color: isDarkMode ? Colors.grey[900] : Colors.grey[100],
             child: Text(
               'search.selected_region'.tr(namedArgs: {
                 'region': _getRegionText(provider.selectedRegion)
               }),
               style: TextStyle(
                 fontSize: 14.sp,
-                color: Colors.grey,
+                color: isDarkMode ? Colors.grey[300] : Colors.grey,
               ),
             ),
           );
@@ -162,20 +168,28 @@ class _DetailScreenState extends State<DetailScreen> {
   // 메인 위젯 빌드
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Provider.of<ThemeProvider>(context).isDarkMode;
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: isDarkMode ? Colors.grey[900] : Colors.white,
         scrolledUnderElevation: 0,
         elevation: 0,
         centerTitle: true,
         leading: _isSearching
             ? IconButton(
-                icon: const Icon(Icons.arrow_back, color: Colors.black),
+                icon: Icon(Icons.arrow_back,
+                    color: isDarkMode ? Colors.white : Colors.black),
                 onPressed: _stopSearch,
               )
             : null,
-        title: Text(
-          'search.title'.tr(), // 이 부분이 "패키지 검색" 등으로 나오도록 translation 파일 확인 필요
-        ),
+        title: _isSearching
+            ? _buildSearchField()
+            : Text(
+                'search.title'.tr(),
+                style: TextStyle(
+                  color: isDarkMode ? Colors.white : Colors.black,
+                ),
+              ),
         actions: _buildActions(),
       ),
       body: Column(
@@ -216,6 +230,7 @@ class _DetailScreenState extends State<DetailScreen> {
         return Container(
           padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
           decoration: BoxDecoration(
+            color: isDarkMode ? Colors.grey[900] : Colors.white,
             border: Border(
               bottom: BorderSide(
                 color: isDarkMode ? Colors.grey[800]! : Colors.grey[200]!,
@@ -235,6 +250,7 @@ class _DetailScreenState extends State<DetailScreen> {
                     ),
                     builder: (context) {
                       return Container(
+                        color: isDarkMode ? Colors.grey[900] : Colors.white,
                         padding: EdgeInsets.symmetric(vertical: 20.h),
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
@@ -326,9 +342,11 @@ class _DetailScreenState extends State<DetailScreen> {
                   padding:
                       EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
                   decoration: BoxDecoration(
-                    color: Colors.grey[100],
+                    color: isDarkMode ? Colors.grey[800] : Colors.grey[100],
                     borderRadius: BorderRadius.circular(20.r),
-                    border: Border.all(color: Colors.grey[300]!),
+                    border: Border.all(
+                        color:
+                            isDarkMode ? Colors.grey[700]! : Colors.grey[300]!),
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
@@ -337,14 +355,15 @@ class _DetailScreenState extends State<DetailScreen> {
                         _getSortText(provider.currentSort)
                             .replaceAll('sort.', ''),
                         style: TextStyle(
-                          color: Colors.black,
+                          color: isDarkMode ? Colors.white : Colors.black,
                           fontSize: 14.sp,
                           fontWeight: FontWeight.w500,
                         ),
                       ),
                       SizedBox(width: 4.w),
                       Icon(Icons.arrow_drop_down,
-                          color: Colors.black, size: 20.sp),
+                          color: isDarkMode ? Colors.white : Colors.black,
+                          size: 20.sp),
                     ],
                   ),
                 ),

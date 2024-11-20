@@ -23,7 +23,6 @@ class _GallerySearchScreenState extends State<GallerySearchScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.white,
         scrolledUnderElevation: 0,
         elevation: 0,
         title: TextField(

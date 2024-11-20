@@ -197,7 +197,7 @@ class _TourismDensityWidgetState extends State<TourismDensityWidget> {
           ),
           SizedBox(height: 4.h),
           Text(
-            '${spot.location} · ${spot.category}',
+            '${spot.location} · ${categoryTranslate(spot.category)}',
             style: TextStyle(
               color: isDarkMode ? Colors.white70 : Colors.grey[600],
               fontSize: 12.sp,
@@ -237,16 +237,16 @@ class _TourismDensityWidgetState extends State<TourismDensityWidget> {
   }
 }
 
-// String categoryTranslate(String category) {
-//   if (category == 'palace') {
-//     return 'tourist_category.palace'.tr();
-//   } else if (category == 'beach') {
-//     return 'tourist_category.beach'.tr();
-//   } else if (category == 'nature') {
-//     return 'tourist_category.nature'.tr();
-//   } else if (category == 'observatory') {
-//     return 'tourist_category.observatory'.tr();
-//   } else {
-//     return 'tourist_category.attraction'.tr();
-//   }
-// }
+String categoryTranslate(String category) {
+  if (category == 'palace') {
+    return 'tourist_category.palace'.tr();
+  } else if (category == 'beach') {
+    return 'tourist_category.beach'.tr();
+  } else if (category == 'nature') {
+    return 'tourist_category.nature'.tr();
+  } else if (category == 'observatory') {
+    return 'tourist_category.observatory'.tr();
+  } else {
+    return 'tourist_category.attraction'.tr();
+  }
+}

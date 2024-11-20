@@ -241,7 +241,8 @@ class _HomeScreenState extends State<HomeScreen> {
               color: isDarkMode ? Colors.grey.shade800 : Colors.grey.shade100,
               borderRadius: BorderRadius.circular(12.r),
             ),
-            child: Icon(icon, color: AppColors.travelonBlueColor, size: 20.r),
+            child:
+                Icon(icon, color: AppColors.travelonLightBlueColor, size: 20.r),
           ),
         ),
         SizedBox(height: 4.h),
