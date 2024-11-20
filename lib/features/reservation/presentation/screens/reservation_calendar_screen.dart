@@ -3,6 +3,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';
@@ -42,6 +43,12 @@ class _ReservationCalendarScreenState extends State<ReservationCalendarScreen> {
     assert(widget.package.minParticipants > 0, 'Invalid minimum participants');
     _selectedParticipants = widget.package.minParticipants;
     _preloadAvailability();
+  }
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // locale 초기화를 여기서 수행
+    initializeDateFormatting(context.locale.languageCode);
   }
 
   // 헬퍼 메서드
@@ -276,6 +283,7 @@ class _ReservationCalendarScreenState extends State<ReservationCalendarScreen> {
             children: [
               if (_isLoading) const LinearProgressIndicator(),
               TableCalendar(
+                locale: context.locale.languageCode, // 현재 선택된 언어 적용
                 firstDay: DateTime.now(),
                 lastDay: DateTime.now().add(const Duration(days: 365)),
                 focusedDay: _focusedDay,
