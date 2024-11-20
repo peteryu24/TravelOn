@@ -122,7 +122,7 @@
     "region": "Region: {region}"
   },
   "sort": {
-    "latest": "Basic order",
+    "latest": "Latest",
     "price_high": "Highest Price",
     "price_low": "Lowest Price",
     "popular": "Popular",
@@ -341,7 +341,7 @@
   },
   "recommendation": {
     "title": "Travel Recommendations",
-    "empty": "I don't have any travel packages to recommend.Likes travel packages and get more recommendations!",
+    "empty": "I don't have any travel packages to recommend.\nLikes travel packages and get more recommendations!",
     "rank": "Rank {rank}"
   },
   "tourist_category": {
