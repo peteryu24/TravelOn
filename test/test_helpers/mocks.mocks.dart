@@ -121,6 +121,23 @@ class MockAuthProvider extends _i1.Mock implements _i2.AuthProvider {
       ) as _i3.Future<void>);
 
   @override
+  _i3.Future<void> deleteAccount(
+    _i4.BuildContext? context,
+    String? password,
+  ) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #deleteAccount,
+          [
+            context,
+            password,
+          ],
+        ),
+        returnValue: _i3.Future<void>.value(),
+        returnValueForMissingStub: _i3.Future<void>.value(),
+      ) as _i3.Future<void>);
+
+  @override
   _i3.Future<_i5.UserModel?> getUserById(String? userId) => (super.noSuchMethod(
         Invocation.method(
           #getUserById,
