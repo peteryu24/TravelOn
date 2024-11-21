@@ -49,7 +49,7 @@ class _UserSearchScreenState extends State<UserSearchScreen> {
           ),
           contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
           actions: [
-            TextButton(
+            ElevatedButton(
               onPressed: () => Navigator.pop(context),
               child: Text('취소'),
             ),
