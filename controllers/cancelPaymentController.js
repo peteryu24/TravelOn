@@ -3,9 +3,11 @@ const pool = require('../config/db');
 const { encryptedSecretKey } = require('../config/toss'); 
 
 const cancelPayment = async (req, res) => {
-  const { buyer, orderName, cancelReason } = req.body;
+  const { buyer, orderName, cancelReason, cancelAmount } = req.body;
 
-  if (!buyer || !orderName || !cancelReason) {
+  console.log('Request Data:', req.body);
+
+  if (!buyer || !orderName || !cancelReason || !cancelAmount) {
     return res.status(400).json({ error: '필수 정보가 누락되었습니다.' });
   }
 
@@ -27,22 +29,27 @@ const cancelPayment = async (req, res) => {
     const cancelUrl = `https://api.tosspayments.com/v1/payments/${paymentKey}/cancel`;
     const cancelResponse = await axios.post(
       cancelUrl,
-      { cancelReason },
+      { cancelReason, cancelAmount },
       {
         headers: {
-          'Authorization': encryptedSecretKey,
+          Authorization: encryptedSecretKey,
           'Content-Type': 'application/json',
         },
       }
     );
 
+    console.log('Toss Payments Response:', cancelResponse.data);
+
     if (cancelResponse.data.status === 'CANCELED') {
+      const cancelAmountValue = cancelAmount; // 기본값 설정
+
       const insertCancelQuery = `
         INSERT INTO cancel (
           payment_key, order_id, order_name, status, requested_at, approved_at, cancel_reason, cancel_amount, buyer
         ) 
         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
       `;
+
       const cancelValues = [
         cancelResponse.data.paymentKey,
         cancelResponse.data.orderId,
@@ -51,11 +58,18 @@ const cancelPayment = async (req, res) => {
         new Date(cancelResponse.data.requestedAt),
         new Date(cancelResponse.data.approvedAt),
         cancelReason,
-        cancelResponse.data.cancelAmount,  
-        buyer
+        cancelAmountValue, // null 방지
+        buyer,
       ];
 
-      await pool.query(insertCancelQuery, cancelValues);
+      console.log('Cancel Values for DB Insert:', cancelValues);
+
+      try {
+        await pool.query(insertCancelQuery, cancelValues);
+      } catch (dbError) {
+        console.error('DB Insert Error:', dbError.message);
+        return res.status(500).json({ error: '데이터베이스 삽입 중 오류가 발생했습니다.', details: dbError.message });
+      }
 
       const deleteQuery = `
         DELETE FROM payments
@@ -65,7 +79,7 @@ const cancelPayment = async (req, res) => {
 
       res.status(200).json({
         message: '결제 취소 성공 및 정보 저장 완료',
-        data: cancelResponse.data
+        data: cancelResponse.data,
       });
     } else {
       res.status(400).json({ error: 'Toss 결제 취소 실패' });
@@ -78,5 +92,6 @@ const cancelPayment = async (req, res) => {
     });
   }
 };
+
 
 module.exports = { cancelPayment };
