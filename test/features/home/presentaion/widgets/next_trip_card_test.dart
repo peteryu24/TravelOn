@@ -12,10 +12,12 @@ import 'package:travel_on_final/features/home/presentation/providers/home_provid
 import 'package:travel_on_final/features/home/presentation/widgets/next_trip_card.dart';
 import '../../../../test_helpers/mocks.mocks.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:travel_on_final/core/providers/theme_provider.dart';
 
 void main() {
   late MockAuthProvider mockAuthProvider;
   late MockHomeProvider mockHomeProvider;
+  late MockThemeProvider mockThemeProvider;
 
   setUpAll(() async {
     WidgetsFlutterBinding.ensureInitialized();
@@ -27,6 +29,7 @@ void main() {
   setUp(() {
     mockAuthProvider = MockAuthProvider();
     mockHomeProvider = MockHomeProvider();
+    mockThemeProvider = MockThemeProvider();
 
     when(mockHomeProvider.isLoading).thenReturn(false);
     when(mockHomeProvider.nextTrip).thenReturn(null);
@@ -55,6 +58,8 @@ void main() {
                     value: mockAuthProvider),
                 ChangeNotifierProvider<HomeProvider>.value(
                     value: mockHomeProvider),
+                ChangeNotifierProvider<ThemeProvider>.value(
+                    value: mockThemeProvider),
               ],
               child: const Scaffold(
                 body: Material(
@@ -89,4 +94,12 @@ void main() {
       expect(find.byType(CircularProgressIndicator), findsOneWidget);
     });
   });
+}
+
+class MockThemeProvider extends Mock implements ThemeProvider {
+  @override
+  ThemeMode get themeMode => ThemeMode.light;
+
+  @override
+  bool get isDarkMode => false;
 }
