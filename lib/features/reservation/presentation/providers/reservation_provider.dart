@@ -1,6 +1,5 @@
 import 'package:flutter/foundation.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:intl/intl.dart';
 import '../../data/models/reservation_model.dart';
 
 class ReservationProvider extends ChangeNotifier {

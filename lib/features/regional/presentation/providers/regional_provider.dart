@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:travel_on_final/features/regional/presentation/widgets/region_selector.dart';
 import '../../domain/repositories/regional_repository.dart';
 import '../../domain/entities/regional_spot.dart';
 import '../../../../core/error/failures.dart';

@@ -151,7 +151,7 @@
     }
   },
   "profile": {
-    "title": "마이 페이지",
+    "title": "마이페이지",
     "default_user": "사용자",
     "guide": {
       "section_title": "가이드 기능",

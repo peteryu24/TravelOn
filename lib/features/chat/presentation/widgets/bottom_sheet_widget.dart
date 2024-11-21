@@ -20,8 +20,6 @@ class BottomSheetWidget {
     required String username,
     double initialHeightFactor = 0.15,
   }) {
-    final chatProvider =
-        Provider.of<ChatProvider>(parentContext, listen: false);
     final isDarkMode =
         Provider.of<ThemeProvider>(parentContext, listen: false).isDarkMode;
 

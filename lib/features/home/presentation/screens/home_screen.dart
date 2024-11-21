@@ -17,7 +17,6 @@ import '../../../../core/providers/navigation_provider.dart';
 import '../../../../features/notification/presentation/screens/notification_center_screen.dart';
 import '../../../../features/notification/presentation/providers/notification_provider.dart';
 import '../../../../features/home/presentation/widgets/tourism_density_widget.dart';
-import 'package:travel_on_final/features/recommendation/presentation/screens/recommendation_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
