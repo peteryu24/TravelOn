@@ -3,15 +3,15 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
-import 'package:travel_on_final/features/auth/presentation/screens/login_screen.dart';
 import 'dart:io';
 import '../../../auth/presentation/providers/auth_provider.dart';
 
 class GuideCertificationScreen extends StatefulWidget {
-  const GuideCertificationScreen({Key? key}) : super(key: key);
+  const GuideCertificationScreen({super.key});
 
   @override
-  State<GuideCertificationScreen> createState() => _GuideCertificationScreenState();
+  State<GuideCertificationScreen> createState() =>
+      _GuideCertificationScreenState();
 }
 
 class _GuideCertificationScreenState extends State<GuideCertificationScreen> {
@@ -93,21 +93,21 @@ class _GuideCertificationScreenState extends State<GuideCertificationScreen> {
                 ),
                 child: _certificateImage != null
                     ? ClipRRect(
-                  borderRadius: BorderRadius.circular(8),
-                  child: Image.file(
-                    _certificateImage!,
-                    fit: BoxFit.cover,
-                    width: double.infinity,
-                  ),
-                )
+                        borderRadius: BorderRadius.circular(8),
+                        child: Image.file(
+                          _certificateImage!,
+                          fit: BoxFit.cover,
+                          width: double.infinity,
+                        ),
+                      )
                     : Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.add_photo_alternate, size: 50),
-                    SizedBox(height: 8.h),
-                    Text('자격증 사진 추가'),
-                  ],
-                ),
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(Icons.add_photo_alternate, size: 50),
+                          SizedBox(height: 8.h),
+                          const Text('자격증 사진 추가'),
+                        ],
+                      ),
               ),
             ),
             SizedBox(height: 24.h),
@@ -118,12 +118,12 @@ class _GuideCertificationScreenState extends State<GuideCertificationScreen> {
               ),
               child: _isLoading
                   ? SizedBox(
-                width: 20.w,
-                height: 20.h,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2,
-                ),
-              )
+                      width: 20.w,
+                      height: 20.h,
+                      child: const CircularProgressIndicator(
+                        strokeWidth: 2,
+                      ),
+                    )
                   : const Text('인증 신청'),
             ),
           ],

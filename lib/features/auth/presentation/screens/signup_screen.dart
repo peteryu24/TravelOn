@@ -5,11 +5,12 @@ import 'package:travel_on_final/features/auth/domain/usecases/signup_usecase.dar
 import 'package:travel_on_final/features/auth/presentation/providers/auth_provider.dart';
 import 'package:travel_on_final/features/auth/presentation/widgets/email_field_widget.dart';
 import 'package:travel_on_final/features/auth/presentation/widgets/password_field_widget.dart';
-import 'package:travel_on_final/features/auth/presentation/widgets/text_field_widget.dart';
 import 'package:travel_on_final/features/auth/presentation/helpers/dialog_helper.dart';
 import 'package:travel_on_final/features/auth/presentation/utils/validation.dart';
 
 class SignupScreen extends StatefulWidget {
+  const SignupScreen({super.key});
+
   @override
   _SignupScreenState createState() => _SignupScreenState();
 }
@@ -19,7 +20,8 @@ class _SignupScreenState extends State<SignupScreen> {
   final TextEditingController _emailIdController = TextEditingController();
   final TextEditingController _emailDomainController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _confirmPasswordController = TextEditingController();
+  final TextEditingController _confirmPasswordController =
+      TextEditingController();
 
   bool _isLoading = false;
   bool _isPasswordMatched = true;
@@ -33,9 +35,11 @@ class _SignupScreenState extends State<SignupScreen> {
 
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     final signupUseCase = SignupUseCase(authProvider);
-    final email = '${_emailIdController.text}@${_selectedDomain == '직접 입력' ? _emailDomainController.text : _selectedDomain}';
+    final email =
+        '${_emailIdController.text}@${_selectedDomain == '직접 입력' ? _emailDomainController.text : _selectedDomain}';
 
-    await signupUseCase.execute(email, _passwordController.text, _nameController.text);
+    await signupUseCase.execute(
+        email, _passwordController.text, _nameController.text);
     setState(() => _isLoading = false);
     DialogHelper.showEmailVerificationDialog(context);
   }
@@ -43,14 +47,16 @@ class _SignupScreenState extends State<SignupScreen> {
   // 닉네임 유효성 검사
   void _checkNameRequirements() {
     setState(() {
-      _isNameValid = _nameController.text.length >= 2 && _nameController.text.length <= 8;
+      _isNameValid =
+          _nameController.text.length >= 2 && _nameController.text.length <= 8;
     });
   }
 
   // 비밀번호 검증 메서드
   void _checkPasswordRequirements() {
     setState(() {
-      _isPasswordMatched = validatePasswordMatch(_passwordController.text, _confirmPasswordController.text);
+      _isPasswordMatched = validatePasswordMatch(
+          _passwordController.text, _confirmPasswordController.text);
       _isPasswordLengthValid = validatePasswordLength(_passwordController.text);
     });
   }
@@ -62,12 +68,13 @@ class _SignupScreenState extends State<SignupScreen> {
       body: SingleChildScrollView(
         padding: EdgeInsets.all(16.0.w),
         child: _isLoading
-            ? Center(child: CircularProgressIndicator())
+            ? const Center(child: CircularProgressIndicator())
             : Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Container(
-                    padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
+                    padding:
+                        EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
                     decoration: BoxDecoration(
                       border: Border.all(color: Colors.blue),
                       borderRadius: BorderRadius.circular(8.r),
@@ -77,9 +84,11 @@ class _SignupScreenState extends State<SignupScreen> {
                       onChanged: (_) => _checkNameRequirements(),
                       decoration: InputDecoration(
                         labelText: '닉네임',
-                        labelStyle: TextStyle(color: Colors.blue, fontSize: 14.sp),
+                        labelStyle:
+                            TextStyle(color: Colors.blue, fontSize: 14.sp),
                         border: InputBorder.none,
-                        errorText: !_isNameValid ? '닉네임은 2글자 이상 8글자 이하여야 합니다.' : null,
+                        errorText:
+                            !_isNameValid ? '닉네임은 2글자 이상 8글자 이하여야 합니다.' : null,
                       ),
                     ),
                   ),
@@ -87,7 +96,8 @@ class _SignupScreenState extends State<SignupScreen> {
                   EmailFieldWidget(
                     emailIdController: _emailIdController,
                     emailDomainController: _emailDomainController,
-                    onDomainSelected: (value) => setState(() => _selectedDomain = value),
+                    onDomainSelected: (value) =>
+                        setState(() => _selectedDomain = value),
                     selectedDomain: _selectedDomain,
                   ),
                   SizedBox(height: 16.h),
@@ -126,7 +136,8 @@ class _SignupScreenState extends State<SignupScreen> {
                       onPressed: _isFormValid ? _signup : null,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.blue[300],
-                        padding: EdgeInsets.symmetric(horizontal: 50, vertical: 16),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 50, vertical: 16),
                       ),
                       child: Text(
                         '회원가입',
@@ -145,7 +156,9 @@ class _SignupScreenState extends State<SignupScreen> {
     return _nameController.text.isNotEmpty &&
         _isNameValid &&
         _emailIdController.text.isNotEmpty &&
-        (_selectedDomain == '직접 입력' ? _emailDomainController.text.isNotEmpty : true) &&
+        (_selectedDomain == '직접 입력'
+            ? _emailDomainController.text.isNotEmpty
+            : true) &&
         _passwordController.text.isNotEmpty &&
         _confirmPasswordController.text.isNotEmpty &&
         _isPasswordMatched &&

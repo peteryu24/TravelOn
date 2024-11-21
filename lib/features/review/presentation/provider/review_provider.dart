@@ -1,10 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:provider/provider.dart';
 import 'package:travel_on_final/features/review/domain/entities/review.dart';
 import 'package:travel_on_final/features/review/domain/repositories/review_repository.dart';
-import 'package:travel_on_final/features/search/presentation/providers/travel_provider.dart';
 
 class ReviewProvider extends ChangeNotifier {
   final ReviewRepository _repository;
@@ -239,14 +237,14 @@ class ReviewProvider extends ChangeNotifier {
 
       // 다음으로 예약 확인
       final hasApprovedReservation =
-      await _repository.canUserReview(userId, packageId);
+          await _repository.canUserReview(userId, packageId);
       if (!hasApprovedReservation) {
-        return 'review.error.unauthorized'.tr();  // throw 대신 return
+        return 'review.error.unauthorized'.tr(); // throw 대신 return
       }
 
       return null;
     } catch (e) {
-      print('Review status check error: $e');  // 에러 로깅 추가
+      print('Review status check error: $e'); // 에러 로깅 추가
       return 'review.error.check_status'.tr();
     }
   }
