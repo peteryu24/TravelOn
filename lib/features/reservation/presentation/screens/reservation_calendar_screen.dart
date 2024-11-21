@@ -11,6 +11,10 @@ import 'package:travel_on_final/core/providers/theme_provider.dart';
 import 'package:travel_on_final/features/auth/presentation/providers/auth_provider.dart';
 import 'package:travel_on_final/features/reservation/presentation/providers/reservation_provider.dart';
 import 'package:travel_on_final/features/search/domain/entities/travel_package.dart';
+import 'package:tosspayments_widget_sdk_flutter/model/paymentData.dart';
+import 'package:get/route_manager.dart';
+import 'package:travel_on_final/features/payment/payment_entry.dart';
+import 'package:travel_on_final/features/payment/payment_process.dart';
 
 class ReservationCalendarScreen extends StatefulWidget {
   final TravelPackage package;
@@ -211,8 +215,9 @@ class _ReservationCalendarScreenState extends State<ReservationCalendarScreen> {
     if (_selectedParticipants < _minParticipants) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-            content: Text('reservation_calendar.participants.min_error'
-                .tr(namedArgs: {'min': _minParticipants.toString()}))),
+          content: Text('reservation_calendar.participants.min_error'
+              .tr(namedArgs: {'min': _minParticipants.toString()})),
+        ),
       );
       return;
     }
@@ -220,8 +225,9 @@ class _ReservationCalendarScreenState extends State<ReservationCalendarScreen> {
     if (_selectedParticipants > _maxParticipants) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-            content: Text('reservation_calendar.participants.max_error'
-                .tr(namedArgs: {'max': _maxParticipants.toString()}))),
+          content: Text('reservation_calendar.participants.max_error'
+              .tr(namedArgs: {'max': _maxParticipants.toString()})),
+        ),
       );
       return;
     }
@@ -229,16 +235,6 @@ class _ReservationCalendarScreenState extends State<ReservationCalendarScreen> {
     if (_selectedDay == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('reservation_calendar.date.select_error'.tr())),
-      );
-      return;
-    }
-
-    if (_selectedParticipants < widget.package.minParticipants ||
-        _selectedParticipants > widget.package.maxParticipants) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-            content:
-                Text('reservation_calendar.participants.invalid_error'.tr())),
       );
       return;
     }
@@ -256,11 +252,38 @@ class _ReservationCalendarScreenState extends State<ReservationCalendarScreen> {
         participants: _selectedParticipants,
       );
 
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('reservation_calendar.request.success'.tr())),
-        );
-        context.pop();
+      // Toss Payments 결제 화면으로 이동
+      PaymentData paymentData = PaymentData(
+        paymentMethod: '카드',
+        orderId: 'tosspaymentsFlutter_${DateTime.now().millisecondsSinceEpoch}',
+        orderName: widget.package.title,
+        amount: widget.package.price.toInt(),
+        customerName: authProvider.currentUser!.name,
+        customerEmail: authProvider.currentUser!.id,
+      );
+
+      final result = await Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => PaymentProcess(paymentData: paymentData),
+        ),
+      );
+
+      // 결제 성공 여부 확인 후 처리
+      if (result != null && result['success'] == true) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+                content: Text('reservation_calendar.request.success'.tr())),
+          );
+          context.pop(); // 이전 화면으로 돌아가기
+        }
+      } else {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(result?['message'] ?? '결제에 실패했습니다.')),
+          );
+        }
       }
     } catch (e) {
       if (mounted) {

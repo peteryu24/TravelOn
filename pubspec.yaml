@@ -27,6 +27,9 @@ dependencies:
   cached_network_image: ^3.4.1
   flutter_dotenv: ^5.2.1
 
+  tosspayments_widget_sdk_flutter: 2.0.0
+  get: ^4.6.6
+
   # 권한
   permission_handler: ^11.3.1
 

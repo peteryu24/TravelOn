@@ -49,6 +49,7 @@ import 'package:travel_on_final/features/regional/data/repositories/regional_rep
 import 'package:travel_on_final/route.dart';
 
 import 'package:kakao_flutter_sdk_common/kakao_flutter_sdk_common.dart';
+import 'package:get/get.dart'; // Get 패키지 추가
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -109,20 +110,13 @@ Future<void> main() async {
       fallbackLocale: const Locale('ko', 'KR'),
       child: MultiProvider(
         providers: [
-          // Firebase 서비스 프로바이더
           Provider<FirebaseAuth>.value(value: FirebaseAuth.instance),
           Provider<FirebaseFirestore>.value(value: FirebaseFirestore.instance),
           Provider<FirebaseMessaging>.value(value: FirebaseMessaging.instance),
-
-          // Repositories
           Provider<AuthRepository>(create: (_) => AuthRepositoryImpl()),
           Provider<GalleryRepository>(create: (_) => GalleryRepository()),
-
-          // Core Providers
           ChangeNotifierProvider(create: (_) => NavigationProvider()),
           ChangeNotifierProvider(create: (_) => WeatherProvider()),
-
-          // Auth 및 Travel 관련 Providers
           ProxyProvider<FirebaseAuth, ResetPasswordUseCase>(
             update: (_, auth, __) => ResetPasswordUseCase(auth),
           ),
@@ -139,8 +133,6 @@ Future<void> main() async {
               context.read<TravelProvider>(),
             ),
           ),
-
-          // Feature Providers
           ChangeNotifierProvider(
             create: (context) =>
                 ChatProvider(context.read<NavigationProvider>()),
@@ -170,7 +162,7 @@ Future<void> main() async {
             create: (context) => NotificationProvider(
               FirebaseFirestore.instance,
               FirebaseMessaging.instance,
-              context.read<NavigationProvider>(), // NavigationProvider 주입
+              context.read<NavigationProvider>(),
             ),
           ),
           ChangeNotifierProvider(create: (_) => RecommendationProvider()),
@@ -203,7 +195,7 @@ class MyApp extends StatelessWidget {
       child: MaterialApp.router(
         title: 'Travel On',
         debugShowCheckedModeBanner: false,
-        routerConfig: goRouter,
+        routerConfig: goRouter, // 여전히 go_router 사용
         localizationsDelegates: context.localizationDelegates,
         supportedLocales: context.supportedLocales,
         locale: context.locale,
@@ -212,44 +204,6 @@ class MyApp extends StatelessWidget {
           colorScheme: ColorScheme.fromSeed(
             seedColor: AppColors.travelonLightBlueColor,
             brightness: Brightness.light,
-            background: Colors.white,
-            surface: Colors.white,
-            primary: AppColors.travelonLightBlueColor,
-            secondary: Colors.blueAccent,
-            onSurface: Colors.black87,
-            onPrimary: Colors.white,
-          ),
-          elevatedButtonTheme: ElevatedButtonThemeData(
-            style: ButtonStyle(
-              backgroundColor:
-                  WidgetStateProperty.all(AppColors.travelonLightBlueColor),
-              foregroundColor: WidgetStateProperty.all(Colors.white),
-              textStyle: WidgetStateProperty.all(
-                const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  inherit: true,
-                ),
-              ),
-              padding: WidgetStateProperty.all(
-                const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              ),
-            ),
-          ),
-          cardTheme: const CardTheme(
-            elevation: 2,
-            margin: EdgeInsets.symmetric(vertical: 4),
-            color: Colors.white,
-          ),
-          appBarTheme: const AppBarTheme(
-            backgroundColor: Colors.white,
-            foregroundColor: Colors.black,
-            elevation: 0,
-            iconTheme: IconThemeData(color: Colors.black),
-          ),
-          bottomNavigationBarTheme: const BottomNavigationBarThemeData(
-            backgroundColor: Colors.white,
-            selectedItemColor: AppColors.travelonLightBlueColor,
-            unselectedItemColor: Colors.grey,
           ),
         ),
         darkTheme: ThemeData(
@@ -257,63 +211,6 @@ class MyApp extends StatelessWidget {
           colorScheme: ColorScheme.fromSeed(
             seedColor: AppColors.travelonBlueColor,
             brightness: Brightness.dark,
-            background: const Color(0xFF1A1A1A),
-            surface: const Color(0xFF2C2C2C),
-            primary: AppColors.travelonBlueColor,
-            secondary: Colors.blueAccent,
-            onSurface: Colors.white,
-            onPrimary: Colors.white,
-            onBackground: Colors.white,
-          ),
-          scaffoldBackgroundColor: const Color(0xFF1A1A1A),
-          cardTheme: CardTheme(
-            elevation: 2,
-            margin: const EdgeInsets.symmetric(vertical: 4),
-            color: const Color(0xFF2C2C2C),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
-          ),
-          appBarTheme: const AppBarTheme(
-            backgroundColor: Color(0xFF1A1A1A),
-            foregroundColor: Colors.white,
-            elevation: 0,
-            iconTheme: IconThemeData(color: Colors.white70),
-          ),
-          iconTheme: const IconThemeData(
-            color: Colors.white70,
-          ),
-          textTheme: const TextTheme(
-            bodyLarge: TextStyle(color: Colors.white),
-            bodyMedium: TextStyle(color: Colors.white70),
-            titleLarge: TextStyle(color: Colors.white),
-            titleMedium: TextStyle(color: Colors.white),
-            titleSmall: TextStyle(color: Colors.white70),
-          ),
-          dividerTheme: const DividerThemeData(
-            color: Colors.white24,
-          ),
-          elevatedButtonTheme: ElevatedButtonThemeData(
-            style: ButtonStyle(
-              backgroundColor:
-                  WidgetStateProperty.all(AppColors.travelonBlueColor),
-              foregroundColor: WidgetStateProperty.all(Colors.white),
-              textStyle: WidgetStateProperty.all(
-                const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  inherit: true,
-                ),
-              ),
-              padding: WidgetStateProperty.all(
-                const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              ),
-            ),
-          ),
-          bottomNavigationBarTheme: const BottomNavigationBarThemeData(
-            backgroundColor: Color(0xFF1A1A1A),
-            selectedItemColor: AppColors.travelonBlueColor,
-            unselectedItemColor: Colors.grey,
-            elevation: 0,
           ),
         ),
         themeMode: isDarkMode ? ThemeMode.dark : ThemeMode.light,
@@ -322,7 +219,6 @@ class MyApp extends StatelessWidget {
   }
 }
 
-// 백그라운드 메시지 핸들러
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);

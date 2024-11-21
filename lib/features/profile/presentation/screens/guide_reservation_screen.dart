@@ -1,38 +1,43 @@
+import 'dart:convert';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import '../../../reservation/presentation/providers/reservation_provider.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
+import 'package:http/http.dart' as http;
 
 class GuideReservationsScreen extends StatefulWidget {
   const GuideReservationsScreen({super.key});
 
   @override
-  State<GuideReservationsScreen> createState() => _GuideReservationsScreenState();
+  State<GuideReservationsScreen> createState() =>
+      _GuideReservationsScreenState();
 }
 
-class _GuideReservationsScreenState extends State<GuideReservationsScreen> with SingleTickerProviderStateMixin {
-  late TabController _tabController;  // TabController 추가
+class _GuideReservationsScreenState extends State<GuideReservationsScreen>
+    with SingleTickerProviderStateMixin {
+  late TabController _tabController; // TabController 추가
 
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 3, vsync: this);  // TabController 초기화
+    _tabController = TabController(length: 3, vsync: this); // TabController 초기화
     _loadReservations();
   }
 
   @override
   void dispose() {
-    _tabController.dispose();  // TabController 해제
+    _tabController.dispose(); // TabController 해제
     super.dispose();
   }
 
   Future<void> _loadReservations() async {
     final userId = context.read<AuthProvider>().currentUser!.id;
-    await context.read<ReservationProvider>().loadReservations(userId, isGuide: true);
+    await context
+        .read<ReservationProvider>()
+        .loadReservations(userId, isGuide: true);
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -40,7 +45,7 @@ class _GuideReservationsScreenState extends State<GuideReservationsScreen> with 
       appBar: AppBar(
         title: const Text('예약 관리'),
         bottom: TabBar(
-          controller: _tabController,  // TabController 연결
+          controller: _tabController, // TabController 연결
           tabs: const [
             Tab(text: '대기중'),
             Tab(text: '승인됨'),
@@ -51,7 +56,7 @@ class _GuideReservationsScreenState extends State<GuideReservationsScreen> with 
       body: Consumer<ReservationProvider>(
         builder: (context, provider, child) {
           return TabBarView(
-            controller: _tabController,  // TabController 연결
+            controller: _tabController, // TabController 연결
             children: [
               _buildReservationList(provider, 'pending'),
               _buildReservationList(provider, 'approved'),
@@ -64,9 +69,8 @@ class _GuideReservationsScreenState extends State<GuideReservationsScreen> with 
   }
 
   Widget _buildReservationList(ReservationProvider provider, String status) {
-    final reservations = provider.reservations
-        .where((res) => res.status == status)
-        .toList();
+    final reservations =
+        provider.reservations.where((res) => res.status == status).toList();
 
     if (reservations.isEmpty) {
       return const Center(
@@ -113,6 +117,7 @@ class _GuideReservationsScreenState extends State<GuideReservationsScreen> with 
                         onPressed: () => _updateReservationStatus(
                           reservation.id,
                           'rejected',
+                          reservation, // 예약 정보 전달
                         ),
                         child: const Text('거절'),
                       ),
@@ -121,6 +126,7 @@ class _GuideReservationsScreenState extends State<GuideReservationsScreen> with 
                         onPressed: () => _updateReservationStatus(
                           reservation.id,
                           'approved',
+                          reservation, // 예약 정보 전달
                         ),
                         child: const Text('승인'),
                       ),
@@ -134,39 +140,48 @@ class _GuideReservationsScreenState extends State<GuideReservationsScreen> with 
     );
   }
 
-  Future<void> _updateReservationStatus(String reservationId, String status) async {
+  Future<void> _updateReservationStatus(
+      String reservationId, String status, dynamic reservation) async {
     try {
-      await context.read<ReservationProvider>().updateReservationStatus(
-        reservationId,
-        status,
-      );
+      // 결제 취소 API 호출
+      if (status == 'rejected') {
+        await _cancelPayment(
+          buyer: reservation.customerName, // 구매자 이름
+          orderName: reservation.packageTitle, // 주문 이름
+          cancelReason: '거절됨',
+          cancelAmount: reservation.price.toInt(), // 취소 금액 추가
+        );
+      }
 
-      // 상태 업데이트 후 즉시 예약 목록 다시 로드
+      await context.read<ReservationProvider>().updateReservationStatus(
+            reservationId,
+            status,
+          );
+
+      // 상태 업데이트 후 예약 목록 다시 로드
       if (mounted) {
         final userId = context.read<AuthProvider>().currentUser!.id;
-        await context.read<ReservationProvider>().loadReservations(userId, isGuide: true);
+        await context
+            .read<ReservationProvider>()
+            .loadReservations(userId, isGuide: true);
 
         // 상태에 따라 탭 변경
-        if (mounted) {
-          if (status == 'approved') {
-            _tabController.animateTo(1);  // 승인됨 탭으로 이동
-          } else if (status == 'rejected') {
-            _tabController.animateTo(2);  // 거절됨 탭으로 이동
-          }
+        if (status == 'approved') {
+          _tabController.animateTo(1); // 승인됨 탭으로 이동
+        } else if (status == 'rejected') {
+          _tabController.animateTo(2); // 거절됨 탭으로 이동
         }
 
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(
-                'reservations.notification.message.reservation_change'.tr(
-                    namedArgs: {
-                      'package': '',  // 패키지명이 필요 없다면 빈 문자열
-                      'status': status == 'approved'
-                          ? 'reservations.status.approved'.tr()
-                          : 'reservations.status.rejected'.tr()
-                    }
-                )
-            ),          ),
+            content: Text('reservations.notification.message.reservation_change'
+                .tr(namedArgs: {
+              'package': '',
+              'status': status == 'approved'
+                  ? 'reservations.status.approved'.tr()
+                  : 'reservations.status.rejected'.tr()
+            })),
+          ),
         );
       }
     } catch (e) {
@@ -177,6 +192,41 @@ class _GuideReservationsScreenState extends State<GuideReservationsScreen> with 
           ),
         );
       }
+    }
+  }
+
+  Future<void> _cancelPayment({
+    required String buyer,
+    required String orderName,
+    required String cancelReason,
+    required int cancelAmount, // 취소 금액 추가
+  }) async {
+    final apiUrl = 'http://10.0.2.2:4000/cancelPayment';
+
+    try {
+      final body = {
+        'buyer': buyer,
+        'orderName': orderName,
+        'cancelReason': cancelReason,
+        'cancelAmount': cancelAmount, // 취소 금액 전달
+      };
+
+      // 전달할 데이터 출력
+      print('Sending Cancel Payment Request: $body');
+
+      final response = await http.post(
+        Uri.parse(apiUrl),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode(body),
+      );
+
+      if (response.statusCode == 200) {
+        print('결제 취소 성공: ${response.body}');
+      } else {
+        print('결제 취소 실패: ${response.body}');
+      }
+    } catch (e) {
+      print('결제 취소 중 오류 발생: $e');
     }
   }
 }
