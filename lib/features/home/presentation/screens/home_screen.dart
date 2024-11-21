@@ -173,7 +173,8 @@ class _HomeScreenState extends State<HomeScreen> {
                       children: [
                         Text(
                           'common.see_more'.tr(), // 여기를 확인
-                          style: const TextStyle(color: Colors.blueAccent),
+                          style: const TextStyle(
+                              color: AppColors.travelonBlueColor),
                         ),
                         Icon(Icons.chevron_right, color: Colors.grey.shade600),
                       ],
