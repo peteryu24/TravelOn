@@ -8,13 +8,7 @@ CREATE TABLE public.payments
   approved_at timestamp without time zone NOT NULL, -- 결제 승인 시간
   buyer character varying(255), -- 구매자 성명
   CONSTRAINT payments_pkey PRIMARY KEY (payment_key)
-)
-WITH (
-  OIDS=FALSE
 );
-
-ALTER TABLE public.payments
-  OWNER TO postgres;
 
 COMMENT ON TABLE public.payments
   IS '결제 성공 테이블';
