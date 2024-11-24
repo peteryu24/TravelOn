@@ -202,7 +202,6 @@ class _ReservationCalendarScreenState extends State<ReservationCalendarScreen> {
   // 예약 처리
   void _requestReservation(BuildContext context) async {
     final authProvider = context.read<AuthProvider>();
-    final reservationProvider = context.read<ReservationProvider>();
 
     if (!authProvider.isAuthenticated) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -239,38 +238,39 @@ class _ReservationCalendarScreenState extends State<ReservationCalendarScreen> {
       return;
     }
 
-    try {
-      await reservationProvider.createReservation(
-        packageId: widget.package.id,
-        packageTitle: widget.package.title,
-        customerId: authProvider.currentUser!.id,
-        customerName: authProvider.currentUser!.name,
-        guideName: widget.package.guideName,
-        guideId: widget.package.guideId,
-        reservationDate: _selectedDay!,
-        price: widget.package.price,
-        participants: _selectedParticipants,
-      );
+    // 결제 데이터를 생성
+    PaymentData paymentData = PaymentData(
+      paymentMethod: '카드',
+      orderId: 'tosspaymentsFlutter_${DateTime.now().millisecondsSinceEpoch}',
+      orderName: widget.package.title,
+      amount: (widget.package.price * _selectedParticipants).toInt(),
+      customerName: authProvider.currentUser!.name,
+      customerEmail: authProvider.currentUser!.id,
+    );
 
-      // Toss Payments 결제 화면으로 이동
-      PaymentData paymentData = PaymentData(
-        paymentMethod: '카드',
-        orderId: 'tosspaymentsFlutter_${DateTime.now().millisecondsSinceEpoch}',
-        orderName: widget.package.title,
-        amount: widget.package.price.toInt(),
-        customerName: authProvider.currentUser!.name,
-        customerEmail: authProvider.currentUser!.id,
-      );
+    // 결제 프로세스로 이동
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => PaymentProcess(paymentData: paymentData),
+      ),
+    );
 
-      final result = await Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => PaymentProcess(paymentData: paymentData),
-        ),
-      );
+    // 결제가 성공하면 예약 요청
+    if (result != null && result['success'] == true) {
+      try {
+        await context.read<ReservationProvider>().createReservation(
+              packageId: widget.package.id,
+              packageTitle: widget.package.title,
+              customerId: authProvider.currentUser!.id,
+              customerName: authProvider.currentUser!.name,
+              guideName: widget.package.guideName,
+              guideId: widget.package.guideId,
+              reservationDate: _selectedDay!,
+              price: widget.package.price,
+              participants: _selectedParticipants,
+            );
 
-      // 결제 성공 여부 확인 후 처리
-      if (result != null && result['success'] == true) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
@@ -278,19 +278,20 @@ class _ReservationCalendarScreenState extends State<ReservationCalendarScreen> {
           );
           context.pop(); // 이전 화면으로 돌아가기
         }
-      } else {
+      } catch (e) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(result?['message'] ?? '결제에 실패했습니다.')),
+            SnackBar(
+                content: Text('reservation_calendar.request.error'
+                    .tr(namedArgs: {'error': e.toString()}))),
           );
         }
       }
-    } catch (e) {
+    } else {
+      // 결제가 실패한 경우
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-              content: Text('reservation_calendar.request.error'
-                  .tr(namedArgs: {'error': e.toString()}))),
+          SnackBar(content: Text(result?['message'] ?? '결제에 실패했습니다.')),
         );
       }
     }
