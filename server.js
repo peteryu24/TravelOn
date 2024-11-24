@@ -8,6 +8,11 @@ require('dotenv').config();
 app.use(express.json());
 app.use(cors());
 
+app.get('/healthz', (req, res) => {
+  res.status(200).send('OK');
+});
+
+
 app.use('/confirm', require('./routes/confirm'));
 app.use('/verifyPayment', require('./routes/verifyPayment'));
 app.use('/cancelPayment', require('./routes/cancelPayment'));
